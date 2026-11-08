@@ -55,11 +55,6 @@ Work in the order listed. A milestone closes only after these steps, in order:
 
 ### Milestone 1: dashboard visible
 
-### serve-build
-- **Goal:** Serve the built front end from Express with a strict content security policy.
-- **Files:** `server/app.ts`, `server/index.ts`, `package.json`, `tests/server/static.test.ts`
-- **Definition of done:** `tests/server/static.test.ts` passes: the index is served with the CSP header; API routes are not shadowed; the CSP blocks remote scripts, styles, fonts, and connections.
-
 ### public-safety-test
 - **Goal:** Fail the test suite when public-repo rules are broken in `dashboard/`.
 - **Files:** `tests/public-safety.test.ts`
@@ -315,6 +310,12 @@ _None._
 - **Files:** `src/views/PlanView.tsx`, `src/views/PlanView.css`, `src/App.tsx`, `tests/client/plan-view.test.tsx`, `tests/client/sidebar.test.tsx`, `tests/app.test.tsx`
 - **Definition of done:** `tests/client/plan-view.test.tsx` passes: tasks appear in the right column under their milestone; the source selector reloads data; the run log renders; empty and error states render.
 - **Result:** done. 343 tests pass, typecheck and build clean. All four views are real now.
+
+### serve-build
+- **Goal:** Serve the built front end from Express with a strict content security policy.
+- **Files:** `server/static.ts`, `server/app.ts`, `server/index.ts`, `package.json`, `tests/server/static.test.ts`, `tests/server/health.test.ts`
+- **Definition of done:** `tests/server/static.test.ts` passes: the index is served with the CSP header; API routes are not shadowed; the CSP blocks remote scripts, styles, fonts, and connections.
+- **Result:** done. 365 tests pass, typecheck and build clean. The Host allowlist now follows the configured `PORT`, and `npm start` serves the built front end.
 
 ## Phase 2: real agent execution
 

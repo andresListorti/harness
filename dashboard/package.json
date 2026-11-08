@@ -6,6 +6,7 @@
     "dev": "vite",
     "dev:server": "tsx server/index.ts",
     "start:server": "tsx server/index.ts",
+    "start": "tsx server/index.ts",
     "build": "tsc --noEmit && vite build",
     "test": "vitest run",
     "typecheck": "tsc --noEmit"
