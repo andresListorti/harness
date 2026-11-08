@@ -112,6 +112,42 @@ const suggestionList = LOCAL_SUGGESTIONS.map(question => '- ' + question).join('
 const unsupported = "I can't do that. " + CAPABILITY_NOTICE
   + '\nI can answer:\n' + suggestionList;
 
+test('knowing about pending tasks does not select the in-progress intent', () => {
+  const reply = answerLocally('Do you know what is pending?', context);
+  expect(reply).toMatch(/^Pending tasks:/);
+  expect(reply).not.toContain('Read plan');
+});
+
+test.each([
+  'What is unknown here?', 'unknown', 'Is the unknown clear?', 'Anything unknown?',
+  'I know', 'knowledge base', 'nowhere', 'Is there any leftover?', 'nextdoor',
+  'commitment', 'a pendingness', 'currency', 'currentlyness', 'currentness',
+  'épending', 'pendingé', '2pending', 'pending2', '_pending', 'pending_item',
+  'in progressness', 'what is run logger?',
+])('requires whole words and phrases: %s', message => {
+  const reply = answerLocally(message, context);
+  expect(reply).toBe("I didn't understand that. " + CAPABILITY_NOTICE
+    + '\nI can answer:\n' + suggestionList);
+  for (const suggestion of LOCAL_SUGGESTIONS) expect(reply).toContain(suggestion);
+});
+
+test.each([
+  ['What is pending?', 'Pending tasks: 2'], ['pending', 'Pending tasks: 2'],
+  ['PENDING!', 'Pending tasks: 2'], ['Which commits are the latest?', 'abcdef1'],
+  ['commit', unsupported], ['show the latest commits', 'abcdef1'],
+  ['What is in progress?', '- Read plan'], ['what is currently happening', '- Read plan'],
+  ['what is happening now', '- Read plan'], ['now', '- Read plan'],
+  ["what's current?", '- Read plan'], ['what is next', 'Pending tasks: 2'],
+  ['what is left', 'Pending tasks: 2'], ['to do', 'Pending tasks: 2'],
+  ['todo', 'Pending tasks: 2'], ['todos', 'Pending tasks: 2'],
+  ['Do you know what is in progress?', '- Read plan'], ['run logs', 'D1. latest'],
+  ['last run', 'D1. latest'], ['How are the tests?', 'Tracked test files: 2'],
+  ['test status', 'Tracked test files: 2'], ['in   progress', '- Read plan'],
+  ['(pending)', 'Pending tasks: 2'], ['is commit recorded?', 'abcdef1'],
+])('preserves real keyword uses and action priority: %s', (message, expected) => {
+  expect(answerLocally(message, context)).toContain(expected);
+});
+
 function expectPlainText(reply: string): void {
   expect(reply).not.toContain('**');
   expect(reply).not.toContain('`');

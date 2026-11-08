@@ -504,3 +504,17 @@ Dependencies were installed by the orchestrator once, during task 1, because the
 - **Orchestrator review of attempt 1:** probing 33 phrases through the real function showed that the verb-first rule wrongly treated short read-only phrases as actions, including one regression (`run log` used to return the latest run): `test status`, `build status`, `commit history`, `update status`, and `open tasks` were also rejected.
 - **Attempt 2:** the orchestrator sent the probe results back. Codex exempted verb-first messages whose next word is a read-only noun (`log`, `status`, `history`, `results`, `summary`, and similar), removed `open` from the verb list, and added a test table for these phrases. Duration of attempt 2: 1m 52s.
 - **Orchestrator check:** a second probe of 53 phrases classified every one as expected (18 actions, 28 questions answered, 7 not understood); `npm test` passed (28 files, 545 tests), `npm run typecheck` was clean, and `npm run build` passed.
+
+## D34. chat-word-boundaries
+
+| | |
+|---|---|
+| Branch | `task/chat-word-boundaries` |
+| Codex attempts | 1 |
+| Codex model | not reported |
+| Duration | 1m 35s |
+| Result | Done |
+
+- **Why:** the `/codex:review` of Milestone 1 reported one P2 finding: the chat matched intent keywords as substrings, so `now` matched inside `know` and `unknown` (for example "Do you know what is pending?" returned the in-progress answer).
+- **Attempt 1:** Codex replaced the substring helper with a whole-word matcher (Unicode-aware word boundaries, an optional trailing `s`, flexible spaces inside phrases) and added `currently` to the in-progress keywords. Intent order, replies, and action detection are unchanged. It added tests for the reported question, for questions that only contain `unknown`, for look-alikes (`nowhere`, `leftover`, `commitment`, `currency`), and for real keywords with plurals, capitals, and punctuation. Its first run after adding two extra cases failed on existing normalization behavior and it fixed that within the same attempt.
+- **Orchestrator check:** probing 42 phrases through the real function gave the expected classification for all of them; a bare `commit` stays an action request under the unchanged verb-first rule, while `commits` returns the commit list. `npm test` passed (28 files, 592 tests), `npm run typecheck` was clean, and `npm run build` passed.
