@@ -55,11 +55,6 @@ Work in the order listed. A milestone closes only after these steps, in order:
 
 ### Milestone 1: dashboard visible
 
-### runlog-parser
-- **Goal:** Parse `docs/run-log.md` into entries, separating example-app entries (`## 1. name`) from dashboard entries (`## D1. name`).
-- **Files:** `server/data/runlog.ts`, `tests/server/runlog.test.ts`
-- **Definition of done:** `tests/server/runlog.test.ts` passes: branch, attempts, result, and notes are extracted; non-entry sections are ignored; malformed input does not throw.
-
 ### git-reader
 - **Goal:** Read recent commits and tracked test files with fixed `git` arguments.
 - **Files:** `server/data/git.ts`, `tests/server/git.test.ts`
@@ -299,6 +294,12 @@ _None._
 - **Files:** `server/data/plan.ts`, `tests/server/plan.test.ts`
 - **Definition of done:** `tests/server/plan.test.ts` passes: goal, files, definition of done, and result are extracted; `_None._` gives an empty column; a level-3 heading with no task fields is kept as the milestone group of the tasks after it; the Phase 2 section is excluded; malformed input does not throw.
 - **Result:** done. 105 tests pass, typecheck and build clean.
+
+### runlog-parser
+- **Goal:** Parse `docs/run-log.md` into entries, separating example-app entries (`## 1. name`) from dashboard entries (`## D1. name`).
+- **Files:** `server/data/runlog.ts`, `tests/server/runlog.test.ts`
+- **Definition of done:** `tests/server/runlog.test.ts` passes: branch, attempts, result, and notes are extracted; non-entry sections are ignored; malformed input does not throw.
+- **Result:** done. 121 tests pass, typecheck and build clean.
 
 ## Phase 2: real agent execution
 
