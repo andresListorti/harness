@@ -55,11 +55,6 @@ Work in the order listed. A milestone closes only after these steps, in order:
 
 ### Milestone 1: dashboard visible
 
-### home-view
-- **Goal:** Compose the orb, spaced "H A R N E S S" title, subtitle, and chat.
-- **Files:** `src/views/HomeView.tsx`, `tests/client/home-view.test.tsx`
-- **Definition of done:** `tests/client/home-view.test.tsx` passes: orb, title, subtitle, and chat render.
-
 ### agents-view
 - **Goal:** Add the historical agent card grid with a 1, 2x2, and 3x3 selector.
 - **Files:** `src/views/AgentsView.tsx`, `tests/client/agents-view.test.tsx`
@@ -310,6 +305,12 @@ _None._
 - **Files:** `src/components/ChatPanel.tsx`, `src/components/ChatPanel.css`, `tests/client/chat-panel.test.tsx`
 - **Definition of done:** `tests/client/chat-panel.test.tsx` passes: sending calls the API and shows the reply; suggestions send their text; New chat clears history; HTML in a reply renders as literal text; errors are shown; Send is disabled while waiting.
 - **Result:** done. 262 tests pass, typecheck and build clean.
+
+### home-view
+- **Goal:** Compose the orb, spaced "H A R N E S S" title, subtitle, and chat.
+- **Files:** `src/views/HomeView.tsx`, `src/views/HomeView.css`, `src/App.tsx`, `tests/client/home-view.test.tsx`, `tests/app.test.tsx`, `tests/client/sidebar.test.tsx`
+- **Definition of done:** `tests/client/home-view.test.tsx` passes: orb, title, subtitle, and chat render.
+- **Result:** done. 266 tests pass, typecheck and build clean.
 
 ## Phase 2: real agent execution
 

@@ -299,3 +299,14 @@ Dependencies were installed by the orchestrator once, during task 1, because the
 
 - **Attempt 1:** Codex wrote `ChatPanel` with an injectable client: suggestion chips loaded from `GET /api/chat/suggestions`, Send (button or Enter), New chat that invalidates any in-flight request, a "Local answer" label on replies, a "Thinking…" indicator, a `role="alert"` error that never shows a raw response body, and plain-text rendering with preserved line breaks so HTML in a reply stays literal. No microphone, voice, hands-free, or model controls exist yet. `tests/client/chat-panel.test.tsx` covers these cases, including a late reply after New chat and after unmount.
 - **Orchestrator check:** reviewed the code and confirmed the ellipsis is stored as proper UTF-8; `npm test` passed (16 files, 262 tests), `npm run typecheck` was clean, and `npm run build` passed.
+
+## D17. home-view
+
+| | |
+|---|---|
+| Branch | `task/home-view` |
+| Codex attempts | 1 |
+| Result | Done |
+
+- **Attempt 1:** Codex wrote `HomeView` (orb, title, subtitle, and the chat panel with a bounded height) and wired it into `App.tsx` for the Harness view; the other three views are still placeholders. The "H A R N E S S" look comes only from CSS (`text-transform: uppercase`, wide letter-spacing, compensating padding) while the heading text stays "Harness", so its accessible name and the existing tests are unchanged. `tests/client/home-view.test.tsx` covers the composition, and two existing tests were adjusted to mock the chat API calls.
+- **Orchestrator check:** reviewed the code; `npm test` passed (17 files, 266 tests), `npm run typecheck` was clean, and `npm run build` passed.
