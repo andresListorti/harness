@@ -10,11 +10,6 @@ A to-do REST API built with TypeScript, Node, Express, and Vitest. Tasks are sto
 
 ## Pending
 
-### list-and-get-tasks
-- **Goal:** Add `GET /tasks`, with an optional `completed` filter, and `GET /tasks/:id`.
-- **Files:** `src/routes/tasks.ts`, `tests/list-tasks.test.ts`
-- **Definition of done:** `tests/list-tasks.test.ts` passes: empty list returns `[]`; list returns all tasks in insertion order; `completed=true` and `completed=false` filter correctly; any other filter value returns 400; a known ID returns 200; an unknown ID returns 404 with code `TASK_NOT_FOUND`.
-
 ### edit-task
 - **Goal:** Add `PATCH /tasks/:id` to edit `title` and `description`.
 - **Files:** `src/routes/tasks.ts`, `tests/edit-task.test.ts`
@@ -69,3 +64,9 @@ _None._
 - **Files:** `src/routes/tasks.ts`, `src/errors.ts`, `src/app.ts`, `src/store.ts`, `tests/create-task.test.ts`
 - **Definition of done:** `tests/create-task.test.ts` passes: valid body returns 201 with the created task; invalid body returns 400 with code `VALIDATION_ERROR` and details; nothing is stored after a rejected request.
 - **Result:** done. 62 tests pass, typecheck clean.
+
+### list-and-get-tasks
+- **Goal:** Add `GET /tasks`, with an optional `completed` filter, and `GET /tasks/:id`.
+- **Files:** `src/routes/tasks.ts`, `tests/list-tasks.test.ts`
+- **Definition of done:** `tests/list-tasks.test.ts` passes: empty list returns `[]`; list returns all tasks in insertion order; `completed=true` and `completed=false` filter correctly; any other filter value returns 400; a known ID returns 200; an unknown ID returns 404 with code `TASK_NOT_FOUND`.
+- **Result:** done. 79 tests pass, typecheck clean.

@@ -52,3 +52,14 @@ The write-enabled sandbox has no network access, so Codex cannot run `npm instal
 
 - **Attempt 1:** Codex added `POST /tasks` in `src/routes/tasks.ts`, the `errorBody` helper in `src/errors.ts`, store injection in `createApp({ store })`, the exported `TaskStore` type in `src/store.ts`, and `tests/create-task.test.ts`.
 - **Orchestrator check:** `npm test` passed (4 files, 62 tests) and `npm run typecheck` was clean. Reviewed the tests: a valid body returns 201 and is stored, and five invalid bodies return 400 `VALIDATION_ERROR` with details and leave the store empty.
+
+## 5. list-and-get-tasks
+
+| | |
+|---|---|
+| Branch | `task/list-and-get-tasks` |
+| Codex attempts | 1 |
+| Result | Done |
+
+- **Attempt 1:** Codex added `GET /tasks` (with a strict `completed=true|false` filter) and `GET /tasks/:id` (404 `TASK_NOT_FOUND`) to the router, plus `tests/list-tasks.test.ts`. Because tasks cannot be completed through the API yet, the tests decorate the store with a small test-only wrapper to produce completed tasks.
+- **Orchestrator check:** `npm test` passed (5 files, 79 tests) and `npm run typecheck` was clean.
