@@ -1,4 +1,5 @@
 import type { PlanSource, RunLog, RunLogEntry } from '../../shared/api';
+import { toPlainText } from './plain-text';
 
 function tableText(value: string): string | null {
   return value.trim().replace(/^`+|`+$/g, '').trim() || null;
@@ -50,5 +51,6 @@ export function parseRunLog(markdown: string, source: PlanSource): RunLog {
       activeNote = false;
     }
   }
+  for (const entry of log.entries) entry.notes = entry.notes.map(toPlainText);
   return log;
 }

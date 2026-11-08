@@ -12,7 +12,7 @@ test('extracts trimmed table values and notes and validates the output', () => {
 | CODEX ATTEMPTS | 2 attempts |
 | result | \`Done\` |
 Ignored prose.
-- First note  
+- **First** \`note\`  
 - Second note
 `, 'example-app');
   expect(log).toEqual({ source: 'example-app', entries: [{

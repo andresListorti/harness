@@ -55,11 +55,6 @@ Work in the order listed. A milestone closes only after these steps, in order:
 
 ### Milestone 1: dashboard visible
 
-### plain-text-notes
-- **Goal:** Show run-log notes and chat replies as clean plain text, without markdown characters (`**`, backticks) and without rendering HTML.
-- **Files:** `server/data/plain-text.ts`, `server/data/runlog.ts`, `server/chat/local.ts`, `tests/server/plain-text.test.ts`, `tests/server/runlog.test.ts`, `tests/server/chat-local.test.ts`
-- **Definition of done:** `tests/server/plain-text.test.ts` passes: bold, italic, inline code, links, and heading markers are removed while the words stay; HTML-looking text is left as literal text; the run-log notes and the chat replies use it; the Agents cards and the Plan run log receive clean notes.
-
 ### reformat-galaxy
 - **Goal:** Reformat `GalaxyView.tsx` and `draw.ts` with readable line lengths, without changing behavior.
 - **Files:** `src/views/GalaxyView.tsx`, `src/galaxy/draw.ts`
@@ -350,6 +345,12 @@ _None._
 - **Files:** none
 - **Definition of done:** from a clean `npm ci`, all checks pass; the server answers only on `127.0.0.1`; the four views work with real repo data; suggestions return local answers; findings are fixed or listed for the user. Then follow "Closing a milestone".
 - **Result:** done. Checks and the real server passed; the Harness and Galaxy views were checked by screenshot, Agents and Plan through the page structure only because the browser tool timed out on screenshots. Two findings were fixed (`home-layout-fix`, `fix-flaky-tests`); two are listed for the user: raw markdown characters in recorded notes, and the dense style of `GalaxyView.tsx` and `draw.ts`. Waiting for `/codex:review` and the push confirmation.
+
+### plain-text-notes
+- **Goal:** Show run-log notes and chat replies as clean plain text, without markdown characters (`**`, backticks) and without rendering HTML.
+- **Files:** `server/data/plain-text.ts`, `server/data/runlog.ts`, `server/chat/local.ts`, `tests/server/plain-text.test.ts`, `tests/server/runlog.test.ts`, `tests/server/chat-local.test.ts`, `tests/server/agents.test.ts`
+- **Definition of done:** `tests/server/plain-text.test.ts` passes: bold, italic, inline code, links, and heading markers are removed while the words stay; HTML-looking text is left as literal text; the run-log notes and the chat replies use it; the Agents cards and the Plan run log receive clean notes.
+- **Result:** done. 445 tests pass, typecheck and build clean. Single `*` and `_` are left alone on purpose (globs and identifiers), so italic markers are not removed.
 
 ### home-layout-fix
 - **Goal:** Keep the home chat usable on short browser windows (found in the Milestone 1 browser acceptance).
