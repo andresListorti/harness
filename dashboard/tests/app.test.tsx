@@ -1,0 +1,20 @@
+import { render, screen } from '@testing-library/react';
+import App from '../src/App';
+import viteConfig from '../vite.config';
+
+test('renders the Harness heading', () => {
+  render(<App />);
+
+  expect(screen.getByRole('heading', { name: 'Harness' })).toBeInTheDocument();
+});
+
+test('binds Vite locally and proxies API requests', () => {
+  expect(viteConfig.server).toMatchObject({
+    host: '127.0.0.1',
+    port: 5173,
+    strictPort: true,
+    proxy: {
+      '/api': 'http://127.0.0.1:3001',
+    },
+  });
+});
