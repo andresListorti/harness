@@ -210,3 +210,14 @@ Dependencies were installed by the orchestrator once, during task 1, because the
 
 - **Attempt 1:** Codex wrote `buildGalaxy(input)` in `server/data/galaxy.ts`: six fixed nodes (core, Claude Code, Codex, Tasks, Commits, Tests) built from plan tasks, run-log entries, commits, and tracked test files. Roles follow the `orchestrator` input and default to Claude Code as orchestrator and Codex as worker; the last recorded test count is read from run-log notes. `tests/server/galaxy.test.ts` validates every case against `galaxySchema`.
 - **Orchestrator check:** reviewed the code; `npm test` passed (8 files, 139 tests), `npm run typecheck` was clean, and `npm run build` passed.
+
+## D9. agents-model
+
+| | |
+|---|---|
+| Branch | `task/agents-model` |
+| Codex attempts | 1 |
+| Result | Done |
+
+- **Attempt 1:** Codex wrote `buildAgents(sources)` in `server/data/agents.ts`: cards only for In progress and Done tasks, status `working`, `done`, or `error` (a non-Done run-log result), agent `codex` only when the matching run-log entry records Codex attempts, model and elapsed time always `null` because nothing records them, and the last three run-log notes (truncated at 240 characters) as output. Card ids use `<source>/<task id>`. `tests/server/agents.test.ts` covers the rules with fixtures and with the real plan and run-log files.
+- **Orchestrator check:** reviewed the code and confirmed the ellipsis is stored as proper UTF-8; `npm test` passed (9 files, 155 tests), `npm run typecheck` was clean, and `npm run build` passed.

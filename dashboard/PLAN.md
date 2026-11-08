@@ -55,11 +55,6 @@ Work in the order listed. A milestone closes only after these steps, in order:
 
 ### Milestone 1: dashboard visible
 
-### agents-model
-- **Goal:** Derive agent cards from plan tasks and run-log entries, with no invented data.
-- **Files:** `server/data/agents.ts`, `tests/server/agents.test.ts`
-- **Definition of done:** `tests/server/agents.test.ts` passes: In progress maps to `working`, Done to `done`, and a run-log failure to `error`; output lines are the latest run-log notes; the agent is taken only from the run-log entry; agent, model, and time are `null` when they are not recorded.
-
 ### data-routes
 - **Goal:** Expose plan, run-log, commits, galaxy, and agents over the API.
 - **Files:** `server/routes/data.ts`, `server/app.ts`, `tests/server/data-routes.test.ts`
@@ -302,6 +297,12 @@ _None._
 - **Files:** `server/data/galaxy.ts`, `tests/server/galaxy.test.ts`
 - **Definition of done:** `tests/server/galaxy.test.ts` passes with fixtures: node counts and details match the input; test counts come from tracked test files and recorded results; the given roles are applied, and they default to Claude Code as orchestrator and Codex as worker; empty input gives a valid galaxy.
 - **Result:** done. 139 tests pass, typecheck and build clean.
+
+### agents-model
+- **Goal:** Derive agent cards from plan tasks and run-log entries, with no invented data.
+- **Files:** `server/data/agents.ts`, `tests/server/agents.test.ts`
+- **Definition of done:** `tests/server/agents.test.ts` passes: In progress maps to `working`, Done to `done`, and a run-log failure to `error`; output lines are the latest run-log notes; the agent is taken only from the run-log entry; agent, model, and time are `null` when they are not recorded.
+- **Result:** done. 155 tests pass, typecheck and build clean.
 
 ## Phase 2: real agent execution
 
