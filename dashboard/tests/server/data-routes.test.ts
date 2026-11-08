@@ -1,6 +1,7 @@
 // @vitest-environment node
 import { mkdtemp, mkdir, rm, writeFile } from 'node:fs/promises';
 import { join } from 'node:path';
+import { tmpdir } from 'node:os';
 import request from 'supertest';
 import { afterEach, beforeEach, expect, test, vi } from 'vitest';
 import { createApp } from '../../server/app';
@@ -16,8 +17,7 @@ const get = (path: string, server = app()) => request(server).get(`/api/${path}`
 
 beforeEach(async () => {
   vi.clearAllMocks();
-  // Keep all fixture writes within dashboard, including temporary directories.
-  repoRoot = await mkdtemp(join(process.cwd(), '.data-routes-test-'));
+  repoRoot = await mkdtemp(join(tmpdir(), 'harness-data-routes-'));
   for (const dir of ['dashboard', 'example-app', 'docs']) await mkdir(join(repoRoot, dir));
   for (const source of ['dashboard', 'example-app']) {
     await writeFile(join(repoRoot, source, 'PLAN.md'), `# PLAN\n## Done\n### ${source}-task\n- **Goal:** Fixture goal\n`);
@@ -77,7 +77,7 @@ test.each(['foo', '../x', '..%2F..%2Fetc%2Fpasswd', '', 'a&source=b'])(
 );
 
 test('missing files yield empty valid data and retain galaxy nodes', async () => {
-  // Remove only the known fixture files; the verified temporary root stays in dashboard.
+  // Remove only the known fixture files.
   for (const file of ['dashboard/PLAN.md', 'example-app/PLAN.md', 'docs/run-log.md']) {
     await rm(join(repoRoot, file));
   }

@@ -1,5 +1,5 @@
 // @vitest-environment jsdom
-import { act, cleanup, fireEvent, render, screen, within } from '@testing-library/react';
+import { act, cleanup, fireEvent, render, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import type { Galaxy } from '../../shared/api';
 import { ApiError } from '../../src/lib/api';
@@ -24,13 +24,26 @@ beforeEach(() => {
 afterEach(() => { cleanup(); vi.restoreAllMocks(); vi.unstubAllGlobals(); });
 const clientFor = (data = nodes) => ({ getGalaxy: vi.fn<() => Promise<Galaxy>>().mockResolvedValue({ nodes: data }) });
 function deferred() { let resolve!: (value: Galaxy) => void; const promise = new Promise<Galaxy>(res => { resolve = res; }); return { promise, resolve }; }
-async function ready(client = clientFor()) { const view = render(<GalaxyView client={client} />); await screen.findByRole('list', { name: 'Galaxy systems' }); return { ...view, canvas: view.container.querySelector('canvas')! }; }
+async function canvasReady(container: HTMLElement) {
+  const canvas = container.querySelector('canvas')!;
+  await waitFor(() => {
+    expect(canvas.dataset.zoom).toBeDefined();
+    expect(recording.methods.clearRect).toHaveBeenCalled();
+  });
+  return canvas;
+}
+async function ready(client = clientFor()) {
+  const view = render(<GalaxyView client={client} />);
+  await screen.findByRole('list', { name: 'Galaxy systems' });
+  return { ...view, canvas: await canvasReady(view.container) };
+}
 function pointer(canvas: HTMLCanvasElement, x: number, y: number) { fireEvent.pointerDown(canvas, { clientX: x, clientY: y, button: 0 }); fireEvent.pointerUp(canvas, { clientX: x, clientY: y }); }
 test('loads six legend nodes, draws a frame and cancels the latest frame on unmount', async () => {
   const pending = deferred(); const client = { getGalaxy: vi.fn(() => pending.promise) };
   const view = render(<GalaxyView client={client} />);
   expect(screen.getByText('Loading galaxy…')).toHaveAttribute('aria-busy', 'true');
   await act(async () => pending.resolve({ nodes }));
+  await canvasReady(view.container);
   expect(within(screen.getByRole('list', { name: 'Galaxy systems' })).getAllByRole('button').map(button => button.textContent)).toEqual(nodes.map(node => node.label));
   const callback = callbacks.get(nextId)!;
   act(() => callback(1000));
@@ -71,7 +84,7 @@ test('reduced motion draws only when needed', async () => {
   await ready(); expect(requestAnimationFrame).not.toHaveBeenCalled();
   const before = recording.methods.clearRect!.mock.calls.length;
   await userEvent.click(screen.getByRole('button', { name: 'Harness' }));
-  expect(recording.methods.clearRect!.mock.calls.length).toBeGreaterThan(before);
+  await waitFor(() => expect(recording.methods.clearRect!.mock.calls.length).toBeGreaterThan(before));
   expect(requestAnimationFrame).not.toHaveBeenCalled();
 });
 test.each([new ApiError('Unavailable', 'FAILED', 500), new Error('Private')])('shows errors and retries (%s)', async error => {

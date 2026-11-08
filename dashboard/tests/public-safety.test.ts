@@ -1,5 +1,6 @@
 // @vitest-environment node
-import { readdirSync, readFileSync } from 'node:fs';
+import { mkdtempSync, mkdirSync, readdirSync, readFileSync, rmSync, writeFileSync, type Dirent } from 'node:fs';
+import { tmpdir } from 'node:os';
 import { extname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { describe, expect, it } from 'vitest';
@@ -91,15 +92,51 @@ describe('safety scanner', () => {
   });
 });
 
-function walk(directory: string, skipped: Set<string>, prefix = ''): string[] {
-  return readdirSync(directory, { withFileTypes: true }).flatMap((entry) => {
+function ignoreMissing<T>(operation: () => T): T | undefined {
+  try {
+    return operation();
+  } catch (error) {
+    if ((error as NodeJS.ErrnoException).code !== 'ENOENT') throw error;
+  }
+}
+
+const listEntries = (directory: string) => readdirSync(directory, { withFileTypes: true });
+
+function walk(directory: string, skipped: Set<string>, prefix = '', list: (directory: string) => Dirent[] = listEntries): string[] {
+  const entries = ignoreMissing(() => list(directory)) ?? [];
+  return entries.flatMap((entry) => {
     const relative = prefix + entry.name;
     if (entry.isDirectory()) {
-      return skipped.has(entry.name) ? [] : walk(join(directory, entry.name), skipped, relative + '/');
+      return skipped.has(entry.name) ? [] : walk(join(directory, entry.name), skipped, relative + '/', list);
     }
     return [relative];
   });
 }
+
+describe('tolerant safety walk', () => {
+  it('keeps scanning when a listed child directory disappears', () => {
+    const directory = mkdtempSync(join(tmpdir(), 'harness-safety-'));
+    const child = join(directory, 'child');
+    mkdirSync(child);
+    writeFileSync(join(directory, 'keep.txt'), 'clean');
+    try {
+      const list = (path: string) => {
+        const entries = listEntries(path);
+        if (path === directory) rmSync(child, { recursive: true });
+        return entries;
+      };
+      expect(walk(directory, new Set(), '', list)).toEqual(['keep.txt']);
+      expect(ignoreMissing(() => readFileSync(join(child, 'gone.txt'), 'utf8'))).toBeUndefined();
+    } finally {
+      rmSync(directory, { recursive: true, force: true });
+    }
+  });
+
+  it('propagates errors other than missing entries', () => {
+    const error = Object.assign(new Error('Access denied'), { code: 'EACCES' });
+    expect(() => ignoreMissing(() => { throw error; })).toThrow(error);
+  });
+});
 
 describe('public repository safety', () => {
   it('scans dashboard text and root reference files without violations', () => {
@@ -109,7 +146,10 @@ describe('public repository safety', () => {
     const excluded = new Set(['package-lock.json', 'tests/helpers/safety-scan.ts', 'tests/public-safety.test.ts']);
     const textExtensions = new Set(['.ts', '.tsx', '.js', '.mjs', '.cjs', '.json', '.css', '.html', '.md', '.txt', '.yml', '.yaml', '.svg', '']);
     const contents = files.filter((file) => !excluded.has(file) && textExtensions.has(extname(file)))
-      .map((file) => ({ file, text: read(dashboard, file) }));
+      .flatMap((file) => {
+        const text = ignoreMissing(() => read(dashboard, file));
+        return text === undefined ? [] : [{ file, text }];
+      });
     for (const file of ['docs/run-log.md', '.env.example']) {
       contents.push({ file, text: read(root, file) });
     }

@@ -326,6 +326,12 @@ _None._
 - **Definition of done:** at a 630 px viewport height the chat messages area keeps at least 12rem and the page scrolls; the orb shrinks on short viewports; tests, typecheck, and build pass.
 - **Result:** done. 407 tests pass, typecheck and build clean.
 
+### fix-flaky-tests
+- **Goal:** Remove two intermittent test failures found in the Milestone 1 acceptance.
+- **Files:** `tests/client/galaxy-view.test.tsx`, `tests/client/chat-panel.test.tsx`, `tests/public-safety.test.ts`, `tests/server/chat-local.test.ts`, `tests/server/data-routes.test.ts`
+- **Definition of done:** no test creates a temporary directory inside `dashboard/`; the safety scan tolerates files that disappear during the walk; the galaxy test waits for the canvas effect; the suite passes repeatedly, including under CPU load.
+- **Result:** done. 409 tests pass; 12 of 12 parallel runs under CPU load pass (6 of 12 earlier runs had failed in a similar stress test).
+
 ## Phase 2: real agent execution
 
 Not started. Requires explicit user approval and a new security review. The plan parser excludes this section from the board.
