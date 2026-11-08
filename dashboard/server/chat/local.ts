@@ -28,7 +28,11 @@ function buildReply(message: string, context: LocalContext): string {
   const normalized = message.trim().toLowerCase()
     .replace(/\s+/g, ' ').replace(/[\p{P}]+$/u, '').trim();
   if (isAction(normalized)) return helpReply("I can't do that.");
-  const includes = (...phrases: string[]) => phrases.some(phrase => normalized.includes(phrase));
+  const matches = (...phrases: string[]) => phrases.some(phrase => {
+    const escaped = phrase.replace(/[.*+?^${}()|[\]\\]/g, '\\$&').replace(/ /g, ' +');
+    return new RegExp(`(?<![\\p{L}\\p{N}_])${escaped}s?(?![\\p{L}\\p{N}_])`, 'u')
+      .test(normalized);
+  });
   if (/\btests?\b/.test(normalized)) {
     let recorded: string | undefined;
     for (const entry of context.runLog) {
@@ -40,12 +44,12 @@ function buildReply(message: string, context: LocalContext): string {
     return `Tracked test files: ${context.testFiles.length}\n${recorded === undefined
       ? 'No run result is recorded.' : `Last recorded run: ${recorded} tests`}`;
   }
-  if (includes('commit', 'git log')) {
+  if (matches('commit', 'git log')) {
     return context.commits.slice(0, 5)
       .map(commit => `${commit.hash.slice(0, 7)} ${commit.subject}`).join('\n')
       || 'No commits found.';
   }
-  if (includes('latest run', 'last run', 'latest task', 'last task', 'run log', 'run the log')) {
+  if (matches('latest run', 'last run', 'latest task', 'last task', 'run log', 'run the log')) {
     const entry = context.runLog.at(-1);
     if (!entry) return 'No runs are recorded yet.';
     const lines = [`${entry.id}. ${entry.title}`];
@@ -54,11 +58,11 @@ function buildReply(message: string, context: LocalContext): string {
     if (entry.notes.length) lines.push(entry.notes[entry.notes.length - 1]);
     return lines.join('\n');
   }
-  if (includes('in progress', 'current', 'working on', 'now')) {
+  if (matches('in progress', 'current', 'currently', 'working on', 'now')) {
     return context.inProgress.map(task => `- ${task.title}`).join('\n')
       || 'Nothing is in progress right now.';
   }
-  if (includes('pending', 'next', 'todo', 'to do', 'remaining', 'left')) {
+  if (matches('pending', 'next', 'todo', 'to do', 'remaining', 'left')) {
     const count = context.pending.length;
     if (!count) return 'No tasks are pending.';
     const lines = [

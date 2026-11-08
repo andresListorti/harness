@@ -356,6 +356,12 @@ _None._
 - **Definition of done:** `tests/server/chat-local.test.ts` passes: requests to launch, run, start, or otherwise act get a reply saying that this version cannot run agents or change files and listing what it can answer; the five suggestions still reach their own answers; the help reply for unknown questions states the same limit.
 - **Result:** done in 2 attempts. 545 tests pass, typecheck and build clean. Short read-only phrases such as `run log`, `test status`, and `commit history` are not treated as actions.
 
+### chat-word-boundaries
+- **Goal:** Match chat intent keywords as whole words or phrases, so `know` and `unknown` no longer trigger `now` (finding from the Codex review of Milestone 1).
+- **Files:** `server/chat/local.ts`, `tests/server/chat-local.test.ts`
+- **Definition of done:** `Do you know what is pending?` returns the pending tasks; questions that only contain `unknown` get the not-understood reply with the capability notice; look-alikes such as `nowhere`, `leftover`, `commitment`, and `currency` trigger no intent; real keywords with plurals, capitals, and punctuation still work.
+- **Result:** done. 592 tests pass, typecheck and build clean. A bare `commit` is still treated as an action request (verb-first rule); `commits` returns the commit list.
+
 ### home-layout-fix
 - **Goal:** Keep the home chat usable on short browser windows (found in the Milestone 1 browser acceptance).
 - **Files:** `src/views/HomeView.css`, `src/App.css`, `tests/client/home-view.test.tsx`
