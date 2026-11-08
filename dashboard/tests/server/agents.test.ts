@@ -103,6 +103,10 @@ test('builds validated historical cards from the real plans and run log', async 
       runLog: parseRunLog(log, 'example-app').entries }),
   ]);
   for (const card of cards) {
+    for (const line of card.output) {
+      expect(line).not.toContain('**');
+      expect(line).not.toContain('`');
+    }
     expect(agentCardSchema.safeParse(card).success).toBe(true);
     expect(card.model).toBeNull();
     expect(card.elapsedSeconds).toBeNull();

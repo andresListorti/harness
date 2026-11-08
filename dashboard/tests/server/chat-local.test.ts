@@ -22,6 +22,16 @@ const context: LocalContext = {
   testFiles: ['a.test.ts', 'b.test.ts'],
 };
 
+test('cleans markup from the latest run reply while keeping the words', () => {
+  const reply = answerLocally('latest run', {
+    ...context,
+    runLog: [{ ...context.runLog[1], notes: ['**Attempt 1:** Wrote `server/data/git.ts`.'] }],
+  });
+  expect(reply).toContain('Attempt 1: Wrote server/data/git.ts.');
+  expect(reply).not.toContain('**');
+  expect(reply).not.toContain('`');
+});
+
 test('suggestions have the required order and each resolves to its own intent', () => {
   expect(LOCAL_SUGGESTIONS).toEqual([
     'What is pending?', 'What is in progress?', 'Show the latest commits',

@@ -436,3 +436,17 @@ Dependencies were installed by the orchestrator once, during task 1, because the
 - **Browser:** the Harness and Galaxy views were checked by screenshot, and the four views through the page structure (the browser tool timed out on some screenshots; a page without the dashboard ran at the same low frame rate, so it was the browser session and not the application). Agents showed historical cards with an em dash for model and time, Plan showed the board and run log for both sources, and Galaxy zoomed and opened planet details.
 - **Findings fixed:** the home chat was unusable on a short window (D26) and two intermittent test failures (D27).
 - **Findings left for the user:** recorded notes show raw markdown characters in the Agents cards and in the "latest run" chat answer, and `GalaxyView.tsx` and `draw.ts` use very dense formatting.
+
+## D29. plain-text-notes
+
+| | |
+|---|---|
+| Branch | `task/plain-text-notes` |
+| Codex attempts | 1 |
+| Codex model | not reported |
+| Duration | 1m 54s |
+| Result | Done |
+
+- **Attempt 1:** Codex added `toPlainText` in `server/data/plain-text.ts` (it removes bold markers, inline code backticks, fenced code markers, link and image syntax, heading and blockquote markers, and leaves HTML-looking text, single asterisks, and single underscores untouched), applied it to every run-log note in the parser and to every local chat reply, and added `tests/server/plain-text.test.ts` plus checks in the run-log, chat, and agents tests. Its first test run failed and it fixed the cause within the same attempt.
+- **Orchestrator check:** reviewed the code; `npm test` passed (27 files, 445 tests), `npm run typecheck` was clean, and `npm run build` passed.
+- **Recording note:** from this entry on, the model row records the model name shown in the Codex companion output (this run showed only a thread id, so "not reported"), and the duration is the wall time of the delegated task as measured by the orchestrator's agent, which includes the Codex run.

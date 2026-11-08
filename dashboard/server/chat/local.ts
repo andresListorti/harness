@@ -1,4 +1,5 @@
 import type { Commit, PlanTask, RunLogEntry } from '../../shared/api';
+import { toPlainText } from '../data/plain-text';
 
 export const LOCAL_SUGGESTIONS: readonly string[] = [
   'What is pending?',
@@ -17,6 +18,10 @@ export interface LocalContext {
 }
 
 export function answerLocally(message: string, context: LocalContext): string {
+  return toPlainText(buildReply(message, context));
+}
+
+function buildReply(message: string, context: LocalContext): string {
   const normalized = message.trim().toLowerCase().replace(/\s+/g, ' ').replace(/[\p{P}]+$/u, '').trim();
   const includes = (...phrases: string[]) => phrases.some(phrase => normalized.includes(phrase));
   if (/\btests?\b/.test(normalized)) {
