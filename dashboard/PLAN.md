@@ -55,11 +55,6 @@ Work in the order listed. A milestone closes only after these steps, in order:
 
 ### Milestone 1: dashboard visible
 
-### chat-panel
-- **Goal:** Add the chat with local answers only: New chat, suggestions, text field, and Send.
-- **Files:** `src/components/ChatPanel.tsx`, `tests/client/chat-panel.test.tsx`
-- **Definition of done:** `tests/client/chat-panel.test.tsx` passes: sending calls the API and shows the reply; suggestions send their text; New chat clears history; HTML in a reply renders as literal text; errors are shown; Send is disabled while waiting.
-
 ### home-view
 - **Goal:** Compose the orb, spaced "H A R N E S S" title, subtitle, and chat.
 - **Files:** `src/views/HomeView.tsx`, `tests/client/home-view.test.tsx`
@@ -309,6 +304,12 @@ _None._
 - **Files:** `src/components/Orb.tsx`, `src/components/Orb.css`, `tests/client/orb.test.tsx`
 - **Definition of done:** `tests/client/orb.test.tsx` passes: each state renders; rings are present; no `img` element exists; animation is disabled under `prefers-reduced-motion`.
 - **Result:** done. 250 tests pass, typecheck and build clean.
+
+### chat-panel
+- **Goal:** Add the chat with local answers only: New chat, suggestions, text field, and Send.
+- **Files:** `src/components/ChatPanel.tsx`, `src/components/ChatPanel.css`, `tests/client/chat-panel.test.tsx`
+- **Definition of done:** `tests/client/chat-panel.test.tsx` passes: sending calls the API and shows the reply; suggestions send their text; New chat clears history; HTML in a reply renders as literal text; errors are shown; Send is disabled while waiting.
+- **Result:** done. 262 tests pass, typecheck and build clean.
 
 ## Phase 2: real agent execution
 
