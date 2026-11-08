@@ -399,3 +399,15 @@ Dependencies were installed by the orchestrator once, during task 1, because the
 
 - **Attempt 1:** Codex wrote `dashboard/README.md` (requirements, production and development run commands, the four views and their real data, data sources, the HTTP API, the implemented security measures, project layout, checks, and a "Not built yet" section), added a Dashboard section to the root `README.md`, a dashboard architecture section to `docs/architecture.md`, run steps to `docs/setup.md`, and rewrote only the introduction of this run log so it explains both entry types. It checked the claims against the code and ran the three checks.
 - **Orchestrator check:** reviewed every changed document against the code and the plan, confirmed no file has a byte order mark or carriage returns, and confirmed the existing run-log entries are unchanged; `npm test` passed (26 files, 406 tests), `npm run typecheck` was clean, and `npm run build` passed.
+
+## D26. home-layout-fix
+
+| | |
+|---|---|
+| Branch | `task/home-layout-fix` |
+| Codex attempts | 1 |
+| Result | Done |
+
+- **Why:** the Milestone 1 browser acceptance showed that on a window about 630 px tall the home chat had only a thin strip of message area, so a conversation was unreadable.
+- **Attempt 1:** Codex replaced the fixed chat height with an automatic height and a message area of at least 12rem (scrolling inside after 24rem), shrank the orb on short viewports, made the main area scroll vertically, and extended `tests/client/home-view.test.tsx` with checks on these CSS rules. Its first test run failed and it fixed the cause within the same attempt.
+- **Orchestrator check:** reviewed the diff; `npm test` passed (26 files, 407 tests) on re-runs, `npm run typecheck` was clean, and `npm run build` passed. One orchestrator run failed on an unrelated intermittent test, which is handled in D27.

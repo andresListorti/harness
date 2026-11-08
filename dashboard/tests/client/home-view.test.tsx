@@ -1,11 +1,14 @@
 // @vitest-environment jsdom
 import { readFileSync } from 'node:fs';
+import { fileURLToPath } from 'node:url';
 import { cleanup, render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import '@testing-library/jest-dom/vitest';
 import { HomeView } from '../../src/views/HomeView';
 
 afterEach(cleanup);
+
+const read = (path: string) => readFileSync(fileURLToPath(new URL(path, import.meta.url)), 'utf8');
 
 function fakeClient() {
   return {
@@ -38,8 +41,8 @@ test.each(['listening', 'speaking'] as const)('passes the %s state to the orb', 
 });
 
 test('styles the title with CSS spacing and keeps home assets local', () => {
-  const source = readFileSync('src/views/HomeView.tsx', 'utf8');
-  const css = readFileSync('src/views/HomeView.css', 'utf8');
+  const source = read('../../src/views/HomeView.tsx');
+  const css = read('../../src/views/HomeView.css');
   const title = css.match(/\.home-title\s*\{([^}]+)\}/)?.[1];
   expect(title).toMatch(/letter-spacing:\s*0\.6em/);
   expect(title).toMatch(/text-transform:\s*uppercase/);
@@ -47,4 +50,18 @@ test('styles the title with CSS spacing and keeps home assets local', () => {
   for (const file of [source, css]) {
     expect(file).not.toMatch(/https?:\/\/|\/\/cdn|@import\s+url\s*\(|data:/i);
   }
+});
+
+test('keeps home conversations readable on short viewports', () => {
+  const css = read('../../src/views/HomeView.css');
+  const appCss = read('../../src/App.css');
+  const messages = css.match(/[^{}]*\.chat-messages\b[^{}]*\{([^}]+)\}/)?.[1];
+  const minimum = messages?.match(/min-height:\s*([\d.]+)rem\b/);
+  expect(minimum).toBeTruthy();
+  expect(Number(minimum?.[1])).toBeGreaterThanOrEqual(12);
+  expect(css).not.toMatch(/height:\s*clamp\(18rem,\s*calc\(100dvh\s*-\s*30rem\),\s*34rem\)/);
+  const orb = css.match(/\.home-orb\s*\{([^}]+)\}/)?.[1];
+  expect(orb).toMatch(/\bwidth:\s*[^;]*\d(?:dvh|vh)\b/);
+  const main = appCss.match(/\.app-main\s*\{([^}]+)\}/)?.[1];
+  expect(main).toMatch(/overflow-y\s*:\s*auto/);
 });
