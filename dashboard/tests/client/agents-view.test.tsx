@@ -1,4 +1,7 @@
 // @vitest-environment jsdom
+import { readFileSync } from 'node:fs';
+import { dirname, resolve } from 'node:path';
+import { fileURLToPath } from 'node:url';
 import { act, cleanup, render, screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import type { AgentCard, Agents } from '../../shared/api';
@@ -37,6 +40,7 @@ test('loads and renders every field as historical data', async () => {
   const output = article.querySelector('pre');
   expect(output).toHaveClass('mono', 'agent-output');
   expect(output?.textContent).toBe('First line\nSecond line');
+  expect(output).toHaveAttribute('title', 'First line\nSecond line');
   expect(screen.queryByRole('button', { name: 'Next' })).not.toBeInTheDocument();
 });
 
@@ -46,8 +50,62 @@ test('shows empty values and all statuses and agent names', async () => {
     card(2, { agent: 'codex', status: 'error' }), card(3),
   ])} />);
   const article = await screen.findByRole('article', { name: 'Task 1' });
-  expect(within(article).getAllByText('—')).toHaveLength(4);
+  const details = within(article.querySelector('dl')!);
+  expect(details.getAllByRole('term').map(term => term.textContent)).toEqual(['Agent']);
+  expect(details.getByRole('definition')).toHaveTextContent('—');
+  const output = article.querySelector('pre');
+  expect(output?.textContent).toBe('—');
+  expect(output).not.toHaveAttribute('title');
   for (const value of ['Working', 'Done', 'Error', 'Codex', 'Claude Code']) expect(screen.getByText(value)).toBeInTheDocument();
+});
+
+test.each([
+  { model: 'Recorded model', elapsedSeconds: 65 },
+  { model: 'Recorded model', elapsedSeconds: null },
+  { model: null, elapsedSeconds: 65 },
+])('shows only recorded detail rows: %o', async values => {
+  render(<AgentsView client={clientFor([card(1, values)])} />);
+  const article = await screen.findByRole('article', { name: 'Task 1' });
+  const details = within(article.querySelector('dl')!);
+  const terms = details.getAllByRole('term').map(term => term.textContent);
+  expect(terms).toEqual([
+    'Agent',
+    ...(values.model === null ? [] : ['Model']),
+    ...(values.elapsedSeconds === null ? [] : ['Time']),
+  ]);
+  if (values.model !== null) {
+    expect(details.getByText(values.model)).toBeInTheDocument();
+  }
+  if (values.elapsedSeconds !== null) {
+    expect(details.getByText('1m 05s')).toBeInTheDocument();
+  }
+});
+
+test.each([
+  ['x'.repeat(2000)],
+  Array.from({ length: 12 }, (_, index) => `Line ${index}: ${'text '.repeat(100)}`),
+])('preserves full long output in text and tooltip: %#', async (...lines) => {
+  render(<AgentsView client={clientFor([card(1, { output: lines })])} />);
+  const article = await screen.findByRole('article', { name: 'Task 1' });
+  const output = article.querySelector('pre');
+  expect(output?.textContent).toBe(lines.join('\n'));
+  expect(output).toHaveAttribute('title', lines.join('\n'));
+});
+
+test('wraps and clamps output without horizontal scrolling', () => {
+  const directory = dirname(fileURLToPath(import.meta.url));
+  const path = resolve(directory, '../../src/views/AgentsView.css');
+  const css = readFileSync(path, 'utf8');
+  const rule = css.match(/\.agent-output\s*\{([^}]*)\}/)?.[1];
+  expect(rule).toBeDefined();
+  for (const declaration of [
+    'white-space: pre-wrap', 'overflow-wrap: anywhere', '-webkit-line-clamp: 4',
+    'line-clamp: 4', 'display: -webkit-box', '-webkit-box-orient: vertical',
+    'overflow: hidden', 'min-width: 0', 'font-family: var(--font-mono)',
+  ]) {
+    expect(rule).toContain(declaration);
+  }
+  expect(rule).not.toMatch(/overflow(?:-x)?\s*:\s*auto\b/);
 });
 
 test('changes layout, paginates, and resets the page when layout changes', async () => {
@@ -139,5 +197,6 @@ test('renders HTML in task and output literally', async () => {
   const { container } = render(<AgentsView client={clientFor([card(1, { task, output: [output] })])} />);
   expect(await screen.findByRole('heading', { name: task })).toBeInTheDocument();
   expect(screen.getByText(output).tagName).toBe('PRE');
+  expect(screen.getByText(output)).toHaveAttribute('title', output);
   expect(container.querySelector('img, b')).toBeNull();
 });

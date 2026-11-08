@@ -463,3 +463,16 @@ Dependencies were installed by the orchestrator once, during task 1, because the
 
 - **Attempt 1:** Codex reformatted `GalaxyView.tsx` and `draw.ts` (one statement per line, long literals and JSX broken across lines) without touching any other file or any test.
 - **Orchestrator check:** esbuild minified output of both files is identical before and after, so only formatting changed; the longest line went from 512 to 95 characters in `GalaxyView.tsx` and from 252 to 74 in `draw.ts`; there is no byte order mark or carriage return; `npm test` passed unchanged (27 files, 445 tests), `npm run typecheck` was clean, and `npm run build` passed.
+
+## D31. agents-card-layout
+
+| | |
+|---|---|
+| Branch | `task/agents-card-layout` |
+| Codex attempts | 1 |
+| Codex model | not reported |
+| Duration | 1m 47s |
+| Result | Done |
+
+- **Attempt 1:** Codex made the Agents card output wrap (including long words), keep line breaks, and show at most four lines with an ellipsis and no horizontal scrolling, put the full text in the block's tooltip, and made the Model and Time rows render only when their value is not null (the Agent row still shows an em dash when unknown). It updated the tests and the dashboard README. Its first test run failed and it fixed the cause within the same attempt.
+- **Orchestrator check:** reviewed the diff and confirmed no byte order marks; `npm test` passed (27 files, 451 tests), `npm run typecheck` was clean, and `npm run build` passed.

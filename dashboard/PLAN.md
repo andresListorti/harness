@@ -55,11 +55,6 @@ Work in the order listed. A milestone closes only after these steps, in order:
 
 ### Milestone 1: dashboard visible
 
-### agents-card-layout
-- **Goal:** Make the Agents card output wrap onto at most 4 lines with no horizontal scroll, and hide the Model and Time rows when their value is null.
-- **Files:** `src/views/AgentsView.tsx`, `src/views/AgentsView.css`, `tests/client/agents-view.test.tsx`, `README.md`
-- **Definition of done:** `tests/client/agents-view.test.tsx` passes: output text wraps (long words too) and is limited to 4 lines through CSS with no horizontal scrolling; the Model and Time rows do not render when null and render when present; the Agent row still shows an em dash when unknown; the empty-output placeholder stays; the dashboard README describes this behavior.
-
 ### run-log-model-duration
 - **Goal:** Record the Codex model and the task duration in every new run-log entry, read them in the parser, and show them in the Agents cards.
 - **Files:** `shared/api.ts`, `server/data/runlog.ts`, `server/data/agents.ts`, `docs/run-log.md`, `README.md`, `tests/shared/api.test.ts`, `tests/server/runlog.test.ts`, `tests/server/agents.test.ts`
@@ -352,6 +347,12 @@ _None._
 - **Files:** `src/views/GalaxyView.tsx`, `src/galaxy/draw.ts`
 - **Definition of done:** no test file changes and all existing tests pass unchanged; no line is longer than 100 characters in the two files; no logic, names, or exported signatures change.
 - **Result:** done. The minified output of both files is identical before and after; the longest lines are 95 and 74 characters (before: 512 and 252); 445 tests pass unchanged, typecheck and build clean.
+
+### agents-card-layout
+- **Goal:** Make the Agents card output wrap onto at most 4 lines with no horizontal scroll, and hide the Model and Time rows when their value is null.
+- **Files:** `src/views/AgentsView.tsx`, `src/views/AgentsView.css`, `tests/client/agents-view.test.tsx`, `README.md`
+- **Definition of done:** `tests/client/agents-view.test.tsx` passes: output text wraps (long words too) and is limited to 4 lines through CSS with no horizontal scrolling; the Model and Time rows do not render when null and render when present; the Agent row still shows an em dash when unknown; the empty-output placeholder stays; the dashboard README describes this behavior.
+- **Result:** done. 451 tests pass, typecheck and build clean. The full output text is in the tooltip.
 
 ### home-layout-fix
 - **Goal:** Keep the home chat usable on short browser windows (found in the Milestone 1 browser acceptance).
