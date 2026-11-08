@@ -1,0 +1,14 @@
+.galaxy-view { display: flex; flex-direction: column; gap: var(--space-4); }
+.galaxy-header { display: flex; align-items: center; justify-content: space-between; gap: var(--space-4); flex-wrap: wrap; }
+.galaxy-header .eyebrow { margin-top: var(--space-3); }
+.galaxy-hint { color: var(--color-text-muted); font-size: var(--text-sm); }
+.galaxy-stage { position: relative; display: flex; flex-direction: column; }
+.galaxy-canvas-container { position: relative; flex: 1; min-height: 24rem; height: 60vh; }
+.galaxy-canvas-container canvas { width: 100%; height: 100%; display: block; cursor: grab; touch-action: none; }
+.galaxy-canvas-container canvas.is-dragging { cursor: grabbing; }
+.galaxy-details { position: absolute; right: var(--space-4); top: var(--space-4); width: min(19rem, 40%); padding: var(--space-5); background: var(--color-bg-raised); border: 1px solid var(--color-border); border-top: 2px solid var(--color-teal); border-radius: var(--radius-lg); display: flex; flex-direction: column; gap: var(--space-3); overflow-wrap: anywhere; }
+.galaxy-details ul { padding-left: var(--space-5); }
+.galaxy-legend { list-style: none; display: flex; gap: var(--space-3); flex-wrap: wrap; padding: 0; }
+.galaxy-legend button[aria-pressed="true"] { border-color: var(--color-amber); color: var(--color-amber); }
+@media (max-width: 40rem) { .galaxy-details { position: static; width: auto; margin-top: var(--space-4); } }
+
