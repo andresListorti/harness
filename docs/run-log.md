@@ -177,3 +177,14 @@ Dependencies were installed by the orchestrator once, during task 1, because the
 
 - **Attempt 1:** Codex wrote `parsePlan(markdown, source)` in `server/data/plan.ts`: columns from the level-2 headings, tasks from level-3 headings with field bullets, group headings applied to the following tasks, other level-2 sections (including Phase 2) ignored, and no throws on malformed input. `tests/server/plan.test.ts` uses inline fixtures plus the real `dashboard/PLAN.md` and `example-app/PLAN.md`.
 - **Orchestrator check:** reviewed the code; `npm test` passed (5 files, 105 tests), `npm run typecheck` was clean, and `npm run build` passed.
+
+## D6. runlog-parser
+
+| | |
+|---|---|
+| Branch | `task/runlog-parser` |
+| Codex attempts | 1 |
+| Result | Done |
+
+- **Attempt 1:** Codex wrote `parseRunLog(markdown, source)` in `server/data/runlog.ts`: entries from `## N. name` and `## DN. name` headings split by source, branch, attempts, and result from the table rows, bullets as notes with continuation lines joined, other sections ignored, and no throws on bad input. `tests/server/runlog.test.ts` uses inline fixtures plus the real `docs/run-log.md`. Codex's own first test, typecheck, and build runs failed and it corrected one file within the same attempt.
+- **Orchestrator check:** reviewed the code; `npm test` passed (6 files, 121 tests), `npm run typecheck` was clean, and `npm run build` passed.
