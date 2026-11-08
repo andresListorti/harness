@@ -55,11 +55,6 @@ Work in the order listed. A milestone closes only after these steps, in order:
 
 ### Milestone 1: dashboard visible
 
-### server-app
-- **Goal:** Add an Express app factory, a separate entry point that binds to `127.0.0.1`, and `GET /api/health`.
-- **Files:** `server/app.ts`, `server/index.ts`, `tests/server/health.test.ts`
-- **Definition of done:** `tests/server/health.test.ts` passes: health returns 200; importing `createApp` does not open a port; the entry point uses host `127.0.0.1`.
-
 ### server-guards
 - **Goal:** Add the Host, Origin, content-type, and body-size guards.
 - **Files:** `server/security.ts`, `server/app.ts`, `tests/server/security.test.ts`
@@ -295,6 +290,12 @@ _None._
 - **Files:** `package.json`, `package-lock.json`, `tsconfig.json`, `vite.config.ts`, `vitest.config.ts`, `index.html`, `.gitignore`, `src/main.tsx`, `src/App.tsx`, `tests/app.test.tsx`
 - **Definition of done:** `tests/app.test.tsx` passes: the app renders the product name. Vite binds to `127.0.0.1` and proxies `/api`. `.gitignore` covers `dist/` and `.data/`. A clean `npm ci` works.
 - **Result:** done. 2 tests pass, typecheck and build clean, verified from a clean `npm ci`.
+
+### server-app
+- **Goal:** Add an Express app factory, a separate entry point that binds to `127.0.0.1`, and `GET /api/health`.
+- **Files:** `server/app.ts`, `server/index.ts`, `tests/server/health.test.ts`
+- **Definition of done:** `tests/server/health.test.ts` passes: health returns 200; importing `createApp` does not open a port; the entry point uses host `127.0.0.1`.
+- **Result:** done. 11 tests pass, typecheck and build clean.
 
 ## Phase 2: real agent execution
 
