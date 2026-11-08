@@ -320,6 +320,12 @@ _None._
 - **Definition of done:** the documents match the implemented behavior; the run-log header describes both entry types; a search of the changed files finds no personal data or local paths.
 - **Result:** done. Docs checked against the code by Codex and reviewed by the orchestrator; 406 tests pass, typecheck and build clean.
 
+### home-layout-fix
+- **Goal:** Keep the home chat usable on short browser windows (found in the Milestone 1 browser acceptance).
+- **Files:** `src/views/HomeView.css`, `src/App.css`, `tests/client/home-view.test.tsx`
+- **Definition of done:** at a 630 px viewport height the chat messages area keeps at least 12rem and the page scrolls; the orb shrinks on short viewports; tests, typecheck, and build pass.
+- **Result:** done. 407 tests pass, typecheck and build clean.
+
 ## Phase 2: real agent execution
 
 Not started. Requires explicit user approval and a new security review. The plan parser excludes this section from the board.

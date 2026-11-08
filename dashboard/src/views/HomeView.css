@@ -8,7 +8,7 @@
   margin-inline: auto;
 }
 
-.home-orb { width: min(14rem, 38vw); }
+.home-orb { width: min(14rem, 38vw, 28vh); min-width: 8rem; }
 
 .home-title {
   text-transform: uppercase;
@@ -29,6 +29,10 @@
 .home-chat { width: 100%; min-width: 0; }
 .home-chat .chat-panel {
   min-height: 18rem;
-  max-height: min(34rem, 60vh);
-  height: clamp(18rem, calc(100dvh - 30rem), 34rem);
+  height: auto;
+}
+
+.home-chat .chat-panel .chat-messages {
+  min-height: 12rem;
+  max-height: 24rem;
 }
