@@ -266,3 +266,14 @@ Dependencies were installed by the orchestrator once, during task 1, because the
 - **Attempt 1:** Codex wrote `src/styles/tokens.css` (colors, typography, spacing, radii, sidebar widths), `src/styles/global.css` (near-black background with a texture made only from CSS gradients, teal focus ring, amber pressed state, `.section-title`, reduced-motion handling), wired both plus the font into `src/main.tsx`, and wrote `tests/client/theme.test.ts`, which also rejects any remote URL or `data:` URI in the styles. Codex's first typecheck and build failed on missing Vite client types and it added `src/vite-env.d.ts` within the same attempt.
 - **Environment step:** the orchestrator installed `@fontsource-variable/inter` (OFL license) before the task, because the plan asks for a bundled font and the Codex sandbox has no network. The built `dist/assets` contains the font files locally.
 - **Orchestrator check:** reviewed the code; `npm test` passed (13 files, 231 tests), `npm run typecheck` was clean, and `npm run build` passed.
+
+## D14. app-shell
+
+| | |
+|---|---|
+| Branch | `task/app-shell` |
+| Codex attempts | 1 |
+| Result | Done |
+
+- **Attempt 1:** Codex wrote the collapsible `Sidebar` (four views, accessible names kept when collapsed, "Close menu" and "Open menu" toggle, status dot, "Full screen" toggle that tolerates missing browser support), the `useAgentStatus` hook that polls `GET /api/health`, and the app layout in `App.tsx`. Each view is a titled placeholder until its own task replaces it. `tests/client/sidebar.test.tsx` covers the sidebar, the hook (fake timers), and an integration test through `App`; `tests/app.test.tsx` now mocks the API client.
+- **Orchestrator check:** reviewed the code; `npm test` passed (14 files, 243 tests), `npm run typecheck` was clean, and `npm run build` passed.

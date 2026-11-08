@@ -55,11 +55,6 @@ Work in the order listed. A milestone closes only after these steps, in order:
 
 ### Milestone 1: dashboard visible
 
-### app-shell
-- **Goal:** Add the collapsible sidebar with navigation for Harness, Agents, Galaxy, and Plan, a status dot, and Full screen.
-- **Files:** `src/components/Sidebar.tsx`, `src/App.tsx`, `tests/client/sidebar.test.tsx`
-- **Definition of done:** `tests/client/sidebar.test.tsx` passes: the four views are listed and switch on click; Close menu hides the labels and keeps accessible names; the status dot reflects `GET /api/health`; Full screen calls the browser API.
-
 ### orb
 - **Goal:** Add the animated orb with concentric teal rings and idle, listening, and speaking states, using SVG and CSS only.
 - **Files:** `src/components/Orb.tsx`, `src/components/Orb.css`, `tests/client/orb.test.tsx`
@@ -307,6 +302,12 @@ _None._
 - **Files:** `src/styles/tokens.css`, `src/styles/global.css`, `src/main.tsx`, `src/App.tsx`, `src/vite-env.d.ts`, `package.json`, `package-lock.json`, `tests/client/theme.test.ts`
 - **Definition of done:** `tests/client/theme.test.ts` passes: the required tokens exist and no stylesheet loads a remote URL.
 - **Result:** done. 231 tests pass, typecheck and build clean. The Inter font ships from the build output (`@fontsource-variable/inter`, OFL license).
+
+### app-shell
+- **Goal:** Add the collapsible sidebar with navigation for Harness, Agents, Galaxy, and Plan, a status dot, and Full screen.
+- **Files:** `src/components/Sidebar.tsx`, `src/components/Sidebar.css`, `src/hooks/useAgentStatus.ts`, `src/App.tsx`, `src/App.css`, `tests/app.test.tsx`, `tests/client/sidebar.test.tsx`
+- **Definition of done:** `tests/client/sidebar.test.tsx` passes: the four views are listed and switch on click; Close menu hides the labels and keeps accessible names; the status dot reflects `GET /api/health`; Full screen calls the browser API.
+- **Result:** done. 243 tests pass, typecheck and build clean. Views are placeholders until their own tasks.
 
 ## Phase 2: real agent execution
 
