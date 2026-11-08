@@ -107,3 +107,18 @@ The write-enabled sandbox has no network access, so Codex cannot run `npm instal
 
 - **Attempt 1:** Codex added `notFoundHandler` and `errorHandler` to `src/errors.ts`, registered them last in `src/app.ts`, and wrote `tests/errors.test.ts`. Malformed JSON returns 400 `INVALID_JSON`, unknown routes and unsupported methods return 404 `ROUTE_NOT_FOUND`, other parser 4xx errors return `BAD_REQUEST`, and unexpected errors return 500 `INTERNAL_ERROR` without the stack or original message (the error is logged on the server).
 - **Orchestrator check:** `npm test` passed (9 files, 109 tests) and `npm run typecheck` was clean.
+
+## 10. ci
+
+| | |
+|---|---|
+| Branch | `task/ci` |
+| Codex attempts | 1 |
+| Result | Done |
+
+- **Attempt 1:** Codex created `.github/workflows/ci.yml` (triggers: push and pull request; one job that runs `npm ci`, `npm test`, and `npm run typecheck` inside `example-app/`, with read-only permissions). This is the only task that writes outside `example-app/`, which was allowed explicitly in the task prompt. Codex could not parse the YAML because no parser was installed in its sandbox.
+- **Orchestrator check:** the YAML was parsed with a YAML library installed outside the repo (valid; triggers `push` and `pull_request`; working directory `example-app`). After deleting `node_modules`, `npm ci`, `npm test` (9 files, 109 tests), and `npm run typecheck` all passed. The workflow itself has not run on GitHub yet.
+
+## Environment steps summary
+
+Dependencies were installed by the orchestrator once, during task 1, because the Codex sandbox has no network. No task after that needed new dependencies, so there were no further installs.

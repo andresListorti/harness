@@ -10,11 +10,6 @@ A to-do REST API built with TypeScript, Node, Express, and Vitest. Tasks are sto
 
 ## Pending
 
-### ci
-- **Goal:** Run install, tests, and typecheck automatically on every push and pull request with GitHub Actions.
-- **Files:** `.github/workflows/ci.yml`, `example-app/package-lock.json`
-- **Definition of done:** the workflow is valid YAML, runs `npm ci`, `npm test`, and `npm run typecheck` inside `example-app/` on `push` and `pull_request`, and the same three commands pass locally from `example-app/`. `package-lock.json` is committed.
-
 ## In progress
 
 _None._
@@ -74,3 +69,9 @@ _None._
 - **Files:** `src/errors.ts`, `src/app.ts`, `tests/errors.test.ts`
 - **Definition of done:** `tests/errors.test.ts` passes: malformed JSON returns 400 with code `INVALID_JSON`; an unknown route returns 404 with code `ROUTE_NOT_FOUND`; an unexpected error returns 500 with code `INTERNAL_ERROR` and does not expose the stack trace or original message.
 - **Result:** done. 109 tests pass, typecheck clean.
+
+### ci
+- **Goal:** Run install, tests, and typecheck automatically on every push and pull request with GitHub Actions.
+- **Files:** `.github/workflows/ci.yml`, `example-app/package-lock.json`
+- **Definition of done:** the workflow is valid YAML, runs `npm ci`, `npm test`, and `npm run typecheck` inside `example-app/` on `push` and `pull_request`, and the same three commands pass locally from `example-app/`. `package-lock.json` is committed.
+- **Result:** done. Valid YAML; npm ci, 109 tests, and typecheck pass locally.
