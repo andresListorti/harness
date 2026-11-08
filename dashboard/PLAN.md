@@ -55,6 +55,31 @@ Work in the order listed. A milestone closes only after these steps, in order:
 
 ### Milestone 1: dashboard visible
 
+### plain-text-notes
+- **Goal:** Show run-log notes and chat replies as clean plain text, without markdown characters (`**`, backticks) and without rendering HTML.
+- **Files:** `server/data/plain-text.ts`, `server/data/runlog.ts`, `server/chat/local.ts`, `tests/server/plain-text.test.ts`, `tests/server/runlog.test.ts`, `tests/server/chat-local.test.ts`
+- **Definition of done:** `tests/server/plain-text.test.ts` passes: bold, italic, inline code, links, and heading markers are removed while the words stay; HTML-looking text is left as literal text; the run-log notes and the chat replies use it; the Agents cards and the Plan run log receive clean notes.
+
+### reformat-galaxy
+- **Goal:** Reformat `GalaxyView.tsx` and `draw.ts` with readable line lengths, without changing behavior.
+- **Files:** `src/views/GalaxyView.tsx`, `src/galaxy/draw.ts`
+- **Definition of done:** no test file changes and all existing tests pass unchanged; no line is longer than 100 characters in the two files; no logic, names, or exported signatures change.
+
+### agents-card-layout
+- **Goal:** Make the Agents card output wrap onto at most 4 lines with no horizontal scroll, and hide the Model and Time rows when their value is null.
+- **Files:** `src/views/AgentsView.tsx`, `src/views/AgentsView.css`, `tests/client/agents-view.test.tsx`, `README.md`
+- **Definition of done:** `tests/client/agents-view.test.tsx` passes: output text wraps (long words too) and is limited to 4 lines through CSS with no horizontal scrolling; the Model and Time rows do not render when null and render when present; the Agent row still shows an em dash when unknown; the empty-output placeholder stays; the dashboard README describes this behavior.
+
+### run-log-model-duration
+- **Goal:** Record the Codex model and the task duration in every new run-log entry, read them in the parser, and show them in the Agents cards.
+- **Files:** `shared/api.ts`, `server/data/runlog.ts`, `server/data/agents.ts`, `docs/run-log.md`, `README.md`, `tests/shared/api.test.ts`, `tests/server/runlog.test.ts`, `tests/server/agents.test.ts`
+- **Definition of done:** new entries carry the table rows `Codex model` and `Duration`; the parser returns `model` and `durationSeconds` (null when absent or unparseable, so older entries keep working); the Agents cards use them for model and elapsed time; the run-log introduction and the dashboard README document the two rows.
+
+### chat-unsupported-requests
+- **Goal:** Make the local chat answer clearly when asked to do something it cannot do (for example launching agents).
+- **Files:** `server/chat/local.ts`, `tests/server/chat-local.test.ts`, `README.md`
+- **Definition of done:** `tests/server/chat-local.test.ts` passes: requests to launch, run, start, or otherwise act get a reply saying that this version cannot run agents or change files and listing what it can answer; the five suggestions still reach their own answers; the help reply for unknown questions states the same limit.
+
 ### Milestone 2: voice and widget
 
 ### tts-config
@@ -91,6 +116,11 @@ Work in the order listed. A milestone closes only after these steps, in order:
 - **Goal:** Add the Settings view with orchestrator and voice choices.
 - **Files:** `src/views/SettingsView.tsx`, `src/components/Sidebar.tsx`, `src/App.tsx`, `tests/client/settings-view.test.tsx`
 - **Definition of done:** `tests/client/settings-view.test.tsx` passes: Settings appears in the sidebar; choosing an orchestrator saves it and shows the other as worker; unconfigured voice providers are disabled; no key field exists.
+
+### chat-history
+- **Goal:** Keep the chat history in the ignored `.data/` folder and restore it when the page reloads; "New chat" deletes it.
+- **Files:** `server/chat/history.ts`, `server/routes/chat.ts`, `shared/api.ts`, `src/components/ChatPanel.tsx`, `src/lib/api.ts`, `tests/server/chat-history.test.ts`, `tests/client/chat-panel.test.tsx`
+- **Definition of done:** the history is stored in `.data/chat-history.json` (ignored by git, written atomically, capped in size, validated on read, with a corrupt file treated as empty); `GET /api/chat/history` returns it and `DELETE /api/chat/history` clears it, both behind the existing Host and Origin guards; the chat panel loads the history on mount and renders it as plain text; every sent message and reply is saved; `New chat` deletes the stored history; a reload shows the previous conversation.
 
 ### speech-input
 - **Goal:** Add Web Speech API input with hold Space to talk.
