@@ -10,11 +10,6 @@ A to-do REST API built with TypeScript, Node, Express, and Vitest. Tasks are sto
 
 ## Pending
 
-### error-handling
-- **Goal:** Return the standard error shape for malformed JSON, unknown routes, and unexpected errors.
-- **Files:** `src/errors.ts`, `src/app.ts`, `tests/errors.test.ts`
-- **Definition of done:** `tests/errors.test.ts` passes: malformed JSON returns 400 with code `INVALID_JSON`; an unknown route returns 404 with code `ROUTE_NOT_FOUND`; an unexpected error returns 500 with code `INTERNAL_ERROR` and does not expose the stack trace or original message.
-
 ### ci
 - **Goal:** Run install, tests, and typecheck automatically on every push and pull request with GitHub Actions.
 - **Files:** `.github/workflows/ci.yml`, `example-app/package-lock.json`
@@ -73,3 +68,9 @@ _None._
 - **Files:** `src/routes/tasks.ts`, `tests/delete-task.test.ts`
 - **Definition of done:** `tests/delete-task.test.ts` passes: returns 204 with an empty body; the task no longer appears in get or list; an unknown ID returns 404.
 - **Result:** done. 100 tests pass, typecheck clean.
+
+### error-handling
+- **Goal:** Return the standard error shape for malformed JSON, unknown routes, and unexpected errors.
+- **Files:** `src/errors.ts`, `src/app.ts`, `tests/errors.test.ts`
+- **Definition of done:** `tests/errors.test.ts` passes: malformed JSON returns 400 with code `INVALID_JSON`; an unknown route returns 404 with code `ROUTE_NOT_FOUND`; an unexpected error returns 500 with code `INTERNAL_ERROR` and does not expose the stack trace or original message.
+- **Result:** done. 109 tests pass, typecheck clean.
