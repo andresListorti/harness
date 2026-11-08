@@ -188,3 +188,14 @@ Dependencies were installed by the orchestrator once, during task 1, because the
 
 - **Attempt 1:** Codex wrote `parseRunLog(markdown, source)` in `server/data/runlog.ts`: entries from `## N. name` and `## DN. name` headings split by source, branch, attempts, and result from the table rows, bullets as notes with continuation lines joined, other sections ignored, and no throws on bad input. `tests/server/runlog.test.ts` uses inline fixtures plus the real `docs/run-log.md`. Codex's own first test, typecheck, and build runs failed and it corrected one file within the same attempt.
 - **Orchestrator check:** reviewed the code; `npm test` passed (6 files, 121 tests), `npm run typecheck` was clean, and `npm run build` passed.
+
+## D7. git-reader
+
+| | |
+|---|---|
+| Branch | `task/git-reader` |
+| Codex attempts | 1 |
+| Result | Done |
+
+- **Attempt 1:** Codex wrote `server/data/git.ts`: `getRepoRoot()`, `readCommits(repoDir, limit)` (hash, subject, and committer date only, limit clamped to 1-200, results validated with `commitSchema`), and `listTestFiles(repoDir)` (tracked `*.test.ts` and `*.test.tsx`, sorted). Git runs through `execFile` with fixed argument arrays and no shell, and every failure returns an empty result. `tests/server/git.test.ts` builds a temporary repository with a placeholder identity assembled at runtime, so no email literal is in the source.
+- **Orchestrator check:** reviewed the code and the email search; `npm test` passed (7 files, 131 tests), `npm run typecheck` was clean, and `npm run build` passed.
