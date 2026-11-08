@@ -1,7 +1,9 @@
 import express, { type Express } from 'express';
 import { applySecurity, jsonErrorHandler, type SecurityOptions } from './security';
+import { createDataRouter, type DataDeps } from './routes/data';
 
 interface AppOptions extends SecurityOptions {
+  data?: DataDeps;
   routes?: (app: Express) => void;
 }
 
@@ -15,6 +17,7 @@ export function createApp(options: AppOptions = {}) {
   });
 
   options.routes?.(app);
+  app.use('/api', createDataRouter(options.data));
 
   app.use('/api', (_req, res) => {
     res.status(404).json({
