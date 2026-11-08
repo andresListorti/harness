@@ -133,3 +133,14 @@ Dependencies were installed by the orchestrator once, during task 1, because the
 
 - **Attempt 1:** Codex wrote the Vite, React, TypeScript, Vitest, and Express project files in `dashboard/` (dependencies pinned to caret ranges given in the task prompt), plus `tests/app.test.tsx` covering the Harness heading and the Vite config (host `127.0.0.1`, `/api` proxy). It could not install dependencies (no network).
 - **Orchestrator check:** the orchestrator ran `npm install` once to create `package-lock.json`, then deleted `node_modules` and `dist` and verified from a clean `npm ci`: `npm test` passed (1 file, 2 tests), `npm run typecheck` was clean, and `npm run build` passed. npm warns that the `esbuild` install script is not yet covered by `allowScripts`; the build and tests are unaffected.
+
+## D2. server-app
+
+| | |
+|---|---|
+| Branch | `task/server-app` |
+| Codex attempts | 1 |
+| Result | Done |
+
+- **Attempt 1:** Codex added `server/app.ts` (`createApp()` with `GET /api/health`, JSON 404 for unknown `/api` routes, `x-powered-by` disabled), `server/index.ts` (`HOST` fixed to `127.0.0.1`, validated `PORT`, `startServer()` that listens only when run directly), `tests/server/health.test.ts`, and a `start:server` script.
+- **Orchestrator check:** reviewed the code; `npm test` passed (2 files, 11 tests), `npm run typecheck` was clean, and `npm run build` passed.
