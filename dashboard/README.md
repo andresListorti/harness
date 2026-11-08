@@ -33,7 +33,9 @@ Open `http://127.0.0.1:5173`. Vite proxies `/api` to port 3001, so keep the back
 
 ## Views
 
-- **Harness:** an orb and chat with suggestions and local answers about pending tasks, work in progress, recent commits, the latest recorded run, and tests. Unknown questions return help.
+- **Harness:** an orb and chat with suggestions and local answers about pending tasks, work in progress, recent commits, the latest recorded run, and tests. Asking chat to launch agents, run commands, or change anything gets a clear reply that this
+  version cannot do it and lists what it can answer. Unknown questions get the same limit and
+  suggestions.
 - **Agents:** historical cards derived from the plans and run log, showing source, task, status,
   and agent (an em dash when unknown). The Model and Time rows appear only when a value is
   recorded in the run-log rows `Codex model` and `Duration` and are hidden otherwise.

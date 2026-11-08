@@ -55,11 +55,6 @@ Work in the order listed. A milestone closes only after these steps, in order:
 
 ### Milestone 1: dashboard visible
 
-### chat-unsupported-requests
-- **Goal:** Make the local chat answer clearly when asked to do something it cannot do (for example launching agents).
-- **Files:** `server/chat/local.ts`, `tests/server/chat-local.test.ts`, `README.md`
-- **Definition of done:** `tests/server/chat-local.test.ts` passes: requests to launch, run, start, or otherwise act get a reply saying that this version cannot run agents or change files and listing what it can answer; the five suggestions still reach their own answers; the help reply for unknown questions states the same limit.
-
 ### Milestone 2: voice and widget
 
 ### tts-config
@@ -354,6 +349,12 @@ _None._
 - **Files:** `shared/api.ts`, `server/data/duration.ts`, `server/data/runlog.ts`, `server/data/agents.ts`, `../docs/run-log.md`, `README.md`, and the tests that build run-log entries
 - **Definition of done:** new entries carry the table rows `Codex model` and `Duration`; the parser returns `model` and `durationSeconds` (null when absent or unparseable, so older entries keep working); the Agents cards use them for model and elapsed time; the run-log introduction and the dashboard README document the two rows.
 - **Result:** done. 494 tests pass, typecheck and build clean. Entries D1 to D28 have neither row; from D29 on the model is "not reported" unless the Codex companion output shows one.
+
+### chat-unsupported-requests
+- **Goal:** Make the local chat answer clearly when asked to do something it cannot do (for example launching agents).
+- **Files:** `server/chat/local.ts`, `tests/server/chat-local.test.ts`, `README.md`, `../docs/architecture.md`
+- **Definition of done:** `tests/server/chat-local.test.ts` passes: requests to launch, run, start, or otherwise act get a reply saying that this version cannot run agents or change files and listing what it can answer; the five suggestions still reach their own answers; the help reply for unknown questions states the same limit.
+- **Result:** done in 2 attempts. 545 tests pass, typecheck and build clean. Short read-only phrases such as `run log`, `test status`, and `commit history` are not treated as actions.
 
 ### home-layout-fix
 - **Goal:** Keep the home chat usable on short browser windows (found in the Milestone 1 browser acceptance).

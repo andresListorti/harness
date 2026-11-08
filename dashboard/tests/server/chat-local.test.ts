@@ -5,11 +5,14 @@ import { tmpdir } from 'node:os';
 import request from 'supertest';
 import { expect, test } from 'vitest';
 import { createApp } from '../../server/app';
-import { answerLocally, LOCAL_SUGGESTIONS, type LocalContext } from '../../server/chat/local';
+import {
+  answerLocally, CAPABILITY_NOTICE, LOCAL_SUGGESTIONS, type LocalContext,
+} from '../../server/chat/local';
 import type { PlanTask } from '../../shared/api';
 
 const task = (title: string): PlanTask => ({
-  id: title, title, group: null, goal: '', files: '', definitionOfDone: '', result: null, column: 'pending',
+  id: title, title, group: null, goal: '', files: '', definitionOfDone: '', result: null,
+  column: 'pending',
 });
 const empty: LocalContext = { pending: [], inProgress: [], runLog: [], commits: [], testFiles: [] };
 const context: LocalContext = {
@@ -45,30 +48,39 @@ test('suggestions have the required order and each resolves to its own intent', 
   ]);
   const expected = [
     'Pending tasks: 2\n- Build chat\n- Build client', '- Read plan', 'abcdef1 Add local answers',
-    'D1. latest\nResult: done\nCodex attempts: 0\nFinal note', 'Tracked test files: 2\nLast recorded run: 1 tests',
+    'D1. latest\nResult: done\nCodex attempts: 0\nFinal note',
+    'Tracked test files: 2\nLast recorded run: 1 tests',
   ];
-  LOCAL_SUGGESTIONS.forEach((question, i) => expect(answerLocally(question, context)).toBe(expected[i]));
+  LOCAL_SUGGESTIONS.forEach((question, i) => {
+    expect(answerLocally(question, context)).toBe(expected[i]);
+  });
 });
 
 test('pending and commits are capped, with an accurate remaining count', () => {
-  const reply = answerLocally('next', { ...context, pending: Array.from({ length: 11 }, (_, i) => task(`Task ${i}`)) });
+  const reply = answerLocally('next', {
+    ...context, pending: Array.from({ length: 11 }, (_, i) => task(`Task ${i}`)),
+  });
   expect(reply).toContain('Pending tasks: 11');
   expect(reply.match(/^- /gm)).toHaveLength(8);
   expect(reply).toContain('- Task 7\n...and 3 more');
   expect(reply).not.toContain('Task 8');
-  expect(answerLocally('commits', { ...context, commits: Array(7).fill(context.commits[0]) }).split('\n')).toHaveLength(5);
+  const commits = answerLocally('commits', {
+    ...context, commits: Array(7).fill(context.commits[0]),
+  });
+  expect(commits.split('\n')).toHaveLength(5);
 });
 
 test('empty replies and unknown help contain plain text', () => {
-  const expected = ['No tasks are pending.', 'Nothing is in progress right now.', 'No commits found.',
+  const expected = [
+    'No tasks are pending.', 'Nothing is in progress right now.', 'No commits found.',
     'No runs are recorded yet.', 'Tracked test files: 0\nNo run result is recorded.'];
   LOCAL_SUGGESTIONS.forEach((question, i) => {
     const reply = answerLocally(question, empty);
     expect(reply).toBe(expected[i]);
     expect(reply).not.toContain('<');
   });
-  const help = answerLocally('Tell me a joke', empty);
-  expect(help).toContain('only answer repo questions without an agent yet');
+  const help = answerLocally('hello', empty);
+  expect(help).toContain(CAPABILITY_NOTICE);
   for (const suggestion of LOCAL_SUGGESTIONS) expect(help).toContain(suggestion);
   expect(help).not.toContain('<');
 });
@@ -77,7 +89,7 @@ test.each([
   ['  WHAT   IS\n PENDING?!  ', 'Pending tasks: 2'], ['CURRENT...', 'Read plan'],
   ['working on', 'Read plan'], ['now', 'Read plan'], ['git log', 'abcdef1'],
   ['last task', 'D1. latest'], ['latest task', 'D1. latest'], ['last run', 'D1. latest'],
-  ['run log', 'D1. latest'], ['todo', 'Build chat'], ['to do', 'Build chat'],
+  ['show the run log', 'D1. latest'], ['todo', 'Build chat'], ['to do', 'Build chat'],
   ['remaining', 'Build chat'], ['left', 'Build chat'],
   ['tests commits latest run current pending', 'Tracked test files: 2'],
   ['commits latest run current pending', 'abcdef1'], ['latest run current pending', 'D1. latest'],
@@ -95,21 +107,117 @@ test('unrecorded run fields are omitted and earlier matching test notes remain u
   expect(answerLocally('tests', { ...context, runLog })).toContain('Last recorded run: 1 tests');
 });
 
+
+const suggestionList = LOCAL_SUGGESTIONS.map(question => '- ' + question).join('\n');
+const unsupported = "I can't do that. " + CAPABILITY_NOTICE
+  + '\nI can answer:\n' + suggestionList;
+
+function expectPlainText(reply: string): void {
+  expect(reply).not.toContain('**');
+  expect(reply).not.toContain('`');
+  expect(reply).not.toContain('<');
+}
+
+test.each([
+  'launch codex', 'Launch an agent to fix the build', 'please run the tests',
+  'can you start the next task?', 'could you merge this branch', 'push to main',
+  'create a new task called demo', 'ask claude to review the code',
+  'have codex implement the settings view', 'use the orchestrator to run the plan',
+  'delete the run log', 'fix the failing test', "let's start milestone 2",
+  'Please just go ahead and now run tests?!', 'spawn a worker',
+  'would you write a file', 'will you execute tests', 'i want you to deploy this',
+  'i need you to update the plan', 'lets kick off the next task',
+  'could we ask the worker to review this', 'let the agent handle tests',
+  'get claude code to fix this', 'make the orchestrator act', 'run the tests',
+  'start the next task', 'run log for codex', 'have codex report status',
+])('rejects unsupported action: %s', message => {
+  const reply = answerLocally(message, context);
+  expect(reply).toBe(unsupported);
+  expectPlainText(reply);
+});
+
+test.each([
+  ['run log', 'D1. latest'],
+  ['run the log', 'D1. latest'],
+  ['test status', 'Tracked test files: 2'],
+  ['test results', 'Tracked test files: 2'],
+  ['commit history', 'abcdef1 Add local answers'],
+  ['change log', "I didn't understand that."],
+  ['open tasks', "I didn't understand that."],
+  ['build status', "I didn't understand that."],
+  ['update status', "I didn't understand that."],
+])('keeps read-only phrases out of action replies: %s', (message, expected) => {
+  const reply = answerLocally(message, context);
+  expect(reply).toContain(expected);
+  expect(reply).not.toContain("I can't do that.");
+  expectPlainText(reply);
+});
+
+test.each([
+  [LOCAL_SUGGESTIONS[0], 'Pending tasks: 2'],
+  [LOCAL_SUGGESTIONS[1], '- Read plan'],
+  [LOCAL_SUGGESTIONS[2], 'abcdef1 Add local answers'],
+  [LOCAL_SUGGESTIONS[3], 'D1. latest'],
+  [LOCAL_SUGGESTIONS[4], 'Tracked test files: 2'],
+  ['how many tests run', 'Tracked test files: 2'],
+  ['which commits are the latest', 'abcdef1 Add local answers'],
+  ['is anything pending', 'Pending tasks: 2'],
+  ['show the latest run', 'D1. latest'],
+  ['what is codex working on now', '- Read plan'],
+  ['status of the tests', 'Tracked test files: 2'],
+])('answers the question: %s', (message, expected) => {
+  const reply = answerLocally(message, context);
+  expect(reply).toContain(expected);
+  expect(reply).not.toContain("I can't do that");
+  expectPlainText(reply);
+});
+
+test.each(['what is the weather', 'hello', 'open the browser'])(
+  'explains limits for unknown text: %s', message => {
+    const reply = answerLocally(message, context);
+    expect(reply).toBe("I didn't understand that. " + CAPABILITY_NOTICE
+      + '\nI can answer:\n' + suggestionList);
+    expectPlainText(reply);
+  },
+);
+
 test('chat routes use fixed repo context and enforce contracts and guards', async () => {
   const repoRoot = await mkdtemp(join(tmpdir(), 'harness-chat-local-'));
   try {
     for (const dir of ['dashboard', 'example-app', 'docs']) await mkdir(join(repoRoot, dir));
-    await writeFile(join(repoRoot, 'dashboard/PLAN.md'), '# PLAN\n## Pending\n### Dashboard pending\n- **Goal:** chat\n## In progress\n### Dashboard current\n- **Goal:** work\n');
-    await writeFile(join(repoRoot, 'example-app/PLAN.md'), '# PLAN\n## Pending\n### Example pending\n- **Goal:** example\n');
-    await writeFile(join(repoRoot, 'docs/run-log.md'), '## D1. Dashboard run\n| Result | done |\n- 9 tests\n## 1. Example run\n- 3 tests\n');
+    await writeFile(join(repoRoot, 'dashboard/PLAN.md'),
+      '# PLAN\n'
+      + '## Pending\n'
+      + '### Dashboard pending\n'
+      + '- **Goal:** chat\n'
+      + '## In progress\n'
+      + '### Dashboard current\n'
+      + '- **Goal:** work\n'
+      + '');
+    await writeFile(join(repoRoot, 'example-app/PLAN.md'),
+      '# PLAN\n'
+      + '## Pending\n'
+      + '### Example pending\n'
+      + '- **Goal:** example\n'
+      + '');
+    await writeFile(join(repoRoot, 'docs/run-log.md'),
+      '## D1. Dashboard run\n'
+      + '| Result | done |\n'
+      + '- 9 tests\n'
+      + '## 1. Example run\n'
+      + '- 3 tests\n'
+      + '');
     const app = createApp({ data: {
-      repoRoot, readCommits: async () => ({ commits: context.commits }), listTestFiles: async () => context.testFiles,
+      repoRoot, readCommits: async () => ({ commits: context.commits }),
+      listTestFiles: async () => context.testFiles,
     } });
     const post = (body: object) => request(app).post('/api/chat').set('Host', '127.0.0.1:3001')
       .set('Origin', 'http://127.0.0.1:3001').set('Content-Type', 'application/json').send(body);
     for (const [message, expected] of [
+      ['please run the tests', unsupported],
       [LOCAL_SUGGESTIONS[0], 'Pending tasks: 1\n- Dashboard pending'],
-      [LOCAL_SUGGESTIONS[1], '- Dashboard current'], [LOCAL_SUGGESTIONS[2], 'abcdef1 Add local answers'],
+      [LOCAL_SUGGESTIONS[1], '- Dashboard current'],
+      [LOCAL_SUGGESTIONS[2], 'abcdef1 Add local answers'],
       [LOCAL_SUGGESTIONS[3], 'D1. Dashboard run\nResult: done\n9 tests'],
       [LOCAL_SUGGESTIONS[4], 'Tracked test files: 2\nLast recorded run: 9 tests'],
     ]) {
@@ -128,7 +236,8 @@ test('chat routes use fixed repo context and enforce contracts and guards', asyn
     const denied = await request(app).post('/api/chat').set('Host', '127.0.0.1:3001')
       .set('Content-Type', 'application/json').send({ message: 'tests' });
     expect(denied.status).toBe(403);
-    const suggestions = await request(app).get('/api/chat/suggestions').set('Host', '127.0.0.1:3001');
+    const suggestions = await request(app).get('/api/chat/suggestions')
+      .set('Host', '127.0.0.1:3001');
     expect(suggestions.status).toBe(200);
     expect(suggestions.body).toEqual({ suggestions: LOCAL_SUGGESTIONS });
     expect(suggestions.headers['cache-control']).toBe('no-store');
