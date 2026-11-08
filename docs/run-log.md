@@ -288,3 +288,14 @@ Dependencies were installed by the orchestrator once, during task 1, because the
 
 - **Attempt 1:** Codex wrote the `Orb` component: five concentric SVG rings, a CSS-gradient glow and core, and idle, listening (amber), and speaking (faster teal pulse with ripples) states driven by `data-state`. Animation is pure CSS with a `prefers-reduced-motion` block. The glow uses HTML radial gradients instead of SVG gradient definitions, so no `url(...)` appears in the files. `tests/client/orb.test.tsx` checks the states, the five rings, the absence of any image element or external reference, and the reduced-motion rule.
 - **Orchestrator check:** reviewed the code; `npm test` passed (15 files, 250 tests), `npm run typecheck` was clean, and `npm run build` passed.
+
+## D16. chat-panel
+
+| | |
+|---|---|
+| Branch | `task/chat-panel` |
+| Codex attempts | 1 |
+| Result | Done |
+
+- **Attempt 1:** Codex wrote `ChatPanel` with an injectable client: suggestion chips loaded from `GET /api/chat/suggestions`, Send (button or Enter), New chat that invalidates any in-flight request, a "Local answer" label on replies, a "Thinking…" indicator, a `role="alert"` error that never shows a raw response body, and plain-text rendering with preserved line breaks so HTML in a reply stays literal. No microphone, voice, hands-free, or model controls exist yet. `tests/client/chat-panel.test.tsx` covers these cases, including a late reply after New chat and after unmount.
+- **Orchestrator check:** reviewed the code and confirmed the ellipsis is stored as proper UTF-8; `npm test` passed (16 files, 262 tests), `npm run typecheck` was clean, and `npm run build` passed.
