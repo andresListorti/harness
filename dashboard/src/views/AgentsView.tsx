@@ -67,10 +67,15 @@ export function AgentsView({ client = api }: { client?: Pick<typeof api, 'getAge
           <span className={`agent-status agent-status--${agent.status}`}>{statuses[agent.status]}</span>
           <dl>
             <div><dt>Agent</dt><dd>{agent.agent === null ? EMPTY_VALUE : agentNames[agent.agent]}</dd></div>
-            <div><dt>Model</dt><dd>{agent.model ?? EMPTY_VALUE}</dd></div>
-            <div><dt>Time</dt><dd>{formatElapsed(agent.elapsedSeconds)}</dd></div>
+            {agent.model !== null && <div><dt>Model</dt><dd>{agent.model}</dd></div>}
+            {agent.elapsedSeconds !== null && <div>
+              <dt>Time</dt><dd>{formatElapsed(agent.elapsedSeconds)}</dd>
+            </div>}
           </dl>
-          <pre className="mono agent-output">{agent.output.length ? agent.output.join('\n') : EMPTY_VALUE}</pre>
+          <pre
+            className="mono agent-output"
+            title={agent.output.length ? agent.output.join('\n') : undefined}
+          >{agent.output.length ? agent.output.join('\n') : EMPTY_VALUE}</pre>
         </article>)}
       </div>
       {pages > 1 && <nav className="agents-pagination" aria-label="Agent pages">
