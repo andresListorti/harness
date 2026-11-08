@@ -55,11 +55,6 @@ Work in the order listed. A milestone closes only after these steps, in order:
 
 ### Milestone 1: dashboard visible
 
-### api-client
-- **Goal:** Add a typed front-end client that validates responses against `shared/api.ts`.
-- **Files:** `src/lib/api.ts`, `tests/client/api.test.ts`
-- **Definition of done:** `tests/client/api.test.ts` passes: valid responses are parsed; HTTP errors and invalid shapes produce typed errors.
-
 ### theme-tokens
 - **Goal:** Add the dark theme: near-black textured background, teal `#2dd4bf`, amber for active states, bundled modern sans font, and large section titles.
 - **Files:** `src/styles/tokens.css`, `src/styles/global.css`, `src/main.tsx`, `tests/client/theme.test.ts`
@@ -305,6 +300,12 @@ _None._
 - **Files:** `server/chat/local.ts`, `server/routes/chat.ts`, `server/routes/data.ts`, `server/app.ts`, `shared/api.ts`, `tests/server/chat-local.test.ts`, `tests/shared/api.test.ts`
 - **Definition of done:** `tests/server/chat-local.test.ts` passes: pending tasks, current task, latest commits, latest run, and test status are answered from fixtures; an unknown question returns a reply listing what can be asked; invalid bodies return 400; the route cannot start a process.
 - **Result:** done. 199 tests pass, typecheck and build clean. Also adds `GET /api/chat/suggestions` and a shared repo reader.
+
+### api-client
+- **Goal:** Add a typed front-end client that validates responses against `shared/api.ts`.
+- **Files:** `src/lib/api.ts`, `tests/client/api.test.ts`
+- **Definition of done:** `tests/client/api.test.ts` passes: valid responses are parsed; HTTP errors and invalid shapes produce typed errors.
+- **Result:** done. 227 tests pass, typecheck and build clean.
 
 ## Phase 2: real agent execution
 

@@ -243,3 +243,14 @@ Dependencies were installed by the orchestrator once, during task 1, because the
 
 - **Attempt 1:** Codex added `answerLocally` in `server/chat/local.ts` (five intents: pending, in progress, latest commits, latest run, and tests, with a help reply for anything else), `POST /api/chat` and `GET /api/chat/suggestions` in `server/routes/chat.ts`, a shared `createRepoReader` exported from `server/routes/data.ts`, and a `chatSuggestionsSchema` in `shared/api.ts`. Replies are plain text built only from repo data. A test asserts the chat modules contain no `child_process` or `spawn`. Codex's first test run showed "latest" matching the tests intent and it fixed the matching to whole words within the same attempt.
 - **Orchestrator check:** reviewed the code; `npm test` passed (11 files, 199 tests), `npm run typecheck` was clean, and `npm run build` passed.
+
+## D12. api-client
+
+| | |
+|---|---|
+| Branch | `task/api-client` |
+| Codex attempts | 1 |
+| Result | Done |
+
+- **Attempt 1:** Codex wrote `src/lib/api.ts`: `ApiError` (codes `NETWORK_ERROR`, `HTTP_ERROR`, `INVALID_RESPONSE`, or the server's own code), `createApiClient(fetchImpl)` with typed methods for health, plan, run log, commits, galaxy, agents, chat suggestions, and chat, and a default `api` instance. Every response is validated against `shared/api.ts`, URLs are relative, and error messages never include the response body. `tests/client/api.test.ts` uses a mocked `fetch`.
+- **Orchestrator check:** reviewed the code; `npm test` passed (12 files, 227 tests), `npm run typecheck` was clean, and `npm run build` passed.
