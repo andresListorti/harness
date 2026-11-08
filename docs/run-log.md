@@ -63,3 +63,14 @@ The write-enabled sandbox has no network access, so Codex cannot run `npm instal
 
 - **Attempt 1:** Codex added `GET /tasks` (with a strict `completed=true|false` filter) and `GET /tasks/:id` (404 `TASK_NOT_FOUND`) to the router, plus `tests/list-tasks.test.ts`. Because tasks cannot be completed through the API yet, the tests decorate the store with a small test-only wrapper to produce completed tasks.
 - **Orchestrator check:** `npm test` passed (5 files, 79 tests) and `npm run typecheck` was clean.
+
+## 6. edit-task
+
+| | |
+|---|---|
+| Branch | `task/edit-task` |
+| Codex attempts | 1 |
+| Result | Done |
+
+- **Attempt 1:** Codex added `PATCH /tasks/:id` (body validated first, then lookup, 404 `TASK_NOT_FOUND`) and `tests/edit-task.test.ts`, with fake timers to check `updatedAt`.
+- **Orchestrator check:** `npm test` passed (6 files, 93 tests) and `npm run typecheck` was clean.

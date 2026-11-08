@@ -1,7 +1,7 @@
 import { Router } from 'express';
 import { errorBody } from '../errors.js';
 import type { TaskStore } from '../store.js';
-import { createTaskSchema } from '../validation.js';
+import { createTaskSchema, updateTaskSchema } from '../validation.js';
 
 export function createTasksRouter(store: TaskStore) {
   const router = Router();
@@ -43,6 +43,24 @@ export function createTasksRouter(store: TaskStore) {
     }
 
     response.status(201).json(store.create(result.data));
+  });
+
+  router.patch('/:id', (request, response) => {
+    const result = updateTaskSchema.safeParse(request.body);
+    if (!result.success) {
+      response.status(400).json(
+        errorBody('VALIDATION_ERROR', 'Invalid task data.', result.error.issues),
+      );
+      return;
+    }
+
+    const task = store.update(request.params.id, result.data);
+    if (!task) {
+      response.status(404).json(errorBody('TASK_NOT_FOUND', 'Task not found.'));
+      return;
+    }
+
+    response.status(200).json(task);
   });
 
   return router;
