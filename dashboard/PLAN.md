@@ -55,11 +55,6 @@ Work in the order listed. A milestone closes only after these steps, in order:
 
 ### Milestone 1: dashboard visible
 
-### galaxy-camera
-- **Goal:** Add pure functions for orbit positions, wheel zoom, drag pan, and hit testing.
-- **Files:** `src/galaxy/camera.ts`, `tests/client/galaxy-camera.test.ts`
-- **Definition of done:** `tests/client/galaxy-camera.test.ts` passes: zoom keeps the point under the cursor fixed and respects limits; pan moves by the screen delta at any zoom; hit testing finds a planet and returns `null` in empty space.
-
 ### galaxy-view
 - **Goal:** Render the animated galaxy on a 2D canvas with a detail panel.
 - **Files:** `src/views/GalaxyView.tsx`, `src/galaxy/draw.ts`, `tests/client/galaxy-view.test.tsx`
@@ -312,6 +307,12 @@ _None._
 - **Files:** `src/views/AgentsView.tsx`, `src/views/AgentsView.css`, `src/lib/format.ts`, `src/App.tsx`, `tests/client/agents-view.test.tsx`, `tests/client/format.test.ts`, `tests/client/sidebar.test.tsx`
 - **Definition of done:** `tests/client/agents-view.test.tsx` passes: task, agent, model, status, time, and monospaced output render; the selector changes the layout; a `null` value shows "—"; the empty state renders.
 - **Result:** done. 294 tests pass, typecheck and build clean. Adds pagination (page size follows the layout) and a Refresh button.
+
+### galaxy-camera
+- **Goal:** Add pure functions for orbit positions, wheel zoom, drag pan, and hit testing.
+- **Files:** `src/galaxy/camera.ts`, `tests/client/galaxy-camera.test.ts`
+- **Definition of done:** `tests/client/galaxy-camera.test.ts` passes: zoom keeps the point under the cursor fixed and respects limits; pan moves by the screen delta at any zoom; hit testing finds a planet and returns `null` in empty space.
+- **Result:** done. 317 tests pass, typecheck and build clean.
 
 ## Phase 2: real agent execution
 

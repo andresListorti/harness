@@ -321,3 +321,14 @@ Dependencies were installed by the orchestrator once, during task 1, because the
 
 - **Attempt 1:** Codex wrote `AgentsView` (grid of historical cards with a 1, 2x2, and 3x3 selector, pagination whose page size follows the layout, a Refresh button, and loading, empty, and error states with retry), the `formatElapsed` helper, and wired the view into `App.tsx`. Cards show source, task, status, agent, model, time, and output as plain monospaced text; missing values show an em dash. `tests/client/agents-view.test.tsx` and `tests/client/format.test.ts` cover the cases, including stale responses and literal HTML.
 - **Orchestrator check:** reviewed the code and confirmed the special characters (multiplication sign, em dash, ellipsis) are stored as proper UTF-8; `npm test` passed (19 files, 294 tests), `npm run typecheck` was clean, and `npm run build` passed.
+
+## D19. galaxy-camera
+
+| | |
+|---|---|
+| Branch | `task/galaxy-camera` |
+| Codex attempts | 1 |
+| Result | Done |
+
+- **Attempt 1:** Codex wrote `src/galaxy/camera.ts`: world and screen conversion, zoom that keeps the point under the cursor fixed with limits, wheel zoom factor, drag pan clamped to a maximum, fit zoom, `layoutGalaxy` (core at the origin, agents and systems on two orbits turning in opposite directions, planet radius growing with count), and hit testing in world and screen space. `tests/client/galaxy-camera.test.ts` covers these. The Codex run outlasted a tool timeout and reported before finishing; the orchestrator waited for the process to end and then verified the result itself.
+- **Orchestrator check:** reviewed the code against the task spec; `npm test` passed (20 files, 317 tests), `npm run typecheck` was clean, and `npm run build` passed.
