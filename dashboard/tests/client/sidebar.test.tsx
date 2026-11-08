@@ -9,6 +9,8 @@ vi.mock('../../src/lib/api', () => ({ api: {
   getHealth: vi.fn(),
   getGalaxy: vi.fn().mockResolvedValue({ nodes: [] }),
   getAgents: vi.fn().mockResolvedValue({ agents: [] }),
+  getPlan: vi.fn().mockResolvedValue({ source: 'dashboard', tasks: [] }),
+  getRunLog: vi.fn().mockResolvedValue({ source: 'dashboard', entries: [] }),
   getChatSuggestions: vi.fn().mockResolvedValue({ suggestions: [] }),
   sendChat: vi.fn(),
 } }));

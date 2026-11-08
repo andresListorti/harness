@@ -4,6 +4,8 @@ import viteConfig from '../vite.config';
 
 vi.mock('../src/lib/api', () => ({ api: {
   getHealth: vi.fn(() => new Promise(() => {})),
+  getPlan: vi.fn().mockResolvedValue({ source: 'dashboard', tasks: [] }),
+  getRunLog: vi.fn().mockResolvedValue({ source: 'dashboard', entries: [] }),
   getChatSuggestions: vi.fn().mockResolvedValue({ suggestions: [] }),
   sendChat: vi.fn(),
 } }));

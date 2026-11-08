@@ -344,3 +344,14 @@ Dependencies were installed by the orchestrator once, during task 1, because the
 - **Not an attempt:** the first launch never reached Codex: the task text contained single quotes that broke the shell command, and the branch stayed unchanged. The task text was saved to a file and passed to Codex through command substitution on the relaunch.
 - **Attempt 1:** Codex wrote `src/galaxy/draw.ts` (deterministic starfield, orbits, core glow, planets, selection ring, labels and counts), `GalaxyView` (data loading with retry, canvas animation loop cancelled on unmount, native non-passive wheel zoom, pointer drag, click-to-select, `Reset view`, reduced-motion handling, an accessible legend of buttons, and a detail panel), and wired it into `App.tsx`. Its tests use a recording canvas context and cover loading, errors, stale responses, selection, drag, wheel, reset, and reduced motion. Codex's first build failed because PowerShell saved the new files with a UTF-8 byte order mark and it re-saved them; the orchestrator found the marks still present in the six new files and stripped them.
 - **Orchestrator check:** reviewed the code; `npm test` passed (22 files, 330 tests), `npm run typecheck` was clean, and `npm run build` passed.
+
+## D21. plan-view
+
+| | |
+|---|---|
+| Branch | `task/plan-view` |
+| Codex attempts | 1 |
+| Result | Done |
+
+- **Attempt 1:** Codex wrote `PlanView`: a Pending, In progress, and Done board with counts and milestone group headings, expandable task details, a source selector between the dashboard and example-app plans, a run log (newest first) with expandable notes, loading, error, and retry states, and protection against stale responses. It also removed the temporary placeholder from `App.tsx`, since all four views are real now. `tests/client/plan-view.test.tsx` covers these cases.
+- **Orchestrator check:** reviewed the code and confirmed no file has a byte order mark; `npm test` passed (23 files, 343 tests), `npm run typecheck` was clean, and `npm run build` passed.

@@ -1,0 +1,38 @@
+.plan-view, .plan-column, .plan-task-group, .plan-card, .plan-run-log {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+.plan-view { gap: var(--space-6); }
+.plan-header, .plan-controls, .plan-column-header {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: var(--space-3);
+}
+.plan-header, .plan-column-header { justify-content: space-between; }
+.plan-header .eyebrow { margin-top: var(--space-3); }
+.plan-controls [aria-pressed="true"] { border-color: var(--color-teal); color: var(--color-teal); }
+.plan-board { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: var(--space-4); }
+.plan-column { min-width: 0; max-height: 65vh; overflow-y: auto; padding: var(--space-3); }
+.plan-column-header span { color: var(--color-text-muted); }
+.plan-card, .plan-run {
+  padding: var(--space-4);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  background: var(--color-bg-raised);
+  overflow-wrap: anywhere;
+}
+.plan-card--in_progress { border-color: var(--color-amber); }
+.plan-done { color: var(--color-teal); font-size: var(--text-sm); align-self: flex-start; }
+.plan-card dl, .plan-card dl > div { display: flex; flex-direction: column; gap: var(--space-2); }
+.plan-card dl, .plan-run p, .plan-run ul { margin-top: var(--space-3); }
+.plan-card dt { color: var(--color-text-muted); }
+.plan-card dd { margin: 0; white-space: pre-wrap; }
+.plan-run summary span { margin-right: var(--space-3); }
+.plan-run ul { padding-left: var(--space-5); }
+.plan-error { color: var(--color-danger); }
+@media (max-width: 56rem) {
+  .plan-board { grid-template-columns: minmax(0, 1fr); }
+  .plan-column { max-height: none; overflow-y: visible; }
+}
