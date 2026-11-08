@@ -55,11 +55,6 @@ Work in the order listed. A milestone closes only after these steps, in order:
 
 ### Milestone 1: dashboard visible
 
-### plan-view
-- **Goal:** Add the Pending, In progress, and Done board with the run log and a source selector.
-- **Files:** `src/views/PlanView.tsx`, `tests/client/plan-view.test.tsx`
-- **Definition of done:** `tests/client/plan-view.test.tsx` passes: tasks appear in the right column under their milestone; the source selector reloads data; the run log renders; empty and error states render.
-
 ### serve-build
 - **Goal:** Serve the built front end from Express with a strict content security policy.
 - **Files:** `server/app.ts`, `server/index.ts`, `package.json`, `tests/server/static.test.ts`
@@ -314,6 +309,12 @@ _None._
 - **Files:** `src/views/GalaxyView.tsx`, `src/views/GalaxyView.css`, `src/galaxy/draw.ts`, `src/App.tsx`, `tests/client/galaxy-view.test.tsx`, `tests/client/galaxy-draw.test.ts`, `tests/client/galaxy-fixture.ts`, `tests/client/sidebar.test.tsx`
 - **Definition of done:** `tests/client/galaxy-view.test.tsx` passes with a mocked canvas: it renders from API data; clicking a planet opens its detail; the animation frame is cancelled on unmount; the systems are also listed for screen readers.
 - **Result:** done. 330 tests pass, typecheck and build clean.
+
+### plan-view
+- **Goal:** Add the Pending, In progress, and Done board with the run log and a source selector.
+- **Files:** `src/views/PlanView.tsx`, `src/views/PlanView.css`, `src/App.tsx`, `tests/client/plan-view.test.tsx`, `tests/client/sidebar.test.tsx`, `tests/app.test.tsx`
+- **Definition of done:** `tests/client/plan-view.test.tsx` passes: tasks appear in the right column under their milestone; the source selector reloads data; the run log renders; empty and error states render.
+- **Result:** done. 343 tests pass, typecheck and build clean. All four views are real now.
 
 ## Phase 2: real agent execution
 
