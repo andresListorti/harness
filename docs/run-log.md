@@ -155,3 +155,14 @@ Dependencies were installed by the orchestrator once, during task 1, because the
 
 - **Attempt 1:** Codex added `server/security.ts` (Host allowlist, Origin check on state-changing methods, JSON content-type check, 16 kb body limit, and a JSON error handler for 400, 413, and 500), wired it into `createApp()` with a `ports` option and a `routes` hook, updated the health tests to send an allowed Host, and wrote `tests/server/security.test.ts`.
 - **Orchestrator check:** reviewed the code; `npm test` passed (3 files, 32 tests), `npm run typecheck` was clean, and `npm run build` passed.
+
+## D4. api-contract
+
+| | |
+|---|---|
+| Branch | `task/api-contract` |
+| Codex attempts | 1 |
+| Result | Done |
+
+- **Attempt 1:** Codex wrote `shared/api.ts` with strict Zod schemas and inferred types for plan tasks and boards, run-log entries, commits, galaxy nodes, agent cards, health, chat request and response, and the API error shape, plus `tests/shared/api.test.ts`. The orchestrator fixed the field shapes in the task prompt so later parsers and models share one contract.
+- **Orchestrator check:** reviewed the schemas; `npm test` passed (4 files, 91 tests), `npm run typecheck` was clean, and `npm run build` passed.
