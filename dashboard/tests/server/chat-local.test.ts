@@ -15,8 +15,14 @@ const empty: LocalContext = { pending: [], inProgress: [], runLog: [], commits: 
 const context: LocalContext = {
   pending: [task('Build chat'), task('Build client')], inProgress: [task('Read plan')],
   runLog: [
-    { id: '1', title: 'old', branch: null, attempts: 1, result: 'done', notes: ['90 tests'] },
-    { id: 'D1', title: 'latest', branch: null, attempts: 0, result: 'done', notes: ['12 tests', '1 test', 'Final note'] },
+    {
+      id: '1', title: 'old', branch: null, model: null, durationSeconds: null,
+      attempts: 1, result: 'done', notes: ['90 tests'],
+    },
+    {
+      id: 'D1', title: 'latest', branch: null, model: null, durationSeconds: null,
+      attempts: 0, result: 'done', notes: ['12 tests', '1 test', 'Final note'],
+    },
   ],
   commits: [{ hash: 'abcdef123456', subject: 'Add local answers', date: '2026-01-01T00:00:00Z' }],
   testFiles: ['a.test.ts', 'b.test.ts'],
@@ -81,7 +87,10 @@ test.each([
 });
 
 test('unrecorded run fields are omitted and earlier matching test notes remain usable', () => {
-  const runLog = [...context.runLog, { id: 'D2', title: 'new', branch: null, attempts: null, result: null, notes: [] }];
+  const runLog = [...context.runLog, {
+    id: 'D2', title: 'new', branch: null, model: null, durationSeconds: null,
+    attempts: null, result: null, notes: [],
+  }];
   expect(answerLocally('latest run', { ...context, runLog })).toBe('D2. new');
   expect(answerLocally('tests', { ...context, runLog })).toContain('Last recorded run: 1 tests');
 });

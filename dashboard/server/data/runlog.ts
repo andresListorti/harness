@@ -1,5 +1,6 @@
 import type { PlanSource, RunLog, RunLogEntry } from '../../shared/api';
 import { toPlainText } from './plain-text';
+import { parseDuration } from './duration';
 
 function tableText(value: string): string | null {
   return value.trim().replace(/^`+|`+$/g, '').trim() || null;
@@ -19,7 +20,10 @@ export function parseRunLog(markdown: string, source: PlanSource): RunLog {
       if (!heading || !heading[2].trim()) continue;
       const [, id, title] = heading;
       if ((id.startsWith('D') ? 'dashboard' : 'example-app') !== source) continue;
-      entry = { id, title: title.trim(), branch: null, attempts: null, result: null, notes: [] };
+      entry = {
+        id, title: title.trim(), branch: null, attempts: null,
+        model: null, durationSeconds: null, result: null, notes: [],
+      };
       log.entries.push(entry);
       continue;
     }
@@ -32,6 +36,11 @@ export function parseRunLog(markdown: string, source: PlanSource): RunLog {
       const value = tableText(row[2]);
       if (label === 'branch') entry.branch = value;
       if (label === 'result') entry.result = value;
+      if (label === 'codex model') {
+        entry.model = value && !/^(not reported|unknown|none|n\/a|-|—)$/i.test(value)
+          ? value : null;
+      }
+      if (label === 'duration') entry.durationSeconds = parseDuration(value ?? '');
       if (label === 'codex attempts') {
         const integer = value?.match(/^\d+/);
         const attempts = integer ? Number(integer[0]) : NaN;

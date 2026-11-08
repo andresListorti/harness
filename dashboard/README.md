@@ -36,14 +36,15 @@ Open `http://127.0.0.1:5173`. Vite proxies `/api` to port 3001, so keep the back
 - **Harness:** an orb and chat with suggestions and local answers about pending tasks, work in progress, recent commits, the latest recorded run, and tests. Unknown questions return help.
 - **Agents:** historical cards derived from the plans and run log, showing source, task, status,
   and agent (an em dash when unknown). The Model and Time rows appear only when a value is
-  recorded and are hidden otherwise. Output is wrapped plain text limited to four lines
+  recorded in the run-log rows `Codex model` and `Duration` and are hidden otherwise.
+  Output is wrapped plain text limited to four lines
   (the full text is in the tooltip). Choose 1, 2x2, or 3x3 layouts with pagination.
 - **Galaxy:** an animated canvas with the Harness core, Claude Code, Codex, Tasks, Commits, and Tests. Details use recorded tasks and attempts, recent commits, tracked test files, and recorded test results. Wheel to zoom, drag to pan, or click a planet; the button legend also opens details from the keyboard. Roles currently default to Claude Code as orchestrator and Codex as worker.
 - **Plan:** a Pending, In progress, and Done board with task details and the run log. The source selector switches between the dashboard and example-app plans. Future milestone tasks can appear as pending; Phase 2 is excluded from the board.
 
 ## Data sources
 
-The backend reads a fixed list of repo files: `dashboard/PLAN.md`, `example-app/PLAN.md`, and `docs/run-log.md`. It also reads `git log` and tracked test file names. In the run log, entries headed `## N. name` belong to example-app and `## DN. name` belong to the dashboard, where N is a number. Test information is recorded history and file inventory; opening the dashboard does not run tests.
+The backend reads a fixed list of repo files: `dashboard/PLAN.md`, `example-app/PLAN.md`, and `docs/run-log.md`. It also reads `git log` and tracked test file names. In the run log, entries headed `## N. name` belong to example-app and `## DN. name` belong to the dashboard, where N is a number. The `Codex model` and `Duration` rows, present from D29 on, supply agent models and times. Test information is recorded history and file inventory; opening the dashboard does not run tests.
 
 ## HTTP API
 

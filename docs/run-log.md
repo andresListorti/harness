@@ -1,6 +1,6 @@
 # Run log
 
-One entry per task: how many attempts Codex needed, which tests passed, and the result. Numbered entries (`## 1. name`) are example-app tasks from `example-app/PLAN.md`; D-prefixed entries (`## D1. name`) are dashboard tasks from `dashboard/PLAN.md`. The orchestrator (Claude Code) runs the tests itself after every attempt.
+One entry per task: how many attempts Codex needed, which tests passed, and the result. Numbered entries (`## 1. name`) are example-app tasks from `example-app/PLAN.md`; D-prefixed entries (`## D1. name`) are dashboard tasks from `dashboard/PLAN.md`. The orchestrator (Claude Code) runs the tests itself after every attempt. Entries from D29 on have two more table rows: `Codex model` (the model name shown in the Codex companion output, or `not reported` when it does not show one) and `Duration` (the wall time of the delegated task as measured by the orchestrator, which includes the Codex run; written like `1m 54s`). Older entries do not have these rows.
 
 ## Environment note: Codex sandbox on Windows
 
@@ -476,3 +476,16 @@ Dependencies were installed by the orchestrator once, during task 1, because the
 
 - **Attempt 1:** Codex made the Agents card output wrap (including long words), keep line breaks, and show at most four lines with an ellipsis and no horizontal scrolling, put the full text in the block's tooltip, and made the Model and Time rows render only when their value is not null (the Agent row still shows an em dash when unknown). It updated the tests and the dashboard README. Its first test run failed and it fixed the cause within the same attempt.
 - **Orchestrator check:** reviewed the diff and confirmed no byte order marks; `npm test` passed (27 files, 451 tests), `npm run typecheck` was clean, and `npm run build` passed.
+
+## D32. run-log-model-duration
+
+| | |
+|---|---|
+| Branch | `task/run-log-model-duration` |
+| Codex attempts | 1 |
+| Codex model | not reported |
+| Duration | 2m 47s |
+| Result | Done |
+
+- **Attempt 1:** Codex added `model` and `durationSeconds` to the run-log entry schema, a strict `parseDuration` (`45s`, `1m 54s`, `1h 02m 05s`, and similar; anything else returns null), made the parser read the `Codex model` and `Duration` rows (a model of "not reported" or similar becomes null; entries without the rows keep nulls), made the Agents cards take model and time from the entry, updated the fixtures and tests (including real-file checks: D29 gives 114 seconds and D1 gives nulls), and documented the two rows in the run-log introduction and the dashboard README.
+- **Orchestrator check:** reviewed the diff and confirmed no byte order marks and that only the run-log introduction changed in the existing text; `npm test` passed (28 files, 494 tests), `npm run typecheck` was clean, and `npm run build` passed.

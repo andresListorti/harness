@@ -16,7 +16,10 @@ function task(id = 'task', overrides: Partial<PlanTask> = {}): PlanTask {
 }
 
 function entry(id = 'D1', overrides: Partial<RunLogEntry> = {}): RunLogEntry {
-  return { id, title: `Run ${id}`, branch: 'task/example', attempts: 1, result: 'Passed', notes: ['A note'], ...overrides };
+  return {
+    id, title: `Run ${id}`, branch: 'task/example', attempts: 1,
+    model: null, durationSeconds: null, result: 'Passed', notes: ['A note'], ...overrides,
+  };
 }
 
 function clientFor(tasks: PlanTask[] = [], entries: RunLogEntry[] = []) {

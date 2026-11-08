@@ -11,7 +11,8 @@ const task = (overrides: Partial<PlanTask> = {}): PlanTask => ({
   goal: '', files: '', definitionOfDone: '', result: null, ...overrides,
 });
 const entry = (overrides: Partial<RunLogEntry> = {}): RunLogEntry => ({
-  id: '1', title: 'task', branch: null, attempts: null, result: null, notes: [], ...overrides,
+  id: '1', title: 'task', branch: null, attempts: null, result: null, notes: [],
+  model: null, durationSeconds: null, ...overrides,
 });
 const source = (overrides: Partial<AgentsSource> = {}): AgentsSource => ({
   source: 'dashboard', tasks: [task()], runLog: [], ...overrides,
@@ -46,10 +47,11 @@ test.each([null, 'Done', ' dOnE '])('result %s preserves the plan status', resul
 });
 
 test.each([null, 0, 2])('identifies Codex only from non-null attempts: %s', attempts => {
-  const [card] = agents([source({ runLog: [entry({ attempts })] })]);
+  const recorded = entry({ attempts, model: 'test-model', durationSeconds: 114 });
+  const [card] = agents([source({ runLog: [recorded] })]);
   expect(card.agent).toBe(attempts === null ? null : 'codex');
-  expect(card.model).toBeNull();
-  expect(card.elapsedSeconds).toBeNull();
+  expect(card.model).toBe('test-model');
+  expect(card.elapsedSeconds).toBe(114);
 });
 
 test('matches task id exactly, never the display title or a partial id', () => {
@@ -108,9 +110,13 @@ test('builds validated historical cards from the real plans and run log', async 
       expect(line).not.toContain('`');
     }
     expect(agentCardSchema.safeParse(card).success).toBe(true);
-    expect(card.model).toBeNull();
-    expect(card.elapsedSeconds).toBeNull();
   }
+  expect(cards.find(card => card.id === 'dashboard/plain-text-notes')).toMatchObject({
+    elapsedSeconds: 114, model: null,
+  });
+  expect(cards.find(card => card.id === 'example-app/ci')).toMatchObject({
+    elapsedSeconds: null, model: null,
+  });
   const setup = cards.find(card => card.id === 'example-app/project-setup');
   expect(setup).toMatchObject({ status: 'done', agent: 'codex' });
   expect(setup?.output.length).toBeGreaterThan(0);

@@ -21,8 +21,8 @@ export function buildAgents(sources: AgentsSource[]): Agents {
         task: task.title,
         status: failed ? 'error' : task.column === 'in_progress' ? 'working' : 'done',
         agent: entry?.attempts != null ? 'codex' : null,
-        model: null,
-        elapsedSeconds: null,
+        model: entry?.model ?? null,
+        elapsedSeconds: entry?.durationSeconds ?? null,
         output: (entry?.notes ?? []).slice(-3).map(note => note.length > 240 ? `${note.slice(0, 239)}…` : note),
       };
       if (card.status === 'working') working.push(card);

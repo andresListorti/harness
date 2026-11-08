@@ -32,6 +32,8 @@ export const runLogEntrySchema = z.object({
   title: z.string().min(1),
   branch: z.string().nullable(),
   attempts: z.number().int().min(0).nullable(),
+  model: z.string().nullable(),
+  durationSeconds: z.number().min(0).finite().nullable(),
   result: z.string().nullable(),
   notes: z.array(z.string()),
 }).strict();

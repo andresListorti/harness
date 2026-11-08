@@ -16,6 +16,7 @@ Ignored prose.
 - Second note
 `, 'example-app');
   expect(log).toEqual({ source: 'example-app', entries: [{
+    model: null, durationSeconds: null,
     id: '1', title: 'project-setup', branch: 'task/setup', attempts: 2,
     result: 'Done', notes: ['First note', 'Second note'],
   }] });
@@ -27,8 +28,28 @@ test('preserves results other than Done', () => {
     .toBe('Failed');
 });
 
+test('reads model and duration labels case-insensitively and strips backticks', () => {
+  const log = parseRunLog(`## D1. timed
+| CODEX MODEL | \`test-model\` |
+| dUrAtIoN | \`1m 54s\` |
+`, 'dashboard');
+  expect(log.entries[0]).toMatchObject({ model: 'test-model', durationSeconds: 114 });
+});
+
+test.each(['', 'not reported', ' UNKNOWN ', 'None', 'N/A', '-', '—'])
+  ('normalizes unavailable model %j', model => {
+    const log = parseRunLog(`## D1. task\n| Codex model | ${model} |`, 'dashboard');
+    expect(log.entries[0].model).toBeNull();
+  });
+
+test('keeps an invalid recorded duration null', () => {
+  const log = parseRunLog('## D1. task\n| Duration | about 2m |', 'dashboard');
+  expect(log.entries[0].durationSeconds).toBeNull();
+});
+
 test('defaults missing rows to null', () => {
   expect(parseRunLog('## 1. minimal', 'example-app').entries[0]).toEqual({
+    model: null, durationSeconds: null,
     id: '1', title: 'minimal', branch: null, attempts: null, result: null, notes: [],
   });
 });
@@ -104,6 +125,13 @@ test('parses and validates both sources from the real run log', () => {
   const dashboard = parseRunLog(markdown, 'dashboard');
   expect(dashboard.entries.some(entry => entry.id.startsWith('D'))).toBe(true);
   expect(dashboard.entries.some(entry => entry.id === 'D1')).toBe(true);
+  expect(dashboard.entries.find(entry => entry.id === 'D29')).toMatchObject({
+    durationSeconds: 114, model: null,
+  });
+  expect(dashboard.entries.find(entry => entry.id === 'D1')).toMatchObject({
+    durationSeconds: null, model: null,
+  });
+  expect(dashboard.entries.find(entry => entry.id === 'D28')?.attempts).toBeNull();
   for (const log of [example, dashboard]) {
     expect(runLogSchema.safeParse(log).success).toBe(true);
   }
