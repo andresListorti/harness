@@ -48,3 +48,17 @@ Codex runs in a `workspace-write` sandbox, and two of its limits shape the divis
 - **No writes to `.git`.** Codex cannot change repository history, so the orchestrator creates all branches and commits.
 
 The worker can only change files in the working tree. Nothing reaches the history until the orchestrator has checked it.
+
+## Dashboard architecture
+
+The dashboard uses React and TypeScript with Vite for the front end and a small Node and Express backend. In a built run, Express serves the front end and API on `127.0.0.1`; during development, Vite serves the front end on port 5173 and proxies `/api` to the backend on port 3001.
+
+The backend parses a fixed list of repo files: `dashboard/PLAN.md`, `example-app/PLAN.md`, and `docs/run-log.md`. Read-only git commands supply recent commit hashes, subjects, dates, and tracked test file names. Parsers and derived models turn this data into API responses validated with shared Zod schemas. The React API client validates responses before the Harness, Agents, Galaxy, and Plan views display them. Agent cards represent recorded history; model and elapsed time remain unknown because neither is recorded.
+
+The backend binds only to `127.0.0.1`. A Host allowlist guards against DNS rebinding, while state-changing requests require an allowlisted Origin and JSON content type when carrying a body. JSON bodies are limited to 16 kb and chat requests use strict schema validation. Repo file paths never come from requests. Git uses `execFile` without a shell, with fixed argument structures and a bounded commit limit, and never requests author names or emails.
+
+The backend sends a strict Content Security Policy restricting resources and connections to the same origin and blocking objects and framing. Other headers disable content-type sniffing, suppress referrer information, and deny framing. Chat replies render as plain text.
+
+Milestone 1 chat answers known repo questions with local code so the dashboard remains read-only and needs no API key or agent execution. The answer function starts no process; its data reader uses the same fixed git queries as the other views. Unsupported questions return suggestions. There is no chat with an agent or way to launch agents yet. Voice, widget mode, settings, and orchestrator selection are also not built; see the [dashboard roadmap](../dashboard/PLAN.md) for milestones 2 and 3 and Phase 2.
+
+The dashboard was built with the same loop: Claude Code orchestrates, Codex implements one task per branch, and tests decide whether the task is done. The dashboard checks are `npm test`, `npm run typecheck`, and `npm run build`, also run by the CI `dashboard` job. See [the dashboard guide](../dashboard/README.md) for commands and API routes.
