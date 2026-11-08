@@ -423,3 +423,16 @@ Dependencies were installed by the orchestrator once, during task 1, because the
 - **Why:** the Milestone 1 acceptance saw the full suite fail intermittently (a galaxy test once, then a different test under load). The orchestrator reproduced two failures with parallel runs under CPU load and found both causes in the tests, not in the application: the public-safety scan walked `dashboard/` while two server tests created and deleted temporary folders inside it (`ENOENT`), and the galaxy test read canvas state before the React effect that sets it up had run.
 - **Attempt 1:** Codex moved the two temporary folders to the operating system temp directory, made the scan ignore only `ENOENT` while walking and reading (with two regression tests), made the galaxy and chat panel tests wait for the real condition instead of reading right after `findBy`, and audited the other client tests for the same pattern. No application code changed. Codex's first run after its initial edits failed and it fixed the cause within the same attempt.
 - **Orchestrator check:** reviewed the diff and confirmed no leftover temporary folders in `dashboard/` and no byte order marks; `npm test` passed (26 files, 409 tests) in 12 of 12 parallel runs under CPU load (before the fix, 2 of 6 such runs failed), `npm run typecheck` was clean, and `npm run build` passed.
+
+## D28. m1-acceptance
+
+| | |
+|---|---|
+| Branch | `task/m1-acceptance` |
+| Codex attempts | not applicable (orchestrator task) |
+| Result | Done |
+
+- **Checks:** from a clean `npm ci`, typecheck and build passed. Tests passed except one intermittent failure that was investigated and fixed (D27). The built server listened only on `127.0.0.1`; every data route returned schema-valid data from the real repo; the five suggested chat questions returned local answers; a foreign or missing Origin, a foreign Host, a path-like `source`, and a traversal attempt were all rejected; the content security policy and the other headers were present on every kind of response.
+- **Browser:** the Harness and Galaxy views were checked by screenshot, and the four views through the page structure (the browser tool timed out on some screenshots; a page without the dashboard ran at the same low frame rate, so it was the browser session and not the application). Agents showed historical cards with an em dash for model and time, Plan showed the board and run log for both sources, and Galaxy zoomed and opened planet details.
+- **Findings fixed:** the home chat was unusable on a short window (D26) and two intermittent test failures (D27).
+- **Findings left for the user:** recorded notes show raw markdown characters in the Agents cards and in the "latest run" chat answer, and `GalaxyView.tsx` and `draw.ts` use very dense formatting.

@@ -55,11 +55,6 @@ Work in the order listed. A milestone closes only after these steps, in order:
 
 ### Milestone 1: dashboard visible
 
-### m1-acceptance
-- **Goal:** Run the built dashboard and check it in a real browser. Performed by the orchestrator.
-- **Files:** none
-- **Definition of done:** from a clean `npm ci`, all checks pass; the server answers only on `127.0.0.1`; the four views work with real repo data; suggestions return local answers; findings are fixed or listed for the user. Then follow "Closing a milestone".
-
 ### Milestone 2: voice and widget
 
 ### tts-config
@@ -319,6 +314,12 @@ _None._
 - **Files:** `README.md`, `../README.md`, `../docs/architecture.md`, `../docs/setup.md`, `../docs/run-log.md`
 - **Definition of done:** the documents match the implemented behavior; the run-log header describes both entry types; a search of the changed files finds no personal data or local paths.
 - **Result:** done. Docs checked against the code by Codex and reviewed by the orchestrator; 406 tests pass, typecheck and build clean.
+
+### m1-acceptance
+- **Goal:** Run the built dashboard and check it in a real browser. Performed by the orchestrator.
+- **Files:** none
+- **Definition of done:** from a clean `npm ci`, all checks pass; the server answers only on `127.0.0.1`; the four views work with real repo data; suggestions return local answers; findings are fixed or listed for the user. Then follow "Closing a milestone".
+- **Result:** done. Checks and the real server passed; the Harness and Galaxy views were checked by screenshot, Agents and Plan through the page structure only because the browser tool timed out on screenshots. Two findings were fixed (`home-layout-fix`, `fix-flaky-tests`); two are listed for the user: raw markdown characters in recorded notes, and the dense style of `GalaxyView.tsx` and `draw.ts`. Waiting for `/codex:review` and the push confirmation.
 
 ### home-layout-fix
 - **Goal:** Keep the home chat usable on short browser windows (found in the Milestone 1 browser acceptance).
