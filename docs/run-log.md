@@ -254,3 +254,15 @@ Dependencies were installed by the orchestrator once, during task 1, because the
 
 - **Attempt 1:** Codex wrote `src/lib/api.ts`: `ApiError` (codes `NETWORK_ERROR`, `HTTP_ERROR`, `INVALID_RESPONSE`, or the server's own code), `createApiClient(fetchImpl)` with typed methods for health, plan, run log, commits, galaxy, agents, chat suggestions, and chat, and a default `api` instance. Every response is validated against `shared/api.ts`, URLs are relative, and error messages never include the response body. `tests/client/api.test.ts` uses a mocked `fetch`.
 - **Orchestrator check:** reviewed the code; `npm test` passed (12 files, 227 tests), `npm run typecheck` was clean, and `npm run build` passed.
+
+## D13. theme-tokens
+
+| | |
+|---|---|
+| Branch | `task/theme-tokens` |
+| Codex attempts | 1 |
+| Result | Done |
+
+- **Attempt 1:** Codex wrote `src/styles/tokens.css` (colors, typography, spacing, radii, sidebar widths), `src/styles/global.css` (near-black background with a texture made only from CSS gradients, teal focus ring, amber pressed state, `.section-title`, reduced-motion handling), wired both plus the font into `src/main.tsx`, and wrote `tests/client/theme.test.ts`, which also rejects any remote URL or `data:` URI in the styles. Codex's first typecheck and build failed on missing Vite client types and it added `src/vite-env.d.ts` within the same attempt.
+- **Environment step:** the orchestrator installed `@fontsource-variable/inter` (OFL license) before the task, because the plan asks for a bundled font and the Codex sandbox has no network. The built `dist/assets` contains the font files locally.
+- **Orchestrator check:** reviewed the code; `npm test` passed (13 files, 231 tests), `npm run typecheck` was clean, and `npm run build` passed.

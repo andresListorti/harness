@@ -1,3 +1,3 @@
 export default function App() {
-  return <h1>Harness</h1>;
+  return <h1 className="section-title">Harness</h1>;
 }
