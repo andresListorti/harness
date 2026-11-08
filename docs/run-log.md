@@ -199,3 +199,14 @@ Dependencies were installed by the orchestrator once, during task 1, because the
 
 - **Attempt 1:** Codex wrote `server/data/git.ts`: `getRepoRoot()`, `readCommits(repoDir, limit)` (hash, subject, and committer date only, limit clamped to 1-200, results validated with `commitSchema`), and `listTestFiles(repoDir)` (tracked `*.test.ts` and `*.test.tsx`, sorted). Git runs through `execFile` with fixed argument arrays and no shell, and every failure returns an empty result. `tests/server/git.test.ts` builds a temporary repository with a placeholder identity assembled at runtime, so no email literal is in the source.
 - **Orchestrator check:** reviewed the code and the email search; `npm test` passed (7 files, 131 tests), `npm run typecheck` was clean, and `npm run build` passed.
+
+## D8. galaxy-model
+
+| | |
+|---|---|
+| Branch | `task/galaxy-model` |
+| Codex attempts | 1 |
+| Result | Done |
+
+- **Attempt 1:** Codex wrote `buildGalaxy(input)` in `server/data/galaxy.ts`: six fixed nodes (core, Claude Code, Codex, Tasks, Commits, Tests) built from plan tasks, run-log entries, commits, and tracked test files. Roles follow the `orchestrator` input and default to Claude Code as orchestrator and Codex as worker; the last recorded test count is read from run-log notes. `tests/server/galaxy.test.ts` validates every case against `galaxySchema`.
+- **Orchestrator check:** reviewed the code; `npm test` passed (8 files, 139 tests), `npm run typecheck` was clean, and `npm run build` passed.
