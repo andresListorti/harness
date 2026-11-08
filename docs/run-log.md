@@ -96,3 +96,14 @@ The write-enabled sandbox has no network access, so Codex cannot run `npm instal
 
 - **Attempt 1:** Codex added `DELETE /tasks/:id` (204 with an empty body, 404 `TASK_NOT_FOUND`) and `tests/delete-task.test.ts`, which also checks that other tasks are unaffected and that a second delete returns 404.
 - **Orchestrator check:** `npm test` passed (8 files, 100 tests) and `npm run typecheck` was clean.
+
+## 9. error-handling
+
+| | |
+|---|---|
+| Branch | `task/error-handling` |
+| Codex attempts | 1 |
+| Result | Done |
+
+- **Attempt 1:** Codex added `notFoundHandler` and `errorHandler` to `src/errors.ts`, registered them last in `src/app.ts`, and wrote `tests/errors.test.ts`. Malformed JSON returns 400 `INVALID_JSON`, unknown routes and unsupported methods return 404 `ROUTE_NOT_FOUND`, other parser 4xx errors return `BAD_REQUEST`, and unexpected errors return 500 `INTERNAL_ERROR` without the stack or original message (the error is logged on the server).
+- **Orchestrator check:** `npm test` passed (9 files, 109 tests) and `npm run typecheck` was clean.
