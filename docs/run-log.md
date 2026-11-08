@@ -221,3 +221,14 @@ Dependencies were installed by the orchestrator once, during task 1, because the
 
 - **Attempt 1:** Codex wrote `buildAgents(sources)` in `server/data/agents.ts`: cards only for In progress and Done tasks, status `working`, `done`, or `error` (a non-Done run-log result), agent `codex` only when the matching run-log entry records Codex attempts, model and elapsed time always `null` because nothing records them, and the last three run-log notes (truncated at 240 characters) as output. Card ids use `<source>/<task id>`. `tests/server/agents.test.ts` covers the rules with fixtures and with the real plan and run-log files.
 - **Orchestrator check:** reviewed the code and confirmed the ellipsis is stored as proper UTF-8; `npm test` passed (9 files, 155 tests), `npm run typecheck` was clean, and `npm run build` passed.
+
+## D10. data-routes
+
+| | |
+|---|---|
+| Branch | `task/data-routes` |
+| Codex attempts | 1 |
+| Result | Done |
+
+- **Attempt 1:** Codex added `createDataRouter(deps)` in `server/routes/data.ts` with read-only `GET /api/plan`, `/api/runlog`, `/api/commits`, `/api/galaxy`, and `/api/agents`, mounted in `createApp` before the `/api` 404 fallback. Files come from a fixed allowlist under the repo root, `source` is validated against `dashboard` and `example-app`, every response is parsed with its schema, and responses are sent with `Cache-Control: no-store`. `tests/server/data-routes.test.ts` uses a temporary repo root with injected git functions, plus an integration test against the real repo.
+- **Orchestrator check:** reviewed the code; `npm test` passed (10 files, 172 tests), `npm run typecheck` was clean, and `npm run build` passed.

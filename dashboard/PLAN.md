@@ -55,11 +55,6 @@ Work in the order listed. A milestone closes only after these steps, in order:
 
 ### Milestone 1: dashboard visible
 
-### data-routes
-- **Goal:** Expose plan, run-log, commits, galaxy, and agents over the API.
-- **Files:** `server/routes/data.ts`, `server/app.ts`, `tests/server/data-routes.test.ts`
-- **Definition of done:** `tests/server/data-routes.test.ts` passes: each route matches `shared/api.ts`; `source` accepts only `dashboard` or `example-app`; a path in `source` returns 400; a missing file returns an empty result.
-
 ### chat-local-answers
 - **Goal:** Answer known repo questions without an agent, through `POST /api/chat`.
 - **Files:** `server/chat/local.ts`, `server/routes/chat.ts`, `server/app.ts`, `tests/server/chat-local.test.ts`
@@ -303,6 +298,12 @@ _None._
 - **Files:** `server/data/agents.ts`, `tests/server/agents.test.ts`
 - **Definition of done:** `tests/server/agents.test.ts` passes: In progress maps to `working`, Done to `done`, and a run-log failure to `error`; output lines are the latest run-log notes; the agent is taken only from the run-log entry; agent, model, and time are `null` when they are not recorded.
 - **Result:** done. 155 tests pass, typecheck and build clean.
+
+### data-routes
+- **Goal:** Expose plan, run-log, commits, galaxy, and agents over the API.
+- **Files:** `server/routes/data.ts`, `server/app.ts`, `tests/server/data-routes.test.ts`
+- **Definition of done:** `tests/server/data-routes.test.ts` passes: each route matches `shared/api.ts`; `source` accepts only `dashboard` or `example-app`; a path in `source` returns 400; a missing file returns an empty result.
+- **Result:** done. 172 tests pass, typecheck and build clean.
 
 ## Phase 2: real agent execution
 
