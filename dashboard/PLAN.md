@@ -55,11 +55,6 @@ Work in the order listed. A milestone closes only after these steps, in order:
 
 ### Milestone 1: dashboard visible
 
-### theme-tokens
-- **Goal:** Add the dark theme: near-black textured background, teal `#2dd4bf`, amber for active states, bundled modern sans font, and large section titles.
-- **Files:** `src/styles/tokens.css`, `src/styles/global.css`, `src/main.tsx`, `tests/client/theme.test.ts`
-- **Definition of done:** `tests/client/theme.test.ts` passes: the required tokens exist and no stylesheet loads a remote URL.
-
 ### app-shell
 - **Goal:** Add the collapsible sidebar with navigation for Harness, Agents, Galaxy, and Plan, a status dot, and Full screen.
 - **Files:** `src/components/Sidebar.tsx`, `src/App.tsx`, `tests/client/sidebar.test.tsx`
@@ -306,6 +301,12 @@ _None._
 - **Files:** `src/lib/api.ts`, `tests/client/api.test.ts`
 - **Definition of done:** `tests/client/api.test.ts` passes: valid responses are parsed; HTTP errors and invalid shapes produce typed errors.
 - **Result:** done. 227 tests pass, typecheck and build clean.
+
+### theme-tokens
+- **Goal:** Add the dark theme: near-black textured background, teal `#2dd4bf`, amber for active states, bundled modern sans font, and large section titles.
+- **Files:** `src/styles/tokens.css`, `src/styles/global.css`, `src/main.tsx`, `src/App.tsx`, `src/vite-env.d.ts`, `package.json`, `package-lock.json`, `tests/client/theme.test.ts`
+- **Definition of done:** `tests/client/theme.test.ts` passes: the required tokens exist and no stylesheet loads a remote URL.
+- **Result:** done. 231 tests pass, typecheck and build clean. The Inter font ships from the build output (`@fontsource-variable/inter`, OFL license).
 
 ## Phase 2: real agent execution
 
