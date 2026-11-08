@@ -17,8 +17,7 @@ export interface DataDeps {
   listTestFiles?: typeof listTestFiles;
 }
 
-export function createDataRouter(deps: DataDeps = {}): Router {
-  const router = Router();
+export function createRepoReader(deps: DataDeps) {
   const repoRoot = deps.repoRoot ?? getRepoRoot();
   const commits = deps.readCommits ?? readCommits;
   const tests = deps.listTestFiles ?? listTestFiles;
@@ -26,14 +25,21 @@ export function createDataRouter(deps: DataDeps = {}): Router {
   const read = (file: string) => readFile(join(repoRoot, file), 'utf8').catch(() => '');
   const plan = async (source: PlanSource) => parsePlan(await read(planFiles[source]), source);
   const runlog = async (source: PlanSource) => parseRunLog(await read('docs/run-log.md'), source);
+  const sources = async () => Promise.all((['example-app', 'dashboard'] as const).map(async source => ({
+    source, tasks: (await plan(source)).tasks, runLog: (await runlog(source)).entries,
+  })));
+
+  return { repoRoot, plan, runlog, sources, commits, tests };
+}
+
+export function createDataRouter(deps: DataDeps = {}): Router {
+  const router = Router();
+  const { repoRoot, plan, runlog, sources, commits, tests } = createRepoReader(deps);
   const source = (req: Request, res: Response): PlanSource | undefined => {
     const parsed = planSourceSchema.safeParse(req.query.source === undefined ? 'dashboard' : req.query.source);
     if (parsed.success) return parsed.data;
     res.status(400).json({ error: { code: 'INVALID_SOURCE', message: 'Source must be dashboard or example-app.' } });
   };
-  const sources = async () => Promise.all((['example-app', 'dashboard'] as const).map(async source => ({
-    source, tasks: (await plan(source)).tasks, runLog: (await runlog(source)).entries,
-  })));
 
   router.use((_req, res, next) => {
     res.set('Cache-Control', 'no-store');

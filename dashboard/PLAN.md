@@ -55,11 +55,6 @@ Work in the order listed. A milestone closes only after these steps, in order:
 
 ### Milestone 1: dashboard visible
 
-### chat-local-answers
-- **Goal:** Answer known repo questions without an agent, through `POST /api/chat`.
-- **Files:** `server/chat/local.ts`, `server/routes/chat.ts`, `server/app.ts`, `tests/server/chat-local.test.ts`
-- **Definition of done:** `tests/server/chat-local.test.ts` passes: pending tasks, current task, latest commits, latest run, and test status are answered from fixtures; an unknown question returns a reply listing what can be asked; invalid bodies return 400; the route cannot start a process.
-
 ### api-client
 - **Goal:** Add a typed front-end client that validates responses against `shared/api.ts`.
 - **Files:** `src/lib/api.ts`, `tests/client/api.test.ts`
@@ -304,6 +299,12 @@ _None._
 - **Files:** `server/routes/data.ts`, `server/app.ts`, `tests/server/data-routes.test.ts`
 - **Definition of done:** `tests/server/data-routes.test.ts` passes: each route matches `shared/api.ts`; `source` accepts only `dashboard` or `example-app`; a path in `source` returns 400; a missing file returns an empty result.
 - **Result:** done. 172 tests pass, typecheck and build clean.
+
+### chat-local-answers
+- **Goal:** Answer known repo questions without an agent, through `POST /api/chat`.
+- **Files:** `server/chat/local.ts`, `server/routes/chat.ts`, `server/routes/data.ts`, `server/app.ts`, `shared/api.ts`, `tests/server/chat-local.test.ts`, `tests/shared/api.test.ts`
+- **Definition of done:** `tests/server/chat-local.test.ts` passes: pending tasks, current task, latest commits, latest run, and test status are answered from fixtures; an unknown question returns a reply listing what can be asked; invalid bodies return 400; the route cannot start a process.
+- **Result:** done. 199 tests pass, typecheck and build clean. Also adds `GET /api/chat/suggestions` and a shared repo reader.
 
 ## Phase 2: real agent execution
 
