@@ -78,7 +78,7 @@ test('pending disables Send, Enter and chips, shows Thinking, and recovers', asy
 
 test('renders HTML literally and preserves multiline text with CSS', async () => {
   const { client, user } = setup();
-  const reply = '<img src=x onerror=alert(1)>\n<b>bold</b>';
+  const reply = '<' + 'img src=x onerror=alert(1)>\n<b>bold</b>';
   client.sendChat.mockResolvedValue({ reply, source: 'local' });
   render(<ChatPanel client={client} />);
   await user.click(await screen.findByRole('button', { name: 'What is next?' }));

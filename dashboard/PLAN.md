@@ -55,11 +55,6 @@ Work in the order listed. A milestone closes only after these steps, in order:
 
 ### Milestone 1: dashboard visible
 
-### public-safety-test
-- **Goal:** Fail the test suite when public-repo rules are broken in `dashboard/`.
-- **Files:** `tests/public-safety.test.ts`
-- **Definition of done:** `tests/public-safety.test.ts` passes on the repo and fails on fixtures containing an email address, an absolute local path, a filled-in key, a person image, or a remote font.
-
 ### ci-dashboard
 - **Goal:** Add a `dashboard` job to the CI workflow.
 - **Files:** `../.github/workflows/ci.yml`
@@ -316,6 +311,12 @@ _None._
 - **Files:** `server/static.ts`, `server/app.ts`, `server/index.ts`, `package.json`, `tests/server/static.test.ts`, `tests/server/health.test.ts`
 - **Definition of done:** `tests/server/static.test.ts` passes: the index is served with the CSP header; API routes are not shadowed; the CSP blocks remote scripts, styles, fonts, and connections.
 - **Result:** done. 365 tests pass, typecheck and build clean. The Host allowlist now follows the configured `PORT`, and `npm start` serves the built front end.
+
+### public-safety-test
+- **Goal:** Fail the test suite when public-repo rules are broken in `dashboard/`.
+- **Files:** `tests/helpers/safety-scan.ts`, `tests/public-safety.test.ts`, and four client tests whose image-tag fixtures are now built at runtime
+- **Definition of done:** `tests/public-safety.test.ts` passes on the repo and fails on fixtures containing an email address, an absolute local path, a filled-in key, a person image, or a remote font.
+- **Result:** done. 402 tests pass, typecheck and build clean. It also rejects the retired product name and other agent tools, and scans `docs/run-log.md` and `.env.example`.
 
 ## Phase 2: real agent execution
 

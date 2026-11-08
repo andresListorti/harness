@@ -366,3 +366,14 @@ Dependencies were installed by the orchestrator once, during task 1, because the
 
 - **Attempt 1:** Codex added `server/static.ts` (a strict content security policy with only same-origin sources, plus `nosniff`, no-referrer, and frame-deny headers on every response; static serving of `dist/` with immutable caching for hashed assets; a single-page fallback that never answers `/api`, dotfiles, missing files with an extension, or non-GET methods), applied it in `createApp`, made the Host allowlist follow the configured `PORT` through `createServerApp()`, added startup messages, and added the `npm start` script. `tests/server/static.test.ts` covers the policy, headers on every kind of response, traversal attempts, and the no-`dist` case. Codex's first test run failed because Express's default 404 replaced the policy header and a dotfile was served; it fixed both within the same attempt.
 - **Orchestrator check:** reviewed the code and confirmed no file has a byte order mark; `npm test` passed (24 files, 365 tests), `npm run typecheck` was clean, and `npm run build` passed.
+
+## D23. public-safety-test
+
+| | |
+|---|---|
+| Branch | `task/public-safety-test` |
+| Codex attempts | 1 |
+| Result | Done |
+
+- **Attempt 1:** Codex wrote `tests/helpers/safety-scan.ts` (a pure scanner for emails, absolute local paths, filled-in secrets, remote fonts, forbidden product and tool names, and image references, with masked excerpts) and `tests/public-safety.test.ts` (self-tests with fixtures built at runtime, a real scan of `dashboard/`, the run log, and `.env.example`, a ban on image files, a check that `.env` is ignored, and a guard against a vacuous scan). Its first run flagged literal image tags in four older client tests; Codex changed those fixtures to be assembled at runtime without changing what they assert.
+- **Orchestrator check:** reviewed the scanner and confirmed no file has a byte order mark; `npm test` passed (25 files, 402 tests), `npm run typecheck` was clean, and `npm run build` passed.
