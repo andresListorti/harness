@@ -144,3 +144,14 @@ Dependencies were installed by the orchestrator once, during task 1, because the
 
 - **Attempt 1:** Codex added `server/app.ts` (`createApp()` with `GET /api/health`, JSON 404 for unknown `/api` routes, `x-powered-by` disabled), `server/index.ts` (`HOST` fixed to `127.0.0.1`, validated `PORT`, `startServer()` that listens only when run directly), `tests/server/health.test.ts`, and a `start:server` script.
 - **Orchestrator check:** reviewed the code; `npm test` passed (2 files, 11 tests), `npm run typecheck` was clean, and `npm run build` passed.
+
+## D3. server-guards
+
+| | |
+|---|---|
+| Branch | `task/server-guards` |
+| Codex attempts | 1 |
+| Result | Done |
+
+- **Attempt 1:** Codex added `server/security.ts` (Host allowlist, Origin check on state-changing methods, JSON content-type check, 16 kb body limit, and a JSON error handler for 400, 413, and 500), wired it into `createApp()` with a `ports` option and a `routes` hook, updated the health tests to send an allowed Host, and wrote `tests/server/security.test.ts`.
+- **Orchestrator check:** reviewed the code; `npm test` passed (3 files, 32 tests), `npm run typecheck` was clean, and `npm run build` passed.

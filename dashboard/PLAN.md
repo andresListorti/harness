@@ -55,11 +55,6 @@ Work in the order listed. A milestone closes only after these steps, in order:
 
 ### Milestone 1: dashboard visible
 
-### server-guards
-- **Goal:** Add the Host, Origin, content-type, and body-size guards.
-- **Files:** `server/security.ts`, `server/app.ts`, `tests/server/security.test.ts`
-- **Definition of done:** `tests/server/security.test.ts` passes: an unknown `Host` returns 403; a POST with a foreign or missing `Origin` returns 403; a non-JSON POST returns 415; an oversized body returns 413; allowed requests pass.
-
 ### api-contract
 - **Goal:** Define the Zod schemas and types shared by the front end and backend for Milestone 1. Later milestones extend this file.
 - **Files:** `shared/api.ts`, `tests/shared/api.test.ts`
@@ -296,6 +291,12 @@ _None._
 - **Files:** `server/app.ts`, `server/index.ts`, `tests/server/health.test.ts`
 - **Definition of done:** `tests/server/health.test.ts` passes: health returns 200; importing `createApp` does not open a port; the entry point uses host `127.0.0.1`.
 - **Result:** done. 11 tests pass, typecheck and build clean.
+
+### server-guards
+- **Goal:** Add the Host, Origin, content-type, and body-size guards.
+- **Files:** `server/security.ts`, `server/app.ts`, `tests/server/security.test.ts`
+- **Definition of done:** `tests/server/security.test.ts` passes: an unknown `Host` returns 403; a POST with a foreign or missing `Origin` returns 403; a non-JSON POST returns 415; an oversized body returns 413; allowed requests pass.
+- **Result:** done. 32 tests pass, typecheck and build clean.
 
 ## Phase 2: real agent execution
 

@@ -11,7 +11,7 @@ afterEach(() => {
 });
 
 test('returns a healthy status without the powered-by header', async () => {
-  const response = await request(createApp()).get('/api/health');
+  const response = await request(createApp()).get('/api/health').set('Host', '127.0.0.1:3001');
 
   expect(response.status).toBe(200);
   expect(response.body).toEqual({ status: 'ok' });
@@ -33,7 +33,7 @@ test('imports the app and entry point without opening a port', async () => {
 });
 
 test('returns a JSON error for unknown API routes', async () => {
-  const response = await request(createApp()).get('/api/missing/nested');
+  const response = await request(createApp()).get('/api/missing/nested').set('Host', '127.0.0.1:3001');
 
   expect(response.status).toBe(404);
   expect(response.body).toEqual({
