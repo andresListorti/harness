@@ -10,11 +10,6 @@ A to-do REST API built with TypeScript, Node, Express, and Vitest. Tasks are sto
 
 ## Pending
 
-### task-store
-- **Goal:** Implement an in-memory store with create, list, get, update, and delete.
-- **Files:** `src/store.ts`, `tests/store.test.ts`
-- **Definition of done:** `tests/store.test.ts` passes: create assigns a unique ID, `completed: false`, and timestamps; list keeps insertion order; get, update, and delete return `undefined` or `false` for unknown IDs; update changes `updatedAt` but not `id` or `createdAt`; each store instance is isolated.
-
 ### create-task
 - **Goal:** Add `POST /tasks` using the validation schema and the store.
 - **Files:** `src/routes/tasks.ts`, `src/app.ts`, `tests/create-task.test.ts`
@@ -67,3 +62,9 @@ _None._
 - **Files:** `src/validation.ts`, `tests/validation.test.ts`
 - **Definition of done:** `tests/validation.test.ts` passes: valid input accepted and title trimmed; empty, whitespace-only, too-long, and non-string titles rejected; too-long description rejected; unknown fields rejected; an empty update rejected.
 - **Result:** done. 48 tests pass, typecheck clean.
+
+### task-store
+- **Goal:** Implement an in-memory store with create, list, get, update, and delete.
+- **Files:** `src/store.ts`, `tests/store.test.ts`
+- **Definition of done:** `tests/store.test.ts` passes: create assigns a unique ID, `completed: false`, and timestamps; list keeps insertion order; get, update, and delete return `undefined` or `false` for unknown IDs; update changes `updatedAt` but not `id` or `createdAt`; each store instance is isolated.
+- **Result:** done. 55 tests pass, typecheck clean.
