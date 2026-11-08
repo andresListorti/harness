@@ -232,3 +232,14 @@ Dependencies were installed by the orchestrator once, during task 1, because the
 
 - **Attempt 1:** Codex added `createDataRouter(deps)` in `server/routes/data.ts` with read-only `GET /api/plan`, `/api/runlog`, `/api/commits`, `/api/galaxy`, and `/api/agents`, mounted in `createApp` before the `/api` 404 fallback. Files come from a fixed allowlist under the repo root, `source` is validated against `dashboard` and `example-app`, every response is parsed with its schema, and responses are sent with `Cache-Control: no-store`. `tests/server/data-routes.test.ts` uses a temporary repo root with injected git functions, plus an integration test against the real repo.
 - **Orchestrator check:** reviewed the code; `npm test` passed (10 files, 172 tests), `npm run typecheck` was clean, and `npm run build` passed.
+
+## D11. chat-local-answers
+
+| | |
+|---|---|
+| Branch | `task/chat-local-answers` |
+| Codex attempts | 1 |
+| Result | Done |
+
+- **Attempt 1:** Codex added `answerLocally` in `server/chat/local.ts` (five intents: pending, in progress, latest commits, latest run, and tests, with a help reply for anything else), `POST /api/chat` and `GET /api/chat/suggestions` in `server/routes/chat.ts`, a shared `createRepoReader` exported from `server/routes/data.ts`, and a `chatSuggestionsSchema` in `shared/api.ts`. Replies are plain text built only from repo data. A test asserts the chat modules contain no `child_process` or `spawn`. Codex's first test run showed "latest" matching the tests intent and it fixed the matching to whole words within the same attempt.
+- **Orchestrator check:** reviewed the code; `npm test` passed (11 files, 199 tests), `npm run typecheck` was clean, and `npm run build` passed.

@@ -36,6 +36,7 @@ const objects: [string, z.ZodType, Record<string, unknown>][] = [
   ['agents', api.agentsSchema, { agents: [card] }],
   ['health', api.healthSchema, { status: 'ok' }],
   ['chatRequest', api.chatRequestSchema, { message: 'Current task?' }],
+  ['chatSuggestions', api.chatSuggestionsSchema, { suggestions: ['What is pending?'] }],
   ['chatResponse', api.chatResponseSchema, { reply: 'Define API', source: 'local' }],
   ['apiError', api.apiErrorSchema, error],
   ['apiError.error', api.apiErrorSchema.shape.error, error.error],
@@ -96,6 +97,8 @@ test('accepts nullable fields', () => {
 });
 
 test.each([
+  [api.chatSuggestionsSchema, { suggestions: [''] }],
+  [api.chatSuggestionsSchema, { suggestions: [1] }],
   [api.planTaskSchema, { ...task, id: '' }],
   [api.planTaskSchema, { ...task, title: '' }],
   [api.runLogEntrySchema, { ...entry, id: '' }],

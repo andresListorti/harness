@@ -101,3 +101,8 @@ export const apiErrorSchema = z.object({
   error: z.object({ code: z.string(), message: z.string() }).strict(),
 }).strict();
 export type ApiError = z.infer<typeof apiErrorSchema>;
+
+export const chatSuggestionsSchema = z.object({
+  suggestions: z.array(z.string().min(1)),
+}).strict();
+export type ChatSuggestions = z.infer<typeof chatSuggestionsSchema>;
