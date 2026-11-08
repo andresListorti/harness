@@ -1,6 +1,6 @@
 // @vitest-environment jsdom
 import { readFileSync } from 'node:fs';
-import { act, cleanup, fireEvent, render, screen, within } from '@testing-library/react';
+import { act, cleanup, fireEvent, render, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import type { ChatResponse } from '../../shared/api';
 import { ChatPanel } from '../../src/components/ChatPanel';
@@ -33,7 +33,7 @@ test('suggestions send exact text and show ordered local answers in the live con
   expect(client.sendChat).toHaveBeenCalledWith('What is next?');
   const log = screen.getByRole('log', { name: 'Conversation' });
   expect(log).toHaveAttribute('aria-live', 'polite');
-  expect(Array.from(log.querySelectorAll('.chat-message p')).map(node => node.textContent)).toEqual(['What is next?', 'The next task.']);
+  await waitFor(() => expect(Array.from(log.querySelectorAll('.chat-message p')).map(node => node.textContent)).toEqual(['What is next?', 'The next task.']));
   expect(within(log).getByText('Local answer')).toBeInTheDocument();
 });
 
@@ -83,7 +83,7 @@ test('renders HTML literally and preserves multiline text with CSS', async () =>
   render(<ChatPanel client={client} />);
   await user.click(await screen.findByRole('button', { name: 'What is next?' }));
   const log = screen.getByRole('log');
-  expect(log.querySelector('.chat-message--assistant p')?.textContent).toBe(reply);
+  await waitFor(() => expect(log.querySelector('.chat-message--assistant p')?.textContent).toBe(reply));
   expect(log.querySelector('img, b')).toBeNull();
   const css = readFileSync('src/components/ChatPanel.css', 'utf8');
   expect(css).toMatch(/\.chat-message p\s*\{\s*white-space:\s*pre-wrap;/);

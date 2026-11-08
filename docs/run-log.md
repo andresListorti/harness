@@ -411,3 +411,15 @@ Dependencies were installed by the orchestrator once, during task 1, because the
 - **Why:** the Milestone 1 browser acceptance showed that on a window about 630 px tall the home chat had only a thin strip of message area, so a conversation was unreadable.
 - **Attempt 1:** Codex replaced the fixed chat height with an automatic height and a message area of at least 12rem (scrolling inside after 24rem), shrank the orb on short viewports, made the main area scroll vertically, and extended `tests/client/home-view.test.tsx` with checks on these CSS rules. Its first test run failed and it fixed the cause within the same attempt.
 - **Orchestrator check:** reviewed the diff; `npm test` passed (26 files, 407 tests) on re-runs, `npm run typecheck` was clean, and `npm run build` passed. One orchestrator run failed on an unrelated intermittent test, which is handled in D27.
+
+## D27. fix-flaky-tests
+
+| | |
+|---|---|
+| Branch | `task/fix-flaky-tests` |
+| Codex attempts | 1 |
+| Result | Done |
+
+- **Why:** the Milestone 1 acceptance saw the full suite fail intermittently (a galaxy test once, then a different test under load). The orchestrator reproduced two failures with parallel runs under CPU load and found both causes in the tests, not in the application: the public-safety scan walked `dashboard/` while two server tests created and deleted temporary folders inside it (`ENOENT`), and the galaxy test read canvas state before the React effect that sets it up had run.
+- **Attempt 1:** Codex moved the two temporary folders to the operating system temp directory, made the scan ignore only `ENOENT` while walking and reading (with two regression tests), made the galaxy and chat panel tests wait for the real condition instead of reading right after `findBy`, and audited the other client tests for the same pattern. No application code changed. Codex's first run after its initial edits failed and it fixed the cause within the same attempt.
+- **Orchestrator check:** reviewed the diff and confirmed no leftover temporary folders in `dashboard/` and no byte order marks; `npm test` passed (26 files, 409 tests) in 12 of 12 parallel runs under CPU load (before the fix, 2 of 6 such runs failed), `npm run typecheck` was clean, and `npm run build` passed.

@@ -1,6 +1,7 @@
 // @vitest-environment node
 import { mkdtemp, mkdir, readFile, rm, writeFile } from 'node:fs/promises';
 import { join } from 'node:path';
+import { tmpdir } from 'node:os';
 import request from 'supertest';
 import { expect, test } from 'vitest';
 import { createApp } from '../../server/app';
@@ -76,7 +77,7 @@ test('unrecorded run fields are omitted and earlier matching test notes remain u
 });
 
 test('chat routes use fixed repo context and enforce contracts and guards', async () => {
-  const repoRoot = await mkdtemp(join(process.cwd(), '.chat-local-test-'));
+  const repoRoot = await mkdtemp(join(tmpdir(), 'harness-chat-local-'));
   try {
     for (const dir of ['dashboard', 'example-app', 'docs']) await mkdir(join(repoRoot, dir));
     await writeFile(join(repoRoot, 'dashboard/PLAN.md'), '# PLAN\n## Pending\n### Dashboard pending\n- **Goal:** chat\n## In progress\n### Dashboard current\n- **Goal:** work\n');
@@ -113,7 +114,6 @@ test('chat routes use fixed repo context and enforce contracts and guards', asyn
     expect(suggestions.body).toEqual({ suggestions: LOCAL_SUGGESTIONS });
     expect(suggestions.headers['cache-control']).toBe('no-store');
   } finally {
-    // The temporary root was created within dashboard above.
     await rm(repoRoot, { recursive: true, force: true });
   }
 });
