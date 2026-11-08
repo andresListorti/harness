@@ -10,11 +10,6 @@ A to-do REST API built with TypeScript, Node, Express, and Vitest. Tasks are sto
 
 ## Pending
 
-### task-validation
-- **Goal:** Define the `Task` type and Zod schemas for create and update input.
-- **Files:** `src/validation.ts`, `tests/validation.test.ts`
-- **Definition of done:** `tests/validation.test.ts` passes: valid input accepted and title trimmed; empty, whitespace-only, too-long, and non-string titles rejected; too-long description rejected; unknown fields rejected; an empty update rejected.
-
 ### task-store
 - **Goal:** Implement an in-memory store with create, list, get, update, and delete.
 - **Files:** `src/store.ts`, `tests/store.test.ts`
@@ -66,3 +61,9 @@ _None._
 - **Files:** `package.json`, `package-lock.json`, `tsconfig.json`, `vitest.config.ts`, `src/app.ts`, `src/server.ts`, `tests/health.test.ts`
 - **Definition of done:** `tests/health.test.ts` passes: `GET /health` returns 200 with `{ "status": "ok" }`; importing `createApp` does not open a port.
 - **Result:** done. 2 tests pass, typecheck clean, verified from a clean `npm ci`.
+
+### task-validation
+- **Goal:** Define the `Task` type and Zod schemas for create and update input.
+- **Files:** `src/validation.ts`, `tests/validation.test.ts`
+- **Definition of done:** `tests/validation.test.ts` passes: valid input accepted and title trimmed; empty, whitespace-only, too-long, and non-string titles rejected; too-long description rejected; unknown fields rejected; an empty update rejected.
+- **Result:** done. 48 tests pass, typecheck clean.

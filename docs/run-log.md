@@ -19,3 +19,14 @@ The write-enabled sandbox has no network access, so Codex cannot run `npm instal
 - **Attempt 1:** Codex wrote the scaffold, `GET /health`, the app factory split, and two tests. It could not install dependencies (no network) and used `latest` tags in `package.json`. After the orchestrator installed dependencies, `npm test` passed (2 tests) and `npm run typecheck` was clean.
 - **Attempt 2:** The orchestrator sent back one fix: pin the dependency versions. Codex replaced every `latest` with a caret range of the installed version, editing only `package.json`.
 - **Final check by the orchestrator:** `npm install` to refresh `package-lock.json`, then a clean `npm ci`, `npm test` (1 file, 2 tests passed) and `npm run typecheck` (no errors).
+
+## 2. task-validation
+
+| | |
+|---|---|
+| Branch | `task/task-validation` |
+| Codex attempts | 1 |
+| Result | Done |
+
+- **Attempt 1:** Codex wrote `src/validation.ts` (the `Task` type, strict `createTaskSchema` and `updateTaskSchema`) and `tests/validation.test.ts`. PowerShell blocked the `npm` launcher, so Codex ran the checks through the Windows command prompt instead.
+- **Orchestrator check:** `npm test` passed (2 files, 48 tests) and `npm run typecheck` was clean.
