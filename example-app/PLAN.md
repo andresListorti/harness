@@ -10,11 +10,6 @@ A to-do REST API built with TypeScript, Node, Express, and Vitest. Tasks are sto
 
 ## Pending
 
-### delete-task
-- **Goal:** Add `DELETE /tasks/:id`.
-- **Files:** `src/routes/tasks.ts`, `tests/delete-task.test.ts`
-- **Definition of done:** `tests/delete-task.test.ts` passes: returns 204 with an empty body; the task no longer appears in get or list; an unknown ID returns 404.
-
 ### error-handling
 - **Goal:** Return the standard error shape for malformed JSON, unknown routes, and unexpected errors.
 - **Files:** `src/errors.ts`, `src/app.ts`, `tests/errors.test.ts`
@@ -72,3 +67,9 @@ _None._
 - **Files:** `src/store.ts`, `src/routes/tasks.ts`, `tests/complete-task.test.ts`, `tests/store.test.ts`, `tests/list-tasks.test.ts`
 - **Definition of done:** `tests/complete-task.test.ts` passes: returns 200 with `completed: true`; a repeated call returns 200 and does not change `updatedAt`; an unknown ID returns 404.
 - **Result:** done. 97 tests pass, typecheck clean.
+
+### delete-task
+- **Goal:** Add `DELETE /tasks/:id`.
+- **Files:** `src/routes/tasks.ts`, `tests/delete-task.test.ts`
+- **Definition of done:** `tests/delete-task.test.ts` passes: returns 204 with an empty body; the task no longer appears in get or list; an unknown ID returns 404.
+- **Result:** done. 100 tests pass, typecheck clean.

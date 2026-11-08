@@ -73,5 +73,14 @@ export function createTasksRouter(store: TaskStore) {
     response.status(200).json(task);
   });
 
+  router.delete('/:id', (request, response) => {
+    if (!store.delete(request.params.id)) {
+      response.status(404).json(errorBody('TASK_NOT_FOUND', 'Task not found.'));
+      return;
+    }
+
+    response.status(204).end();
+  });
+
   return router;
 }

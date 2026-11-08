@@ -85,3 +85,14 @@ The write-enabled sandbox has no network access, so Codex cannot run `npm instal
 
 - **Attempt 1:** Codex added an idempotent `complete(id)` to the store (it refreshes `updatedAt` only on the first completion), `POST /tasks/:id/complete`, and `tests/complete-task.test.ts`. As requested, it also replaced the test-only wrapper in `tests/list-tasks.test.ts` with `store.complete()` and added store tests for the new method.
 - **Orchestrator check:** `npm test` passed (7 files, 97 tests) and `npm run typecheck` was clean.
+
+## 8. delete-task
+
+| | |
+|---|---|
+| Branch | `task/delete-task` |
+| Codex attempts | 1 |
+| Result | Done |
+
+- **Attempt 1:** Codex added `DELETE /tasks/:id` (204 with an empty body, 404 `TASK_NOT_FOUND`) and `tests/delete-task.test.ts`, which also checks that other tasks are unaffected and that a second delete returns 404.
+- **Orchestrator check:** `npm test` passed (8 files, 100 tests) and `npm run typecheck` was clean.
