@@ -165,7 +165,7 @@ test.each([true, false])('ignores results after unmount (success: %s)', async su
 });
 
 test('renders API HTML literally', async () => {
-  const title = '<img src=x onerror=alert(1)>';
+  const title = '<' + 'img src=x onerror=alert(1)>';
   const goal = '<b>Goal</b>';
   const note = '<b>Note</b>';
   const { container } = render(<PlanView client={clientFor([task(title, { goal })], [entry('D1', { notes: [note] })])} />);

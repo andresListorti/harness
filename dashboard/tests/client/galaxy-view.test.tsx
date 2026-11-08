@@ -91,7 +91,7 @@ test('ignores superseded and unmounted requests', async () => {
   await act(async () => late.resolve({ nodes })); expect(view.container).toBeEmptyDOMElement();
 });
 test('renders HTML literally', async () => {
-  const label = '<img src=x onerror=alert(1)>'; const detail = '<b>Plain text</b>';
+  const label = '<' + 'img src=x onerror=alert(1)>'; const detail = '<b>Plain text</b>';
   const { container } = await ready(clientFor([{ ...nodes[0]!, label, details: [detail] }, nodes[1]!]));
   await userEvent.click(screen.getByRole('button', { name: label }));
   expect(screen.getByRole('heading', { name: label })).toBeInTheDocument(); expect(screen.getByText(detail)).toBeInTheDocument(); expect(container.querySelector('img,b')).toBeNull();

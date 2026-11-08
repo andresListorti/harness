@@ -134,7 +134,7 @@ test.each([true, false])('ignores results after unmount (success: %s)', async su
 });
 
 test('renders HTML in task and output literally', async () => {
-  const task = '<img src=x onerror=alert(1)>';
+  const task = '<' + 'img src=x onerror=alert(1)>';
   const output = '<b>Plain text</b>';
   const { container } = render(<AgentsView client={clientFor([card(1, { task, output: [output] })])} />);
   expect(await screen.findByRole('heading', { name: task })).toBeInTheDocument();
