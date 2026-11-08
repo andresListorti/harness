@@ -11,7 +11,7 @@ const task = {
 };
 const entry = {
   id: 'D1', title: 'Define API', branch: 'task/api-contract', attempts: 0,
-  result: null, notes: ['Tests pass'],
+  model: null, durationSeconds: null, result: null, notes: ['Tests pass'],
 };
 const commit = { hash: 'abcdef1', subject: 'Define API', date: '2026-11-08T12:00:00-03:00' };
 const node = {
@@ -87,6 +87,19 @@ test.each(['yesterday', '2026-11-08', '2026-11-08T15:00:00'])('rejects non-ISO d
 
 test.each([-1, 1.5])('rejects invalid attempts %s', (attempts) => {
   expect(api.runLogEntrySchema.safeParse({ ...entry, attempts }).success).toBe(false);
+});
+
+test('accepts recorded model and duration values', () => {
+  const recorded = { ...entry, model: 'test-model', durationSeconds: 114 };
+  expect(api.runLogEntrySchema.parse(recorded)).toEqual(recorded);
+});
+
+test.each([-1, Infinity, NaN])('rejects invalid duration %s', durationSeconds => {
+  expect(api.runLogEntrySchema.safeParse({ ...entry, durationSeconds }).success).toBe(false);
+});
+
+test('rejects a non-string model', () => {
+  expect(api.runLogEntrySchema.safeParse({ ...entry, model: 42 }).success).toBe(false);
 });
 
 test('accepts nullable fields', () => {

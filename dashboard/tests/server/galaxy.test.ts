@@ -7,6 +7,7 @@ const task = (column: PlanTask['column']): PlanTask => ({
   id: 'task', title: 'Task', group: null, goal: '', files: '', definitionOfDone: '', result: null, column,
 });
 const entry = (attempts: number | null = null, notes: string[] = []): RunLogEntry => ({
+  model: null, durationSeconds: null,
   id: '1', title: 'Task', branch: null, attempts, result: null, notes,
 });
 const commit = (index: number): Commit => ({

@@ -8,6 +8,7 @@ const plan = { source: 'dashboard', tasks: [{
   files: '', definitionOfDone: '', result: null, column: 'pending',
 }] };
 const runLog = { source: 'dashboard', entries: [{
+  model: null, durationSeconds: null,
   id: 'D1', title: 'Client', branch: null, attempts: 1, result: null, notes: ['Done'],
 }] };
 const commits = { commits: [{ hash: 'abcdef0', subject: 'Add client', date: '2026-01-01T00:00:00Z' }] };
