@@ -55,11 +55,6 @@ Work in the order listed. A milestone closes only after these steps, in order:
 
 ### Milestone 1: dashboard visible
 
-### git-reader
-- **Goal:** Read recent commits and tracked test files with fixed `git` arguments.
-- **Files:** `server/data/git.ts`, `tests/server/git.test.ts`
-- **Definition of done:** `tests/server/git.test.ts` passes against a temporary repository: commits return hash, subject, and date only; no author or email appears; the commit limit is enforced; a missing `git` or repository returns an empty result.
-
 ### galaxy-model
 - **Goal:** Build the galaxy nodes (core, Claude Code, Codex, Tasks, Commits, Tests) from real data, taking the orchestrator and worker roles as input.
 - **Files:** `server/data/galaxy.ts`, `tests/server/galaxy.test.ts`
@@ -300,6 +295,12 @@ _None._
 - **Files:** `server/data/runlog.ts`, `tests/server/runlog.test.ts`
 - **Definition of done:** `tests/server/runlog.test.ts` passes: branch, attempts, result, and notes are extracted; non-entry sections are ignored; malformed input does not throw.
 - **Result:** done. 121 tests pass, typecheck and build clean.
+
+### git-reader
+- **Goal:** Read recent commits and tracked test files with fixed `git` arguments.
+- **Files:** `server/data/git.ts`, `tests/server/git.test.ts`
+- **Definition of done:** `tests/server/git.test.ts` passes against a temporary repository: commits return hash, subject, and date only; no author or email appears; the commit limit is enforced; a missing `git` or repository returns an empty result.
+- **Result:** done. 131 tests pass, typecheck and build clean.
 
 ## Phase 2: real agent execution
 
