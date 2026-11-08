@@ -2,6 +2,8 @@ import { render, screen } from '@testing-library/react';
 import App from '../src/App';
 import viteConfig from '../vite.config';
 
+vi.mock('../src/lib/api', () => ({ api: { getHealth: vi.fn(() => new Promise(() => {})) } }));
+
 test('renders the Harness heading', () => {
   render(<App />);
 
