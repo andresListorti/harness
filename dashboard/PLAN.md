@@ -55,11 +55,6 @@ Work in the order listed. A milestone closes only after these steps, in order:
 
 ### Milestone 1: dashboard visible
 
-### reformat-galaxy
-- **Goal:** Reformat `GalaxyView.tsx` and `draw.ts` with readable line lengths, without changing behavior.
-- **Files:** `src/views/GalaxyView.tsx`, `src/galaxy/draw.ts`
-- **Definition of done:** no test file changes and all existing tests pass unchanged; no line is longer than 100 characters in the two files; no logic, names, or exported signatures change.
-
 ### agents-card-layout
 - **Goal:** Make the Agents card output wrap onto at most 4 lines with no horizontal scroll, and hide the Model and Time rows when their value is null.
 - **Files:** `src/views/AgentsView.tsx`, `src/views/AgentsView.css`, `tests/client/agents-view.test.tsx`, `README.md`
@@ -351,6 +346,12 @@ _None._
 - **Files:** `server/data/plain-text.ts`, `server/data/runlog.ts`, `server/chat/local.ts`, `tests/server/plain-text.test.ts`, `tests/server/runlog.test.ts`, `tests/server/chat-local.test.ts`, `tests/server/agents.test.ts`
 - **Definition of done:** `tests/server/plain-text.test.ts` passes: bold, italic, inline code, links, and heading markers are removed while the words stay; HTML-looking text is left as literal text; the run-log notes and the chat replies use it; the Agents cards and the Plan run log receive clean notes.
 - **Result:** done. 445 tests pass, typecheck and build clean. Single `*` and `_` are left alone on purpose (globs and identifiers), so italic markers are not removed.
+
+### reformat-galaxy
+- **Goal:** Reformat `GalaxyView.tsx` and `draw.ts` with readable line lengths, without changing behavior.
+- **Files:** `src/views/GalaxyView.tsx`, `src/galaxy/draw.ts`
+- **Definition of done:** no test file changes and all existing tests pass unchanged; no line is longer than 100 characters in the two files; no logic, names, or exported signatures change.
+- **Result:** done. The minified output of both files is identical before and after; the longest lines are 95 and 74 characters (before: 512 and 252); 445 tests pass unchanged, typecheck and build clean.
 
 ### home-layout-fix
 - **Goal:** Keep the home chat usable on short browser windows (found in the Milestone 1 browser acceptance).

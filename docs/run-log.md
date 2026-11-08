@@ -450,3 +450,16 @@ Dependencies were installed by the orchestrator once, during task 1, because the
 - **Attempt 1:** Codex added `toPlainText` in `server/data/plain-text.ts` (it removes bold markers, inline code backticks, fenced code markers, link and image syntax, heading and blockquote markers, and leaves HTML-looking text, single asterisks, and single underscores untouched), applied it to every run-log note in the parser and to every local chat reply, and added `tests/server/plain-text.test.ts` plus checks in the run-log, chat, and agents tests. Its first test run failed and it fixed the cause within the same attempt.
 - **Orchestrator check:** reviewed the code; `npm test` passed (27 files, 445 tests), `npm run typecheck` was clean, and `npm run build` passed.
 - **Recording note:** from this entry on, the model row records the model name shown in the Codex companion output (this run showed only a thread id, so "not reported"), and the duration is the wall time of the delegated task as measured by the orchestrator's agent, which includes the Codex run.
+
+## D30. reformat-galaxy
+
+| | |
+|---|---|
+| Branch | `task/reformat-galaxy` |
+| Codex attempts | 1 |
+| Codex model | not reported |
+| Duration | 3m 53s |
+| Result | Done |
+
+- **Attempt 1:** Codex reformatted `GalaxyView.tsx` and `draw.ts` (one statement per line, long literals and JSX broken across lines) without touching any other file or any test.
+- **Orchestrator check:** esbuild minified output of both files is identical before and after, so only formatting changed; the longest line went from 512 to 95 characters in `GalaxyView.tsx` and from 252 to 74 in `draw.ts`; there is no byte order mark or carriage return; `npm test` passed unchanged (27 files, 445 tests), `npm run typecheck` was clean, and `npm run build` passed.
