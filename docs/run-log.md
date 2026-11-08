@@ -310,3 +310,14 @@ Dependencies were installed by the orchestrator once, during task 1, because the
 
 - **Attempt 1:** Codex wrote `HomeView` (orb, title, subtitle, and the chat panel with a bounded height) and wired it into `App.tsx` for the Harness view; the other three views are still placeholders. The "H A R N E S S" look comes only from CSS (`text-transform: uppercase`, wide letter-spacing, compensating padding) while the heading text stays "Harness", so its accessible name and the existing tests are unchanged. `tests/client/home-view.test.tsx` covers the composition, and two existing tests were adjusted to mock the chat API calls.
 - **Orchestrator check:** reviewed the code; `npm test` passed (17 files, 266 tests), `npm run typecheck` was clean, and `npm run build` passed.
+
+## D18. agents-view
+
+| | |
+|---|---|
+| Branch | `task/agents-view` |
+| Codex attempts | 1 |
+| Result | Done |
+
+- **Attempt 1:** Codex wrote `AgentsView` (grid of historical cards with a 1, 2x2, and 3x3 selector, pagination whose page size follows the layout, a Refresh button, and loading, empty, and error states with retry), the `formatElapsed` helper, and wired the view into `App.tsx`. Cards show source, task, status, agent, model, time, and output as plain monospaced text; missing values show an em dash. `tests/client/agents-view.test.tsx` and `tests/client/format.test.ts` cover the cases, including stale responses and literal HTML.
+- **Orchestrator check:** reviewed the code and confirmed the special characters (multiplication sign, em dash, ellipsis) are stored as proper UTF-8; `npm test` passed (19 files, 294 tests), `npm run typecheck` was clean, and `npm run build` passed.

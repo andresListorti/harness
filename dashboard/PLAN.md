@@ -55,11 +55,6 @@ Work in the order listed. A milestone closes only after these steps, in order:
 
 ### Milestone 1: dashboard visible
 
-### agents-view
-- **Goal:** Add the historical agent card grid with a 1, 2x2, and 3x3 selector.
-- **Files:** `src/views/AgentsView.tsx`, `tests/client/agents-view.test.tsx`
-- **Definition of done:** `tests/client/agents-view.test.tsx` passes: task, agent, model, status, time, and monospaced output render; the selector changes the layout; a `null` value shows "—"; the empty state renders.
-
 ### galaxy-camera
 - **Goal:** Add pure functions for orbit positions, wheel zoom, drag pan, and hit testing.
 - **Files:** `src/galaxy/camera.ts`, `tests/client/galaxy-camera.test.ts`
@@ -311,6 +306,12 @@ _None._
 - **Files:** `src/views/HomeView.tsx`, `src/views/HomeView.css`, `src/App.tsx`, `tests/client/home-view.test.tsx`, `tests/app.test.tsx`, `tests/client/sidebar.test.tsx`
 - **Definition of done:** `tests/client/home-view.test.tsx` passes: orb, title, subtitle, and chat render.
 - **Result:** done. 266 tests pass, typecheck and build clean.
+
+### agents-view
+- **Goal:** Add the historical agent card grid with a 1, 2x2, and 3x3 selector.
+- **Files:** `src/views/AgentsView.tsx`, `src/views/AgentsView.css`, `src/lib/format.ts`, `src/App.tsx`, `tests/client/agents-view.test.tsx`, `tests/client/format.test.ts`, `tests/client/sidebar.test.tsx`
+- **Definition of done:** `tests/client/agents-view.test.tsx` passes: task, agent, model, status, time, and monospaced output render; the selector changes the layout; a `null` value shows "—"; the empty state renders.
+- **Result:** done. 294 tests pass, typecheck and build clean. Adds pagination (page size follows the layout) and a Refresh button.
 
 ## Phase 2: real agent execution
 

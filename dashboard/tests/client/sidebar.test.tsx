@@ -7,6 +7,7 @@ import App from '../../src/App';
 
 vi.mock('../../src/lib/api', () => ({ api: {
   getHealth: vi.fn(),
+  getAgents: vi.fn().mockResolvedValue({ agents: [] }),
   getChatSuggestions: vi.fn().mockResolvedValue({ suggestions: [] }),
   sendChat: vi.fn(),
 } }));
