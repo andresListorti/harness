@@ -1,0 +1,67 @@
+.orb {
+  position: relative;
+  isolation: isolate;
+  width: 100%;
+  max-width: 22rem;
+  aspect-ratio: 1;
+  color: var(--color-teal);
+}
+
+.orb svg { position: absolute; inset: 0; width: 100%; height: 100%; }
+.orb-glow, .orb-core {
+  position: absolute;
+  border-radius: 50%;
+  pointer-events: none;
+}
+.orb-glow {
+  inset: 0;
+  background: radial-gradient(circle, var(--color-teal-glow), transparent 70%);
+  animation: orb-breathe 6s ease-in-out infinite;
+}
+.orb-core {
+  inset: 30%;
+  color: var(--color-teal);
+  background: radial-gradient(circle, currentColor, transparent 70%);
+  opacity: 0.35;
+  animation: orb-breathe 6s ease-in-out infinite;
+}
+.orb-ring, .orb-ripple { stroke: currentColor; stroke-width: 1.5; }
+.orb-ring, .orb-core, .orb-dot, .orb-ripple { transition: color 600ms ease; }
+.orb-rings, .orb-ring--rotating, .orb-ripple {
+  transform-origin: 100px 100px;
+}
+.orb-rings { animation: orb-breathe 6s ease-in-out infinite; }
+.orb-ring--rotating { animation: orb-rotate 48s linear infinite; }
+.orb-dot { fill: currentColor; }
+.orb-ripple { opacity: 0; }
+
+.orb[data-state='listening'] .orb-core,
+.orb[data-state='listening'] .orb-ring--inner,
+.orb[data-state='listening'] .orb-dot,
+.orb[data-state='listening'] .orb-ripple { color: var(--color-amber); }
+.orb[data-state='listening'] .orb-ripple { animation: orb-ripple 3s ease-out infinite; }
+.orb[data-state='listening'] .orb-ripple--delayed { animation: none; }
+.orb[data-state='speaking'] .orb-rings,
+.orb[data-state='speaking'] .orb-core { animation-duration: 1.2s; }
+.orb[data-state='speaking'] .orb-ripple { animation: orb-ripple 1.8s ease-out infinite; }
+.orb[data-state='speaking'] .orb-ripple--delayed { animation-delay: 0.9s; }
+
+@keyframes orb-breathe {
+  0%, 100% { transform: scale(0.97); opacity: 0.65; }
+  50% { transform: scale(1); opacity: 1; }
+}
+@keyframes orb-rotate {
+  to { transform: rotate(360deg); }
+}
+@keyframes orb-ripple {
+  0% { transform: scale(1); opacity: 0; }
+  15% { opacity: 0.5; }
+  100% { transform: scale(3.25); opacity: 0; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .orb, .orb * {
+    animation: none !important;
+    transition: none !important;
+  }
+}

@@ -55,11 +55,6 @@ Work in the order listed. A milestone closes only after these steps, in order:
 
 ### Milestone 1: dashboard visible
 
-### orb
-- **Goal:** Add the animated orb with concentric teal rings and idle, listening, and speaking states, using SVG and CSS only.
-- **Files:** `src/components/Orb.tsx`, `src/components/Orb.css`, `tests/client/orb.test.tsx`
-- **Definition of done:** `tests/client/orb.test.tsx` passes: each state renders; rings are present; no `img` element exists; animation is disabled under `prefers-reduced-motion`.
-
 ### chat-panel
 - **Goal:** Add the chat with local answers only: New chat, suggestions, text field, and Send.
 - **Files:** `src/components/ChatPanel.tsx`, `tests/client/chat-panel.test.tsx`
@@ -308,6 +303,12 @@ _None._
 - **Files:** `src/components/Sidebar.tsx`, `src/components/Sidebar.css`, `src/hooks/useAgentStatus.ts`, `src/App.tsx`, `src/App.css`, `tests/app.test.tsx`, `tests/client/sidebar.test.tsx`
 - **Definition of done:** `tests/client/sidebar.test.tsx` passes: the four views are listed and switch on click; Close menu hides the labels and keeps accessible names; the status dot reflects `GET /api/health`; Full screen calls the browser API.
 - **Result:** done. 243 tests pass, typecheck and build clean. Views are placeholders until their own tasks.
+
+### orb
+- **Goal:** Add the animated orb with concentric teal rings and idle, listening, and speaking states, using SVG and CSS only.
+- **Files:** `src/components/Orb.tsx`, `src/components/Orb.css`, `tests/client/orb.test.tsx`
+- **Definition of done:** `tests/client/orb.test.tsx` passes: each state renders; rings are present; no `img` element exists; animation is disabled under `prefers-reduced-motion`.
+- **Result:** done. 250 tests pass, typecheck and build clean.
 
 ## Phase 2: real agent execution
 

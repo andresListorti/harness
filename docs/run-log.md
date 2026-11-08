@@ -277,3 +277,14 @@ Dependencies were installed by the orchestrator once, during task 1, because the
 
 - **Attempt 1:** Codex wrote the collapsible `Sidebar` (four views, accessible names kept when collapsed, "Close menu" and "Open menu" toggle, status dot, "Full screen" toggle that tolerates missing browser support), the `useAgentStatus` hook that polls `GET /api/health`, and the app layout in `App.tsx`. Each view is a titled placeholder until its own task replaces it. `tests/client/sidebar.test.tsx` covers the sidebar, the hook (fake timers), and an integration test through `App`; `tests/app.test.tsx` now mocks the API client.
 - **Orchestrator check:** reviewed the code; `npm test` passed (14 files, 243 tests), `npm run typecheck` was clean, and `npm run build` passed.
+
+## D15. orb
+
+| | |
+|---|---|
+| Branch | `task/orb` |
+| Codex attempts | 1 |
+| Result | Done |
+
+- **Attempt 1:** Codex wrote the `Orb` component: five concentric SVG rings, a CSS-gradient glow and core, and idle, listening (amber), and speaking (faster teal pulse with ripples) states driven by `data-state`. Animation is pure CSS with a `prefers-reduced-motion` block. The glow uses HTML radial gradients instead of SVG gradient definitions, so no `url(...)` appears in the files. `tests/client/orb.test.tsx` checks the states, the five rings, the absence of any image element or external reference, and the reduced-motion rule.
+- **Orchestrator check:** reviewed the code; `npm test` passed (15 files, 250 tests), `npm run typecheck` was clean, and `npm run build` passed.
