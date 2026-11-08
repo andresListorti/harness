@@ -38,7 +38,7 @@ An agent's report that it finished is a claim, not evidence. The orchestrator re
 
 ### Two model families
 
-One agent reviewing its own work tends to share the blind spots that produced it. Here the code is written by one model family and reviewed by another. Running on two fixed-price plans also doubles the available quota, with no per-token billing and no API keys to manage.
+One agent reviewing its own work tends to share the blind spots that produced it. Here the code is written by one model family and reviewed by another. Running on two fixed-price plans also keeps costs predictable, with no per-token billing and no API keys to manage.
 
 ### Sandbox limits as a boundary
 
