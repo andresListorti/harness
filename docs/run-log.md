@@ -489,3 +489,18 @@ Dependencies were installed by the orchestrator once, during task 1, because the
 
 - **Attempt 1:** Codex added `model` and `durationSeconds` to the run-log entry schema, a strict `parseDuration` (`45s`, `1m 54s`, `1h 02m 05s`, and similar; anything else returns null), made the parser read the `Codex model` and `Duration` rows (a model of "not reported" or similar becomes null; entries without the rows keep nulls), made the Agents cards take model and time from the entry, updated the fixtures and tests (including real-file checks: D29 gives 114 seconds and D1 gives nulls), and documented the two rows in the run-log introduction and the dashboard README.
 - **Orchestrator check:** reviewed the diff and confirmed no byte order marks and that only the run-log introduction changed in the existing text; `npm test` passed (28 files, 494 tests), `npm run typecheck` was clean, and `npm run build` passed.
+
+## D33. chat-unsupported-requests
+
+| | |
+|---|---|
+| Branch | `task/chat-unsupported-requests` |
+| Codex attempts | 2 |
+| Codex model | not reported |
+| Duration | 4m 12s |
+| Result | Done |
+
+- **Attempt 1:** Codex added `CAPABILITY_NOTICE` and action detection ahead of the intents in `server/chat/local.ts`: a request to launch, run, start, merge, push, create, fix, and similar, or to have an agent do something, gets "I can't do that." plus the notice and the list of questions it can answer; unknown questions get "I didn't understand that." with the same notice and list. It updated the tests, the dashboard README, and one sentence of `docs/architecture.md`. Duration of attempt 1: 2m 20s.
+- **Orchestrator review of attempt 1:** probing 33 phrases through the real function showed that the verb-first rule wrongly treated short read-only phrases as actions, including one regression (`run log` used to return the latest run): `test status`, `build status`, `commit history`, `update status`, and `open tasks` were also rejected.
+- **Attempt 2:** the orchestrator sent the probe results back. Codex exempted verb-first messages whose next word is a read-only noun (`log`, `status`, `history`, `results`, `summary`, and similar), removed `open` from the verb list, and added a test table for these phrases. Duration of attempt 2: 1m 52s.
+- **Orchestrator check:** a second probe of 53 phrases classified every one as expected (18 actions, 28 questions answered, 7 not understood); `npm test` passed (28 files, 545 tests), `npm run typecheck` was clean, and `npm run build` passed.
