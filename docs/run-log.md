@@ -355,3 +355,14 @@ Dependencies were installed by the orchestrator once, during task 1, because the
 
 - **Attempt 1:** Codex wrote `PlanView`: a Pending, In progress, and Done board with counts and milestone group headings, expandable task details, a source selector between the dashboard and example-app plans, a run log (newest first) with expandable notes, loading, error, and retry states, and protection against stale responses. It also removed the temporary placeholder from `App.tsx`, since all four views are real now. `tests/client/plan-view.test.tsx` covers these cases.
 - **Orchestrator check:** reviewed the code and confirmed no file has a byte order mark; `npm test` passed (23 files, 343 tests), `npm run typecheck` was clean, and `npm run build` passed.
+
+## D22. serve-build
+
+| | |
+|---|---|
+| Branch | `task/serve-build` |
+| Codex attempts | 1 |
+| Result | Done |
+
+- **Attempt 1:** Codex added `server/static.ts` (a strict content security policy with only same-origin sources, plus `nosniff`, no-referrer, and frame-deny headers on every response; static serving of `dist/` with immutable caching for hashed assets; a single-page fallback that never answers `/api`, dotfiles, missing files with an extension, or non-GET methods), applied it in `createApp`, made the Host allowlist follow the configured `PORT` through `createServerApp()`, added startup messages, and added the `npm start` script. `tests/server/static.test.ts` covers the policy, headers on every kind of response, traversal attempts, and the no-`dist` case. Codex's first test run failed because Express's default 404 replaced the policy header and a dotfile was served; it fixed both within the same attempt.
+- **Orchestrator check:** reviewed the code and confirmed no file has a byte order mark; `npm test` passed (24 files, 365 tests), `npm run typecheck` was clean, and `npm run build` passed.

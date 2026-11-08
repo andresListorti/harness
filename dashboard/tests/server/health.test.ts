@@ -55,5 +55,24 @@ test('starts the server on the configured loopback address', async () => {
 
   startServer();
 
-  expect(listen).toHaveBeenCalledWith(4321, '127.0.0.1');
+  expect(listen).toHaveBeenCalledWith(4321, '127.0.0.1', expect.any(Function));
+});
+
+test('uses the configured server port in the Host allowlist', async () => {
+  vi.stubEnv('PORT', '4321');
+  vi.resetModules();
+  const { createServerApp } = await import('../../server/index');
+  const app = createServerApp();
+  expect((await request(app).get('/api/health').set('Host', '127.0.0.1:4321')).status).toBe(200);
+  expect((await request(app).get('/api/health').set('Host', '127.0.0.1:3001')).status).toBe(403);
+});
+
+test('accepts the default server and Vite hosts', async () => {
+  vi.stubEnv('PORT', undefined);
+  vi.resetModules();
+  const { createServerApp } = await import('../../server/index');
+  const app = createServerApp();
+  for (const host of ['127.0.0.1:3001', 'localhost:3001', '127.0.0.1:5173', 'localhost:5173']) {
+    expect((await request(app).get('/api/health').set('Host', host)).status).toBe(200);
+  }
 });
