@@ -7,6 +7,7 @@ import App from '../../src/App';
 
 vi.mock('../../src/lib/api', () => ({ api: {
   getHealth: vi.fn(),
+  getGalaxy: vi.fn().mockResolvedValue({ nodes: [] }),
   getAgents: vi.fn().mockResolvedValue({ agents: [] }),
   getChatSuggestions: vi.fn().mockResolvedValue({ suggestions: [] }),
   sendChat: vi.fn(),
@@ -141,3 +142,4 @@ test.each([true, false])('App shows health status and switches views (healthy: %
   await user.click(screen.getByRole('button', { name: 'Open menu' }));
   expect(screen.getByText('Galaxy')).toBeInTheDocument();
 });
+

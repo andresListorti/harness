@@ -332,3 +332,15 @@ Dependencies were installed by the orchestrator once, during task 1, because the
 
 - **Attempt 1:** Codex wrote `src/galaxy/camera.ts`: world and screen conversion, zoom that keeps the point under the cursor fixed with limits, wheel zoom factor, drag pan clamped to a maximum, fit zoom, `layoutGalaxy` (core at the origin, agents and systems on two orbits turning in opposite directions, planet radius growing with count), and hit testing in world and screen space. `tests/client/galaxy-camera.test.ts` covers these. The Codex run outlasted a tool timeout and reported before finishing; the orchestrator waited for the process to end and then verified the result itself.
 - **Orchestrator check:** reviewed the code against the task spec; `npm test` passed (20 files, 317 tests), `npm run typecheck` was clean, and `npm run build` passed.
+
+## D20. galaxy-view
+
+| | |
+|---|---|
+| Branch | `task/galaxy-view` |
+| Codex attempts | 1 |
+| Result | Done |
+
+- **Not an attempt:** the first launch never reached Codex: the task text contained single quotes that broke the shell command, and the branch stayed unchanged. The task text was saved to a file and passed to Codex through command substitution on the relaunch.
+- **Attempt 1:** Codex wrote `src/galaxy/draw.ts` (deterministic starfield, orbits, core glow, planets, selection ring, labels and counts), `GalaxyView` (data loading with retry, canvas animation loop cancelled on unmount, native non-passive wheel zoom, pointer drag, click-to-select, `Reset view`, reduced-motion handling, an accessible legend of buttons, and a detail panel), and wired it into `App.tsx`. Its tests use a recording canvas context and cover loading, errors, stale responses, selection, drag, wheel, reset, and reduced motion. Codex's first build failed because PowerShell saved the new files with a UTF-8 byte order mark and it re-saved them; the orchestrator found the marks still present in the six new files and stripped them.
+- **Orchestrator check:** reviewed the code; `npm test` passed (22 files, 330 tests), `npm run typecheck` was clean, and `npm run build` passed.

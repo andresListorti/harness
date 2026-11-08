@@ -55,11 +55,6 @@ Work in the order listed. A milestone closes only after these steps, in order:
 
 ### Milestone 1: dashboard visible
 
-### galaxy-view
-- **Goal:** Render the animated galaxy on a 2D canvas with a detail panel.
-- **Files:** `src/views/GalaxyView.tsx`, `src/galaxy/draw.ts`, `tests/client/galaxy-view.test.tsx`
-- **Definition of done:** `tests/client/galaxy-view.test.tsx` passes with a mocked canvas: it renders from API data; clicking a planet opens its detail; the animation frame is cancelled on unmount; the systems are also listed for screen readers.
-
 ### plan-view
 - **Goal:** Add the Pending, In progress, and Done board with the run log and a source selector.
 - **Files:** `src/views/PlanView.tsx`, `tests/client/plan-view.test.tsx`
@@ -313,6 +308,12 @@ _None._
 - **Files:** `src/galaxy/camera.ts`, `tests/client/galaxy-camera.test.ts`
 - **Definition of done:** `tests/client/galaxy-camera.test.ts` passes: zoom keeps the point under the cursor fixed and respects limits; pan moves by the screen delta at any zoom; hit testing finds a planet and returns `null` in empty space.
 - **Result:** done. 317 tests pass, typecheck and build clean.
+
+### galaxy-view
+- **Goal:** Render the animated galaxy on a 2D canvas with a detail panel.
+- **Files:** `src/views/GalaxyView.tsx`, `src/views/GalaxyView.css`, `src/galaxy/draw.ts`, `src/App.tsx`, `tests/client/galaxy-view.test.tsx`, `tests/client/galaxy-draw.test.ts`, `tests/client/galaxy-fixture.ts`, `tests/client/sidebar.test.tsx`
+- **Definition of done:** `tests/client/galaxy-view.test.tsx` passes with a mocked canvas: it renders from API data; clicking a planet opens its detail; the animation frame is cancelled on unmount; the systems are also listed for screen readers.
+- **Result:** done. 330 tests pass, typecheck and build clean.
 
 ## Phase 2: real agent execution
 
