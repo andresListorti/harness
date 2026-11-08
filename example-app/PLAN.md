@@ -10,6 +10,8 @@ A to-do REST API built with TypeScript, Node, Express, and Vitest. Tasks are sto
 
 ## Pending
 
+_None._
+
 ## In progress
 
 _None._
