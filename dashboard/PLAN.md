@@ -55,11 +55,6 @@ Work in the order listed. A milestone closes only after these steps, in order:
 
 ### Milestone 1: dashboard visible
 
-### scaffold
-- **Goal:** Create the Vite, React, TypeScript, Vitest, and Express project with a page that renders "Harness".
-- **Files:** `package.json`, `package-lock.json`, `tsconfig.json`, `vite.config.ts`, `vitest.config.ts`, `index.html`, `.gitignore`, `src/main.tsx`, `src/App.tsx`, `tests/app.test.tsx`
-- **Definition of done:** `tests/app.test.tsx` passes: the app renders the product name. Vite binds to `127.0.0.1` and proxies `/api`. `.gitignore` covers `dist/` and `.data/`. A clean `npm ci` works.
-
 ### server-app
 - **Goal:** Add an Express app factory, a separate entry point that binds to `127.0.0.1`, and `GET /api/health`.
 - **Files:** `server/app.ts`, `server/index.ts`, `tests/server/health.test.ts`
@@ -295,7 +290,11 @@ _None._
 
 ## Done
 
-_None._
+### scaffold
+- **Goal:** Create the Vite, React, TypeScript, Vitest, and Express project with a page that renders "Harness".
+- **Files:** `package.json`, `package-lock.json`, `tsconfig.json`, `vite.config.ts`, `vitest.config.ts`, `index.html`, `.gitignore`, `src/main.tsx`, `src/App.tsx`, `tests/app.test.tsx`
+- **Definition of done:** `tests/app.test.tsx` passes: the app renders the product name. Vite binds to `127.0.0.1` and proxies `/api`. `.gitignore` covers `dist/` and `.data/`. A clean `npm ci` works.
+- **Result:** done. 2 tests pass, typecheck and build clean, verified from a clean `npm ci`.
 
 ## Phase 2: real agent execution
 
