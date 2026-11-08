@@ -1,6 +1,6 @@
 # Run log
 
-One entry per task in `example-app/PLAN.md`: how many attempts Codex needed, which tests passed, and the result. The orchestrator (Claude Code) runs the tests itself after every attempt.
+One entry per task: how many attempts Codex needed, which tests passed, and the result. Numbered entries (`## 1. name`) are example-app tasks from `example-app/PLAN.md`; D-prefixed entries (`## D1. name`) are dashboard tasks from `dashboard/PLAN.md`. The orchestrator (Claude Code) runs the tests itself after every attempt.
 
 ## Environment note: Codex sandbox on Windows
 
@@ -388,3 +388,14 @@ Dependencies were installed by the orchestrator once, during task 1, because the
 
 - **Attempt 1:** Codex added a `dashboard` job to `.github/workflows/ci.yml` (same pinned actions, Node 24, npm cache keyed on `dashboard/package-lock.json`, then `npm ci`, `npm test`, `npm run typecheck`, `npm run build` in `dashboard/`), leaving the `example-app` job and the read-only permissions untouched. It also wrote `dashboard/tests/ci-workflow.test.ts`, which checks the workflow text: permissions, both jobs and their steps in order, 40-character SHAs that match across jobs, and no secrets or tabs. Like the first CI task, this one writes outside its own folder, which the task prompt allowed explicitly.
 - **Orchestrator check:** the YAML was parsed with a YAML library installed outside the repo (valid; triggers `push` and `pull_request`; both jobs and their steps as expected); `npm test` passed (26 files, 406 tests), `npm run typecheck` was clean, and `npm run build` passed. The workflow itself has not run on GitHub yet.
+
+## D25. docs-dashboard
+
+| | |
+|---|---|
+| Branch | `task/docs-dashboard` |
+| Codex attempts | 1 |
+| Result | Done |
+
+- **Attempt 1:** Codex wrote `dashboard/README.md` (requirements, production and development run commands, the four views and their real data, data sources, the HTTP API, the implemented security measures, project layout, checks, and a "Not built yet" section), added a Dashboard section to the root `README.md`, a dashboard architecture section to `docs/architecture.md`, run steps to `docs/setup.md`, and rewrote only the introduction of this run log so it explains both entry types. It checked the claims against the code and ran the three checks.
+- **Orchestrator check:** reviewed every changed document against the code and the plan, confirmed no file has a byte order mark or carriage returns, and confirmed the existing run-log entries are unchanged; `npm test` passed (26 files, 406 tests), `npm run typecheck` was clean, and `npm run build` passed.

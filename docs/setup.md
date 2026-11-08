@@ -69,6 +69,21 @@ Without the elevated sandbox, Codex can stay read-only and its commands fail wit
    codex exec --skip-git-repo-check "Create a file named hello.txt containing the word hi"
    ```
 
+## Run the dashboard
+
+Use Node 24 (the version used by dashboard CI) and npm. From the repo root:
+
+```sh
+cd dashboard
+npm ci
+npm run build
+npm start
+```
+
+Open `http://127.0.0.1:3001`. Set `PORT` to change the backend port. No API key is needed for milestone 1: `.env.example` is still intentionally empty, and the dashboard reads no environment setting except `PORT`. It does not load `.env`.
+
+See [the dashboard guide](../dashboard/README.md) for development mode, views, security, and what is not built yet.
+
 ## Run the example app
 
 ```sh

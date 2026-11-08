@@ -55,11 +55,6 @@ Work in the order listed. A milestone closes only after these steps, in order:
 
 ### Milestone 1: dashboard visible
 
-### docs-dashboard
-- **Goal:** Document setup, the four views, the Milestone 1 security model, and what is not built yet.
-- **Files:** `README.md`, `../README.md`, `../docs/architecture.md`, `../docs/setup.md`, `../docs/run-log.md`
-- **Definition of done:** the documents match the implemented behavior; the run-log header describes both entry types; a search of the changed files finds no personal data or local paths.
-
 ### m1-acceptance
 - **Goal:** Run the built dashboard and check it in a real browser. Performed by the orchestrator.
 - **Files:** none
@@ -318,6 +313,12 @@ _None._
 - **Files:** `../.github/workflows/ci.yml`, `tests/ci-workflow.test.ts`
 - **Definition of done:** the YAML parses; the new job runs `npm ci`, `npm test`, `npm run typecheck`, and `npm run build` in `dashboard/`, uses the same pinned actions, and keeps read-only permissions; the `example-app` job is unchanged.
 - **Result:** done. YAML parsed with an external parser; 406 tests pass, typecheck and build clean. The workflow has not run on GitHub yet.
+
+### docs-dashboard
+- **Goal:** Document setup, the four views, the Milestone 1 security model, and what is not built yet.
+- **Files:** `README.md`, `../README.md`, `../docs/architecture.md`, `../docs/setup.md`, `../docs/run-log.md`
+- **Definition of done:** the documents match the implemented behavior; the run-log header describes both entry types; a search of the changed files finds no personal data or local paths.
+- **Result:** done. Docs checked against the code by Codex and reviewed by the orchestrator; 406 tests pass, typecheck and build clean.
 
 ## Phase 2: real agent execution
 

@@ -56,6 +56,20 @@ The full rules are in [CLAUDE.md](CLAUDE.md). The design reasoning is in [docs/a
 
 The single retry was a review fix on the first task (replacing `latest` dependency tags with pinned versions), not a test failure. One earlier run was blocked by the sandbox before it attempted the task, and it is not counted as an attempt. Task-by-task details are in [docs/run-log.md](docs/run-log.md) and [example-app/PLAN.md](example-app/PLAN.md).
 
+## Dashboard
+
+The local Harness dashboard shows repo questions, historical agent cards, a galaxy of repo data, and the plan board. Milestone 1 is read-only and local; see [dashboard/README.md](dashboard/README.md) for requirements, development commands, security, and limits.
+
+With Node 24 and npm, start from the repo root:
+
+```sh
+cd dashboard
+npm ci
+npm run build && npm start
+```
+
+Open `http://127.0.0.1:3001`.
+
 ## Design notes
 
 - **The Codex sandbox has no network**, so the orchestrator installs dependencies as an environment step.
