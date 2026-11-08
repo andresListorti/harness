@@ -55,11 +55,6 @@ Work in the order listed. A milestone closes only after these steps, in order:
 
 ### Milestone 1: dashboard visible
 
-### api-contract
-- **Goal:** Define the Zod schemas and types shared by the front end and backend for Milestone 1. Later milestones extend this file.
-- **Files:** `shared/api.ts`, `tests/shared/api.test.ts`
-- **Definition of done:** `tests/shared/api.test.ts` passes: valid plan, run-log, commit, galaxy, agent card, and chat payloads are accepted; unknown enum values and unknown fields are rejected.
-
 ### plan-parser
 - **Goal:** Parse a `PLAN.md` into Pending, In progress, and Done tasks.
 - **Files:** `server/data/plan.ts`, `tests/server/plan.test.ts`
@@ -297,6 +292,12 @@ _None._
 - **Files:** `server/security.ts`, `server/app.ts`, `tests/server/security.test.ts`
 - **Definition of done:** `tests/server/security.test.ts` passes: an unknown `Host` returns 403; a POST with a foreign or missing `Origin` returns 403; a non-JSON POST returns 415; an oversized body returns 413; allowed requests pass.
 - **Result:** done. 32 tests pass, typecheck and build clean.
+
+### api-contract
+- **Goal:** Define the Zod schemas and types shared by the front end and backend for Milestone 1. Later milestones extend this file.
+- **Files:** `shared/api.ts`, `tests/shared/api.test.ts`
+- **Definition of done:** `tests/shared/api.test.ts` passes: valid plan, run-log, commit, galaxy, agent card, and chat payloads are accepted; unknown enum values and unknown fields are rejected.
+- **Result:** done. 91 tests pass, typecheck and build clean.
 
 ## Phase 2: real agent execution
 
