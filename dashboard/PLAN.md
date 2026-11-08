@@ -55,11 +55,6 @@ Work in the order listed. A milestone closes only after these steps, in order:
 
 ### Milestone 1: dashboard visible
 
-### ci-dashboard
-- **Goal:** Add a `dashboard` job to the CI workflow.
-- **Files:** `../.github/workflows/ci.yml`
-- **Definition of done:** the YAML parses; the new job runs `npm ci`, `npm test`, `npm run typecheck`, and `npm run build` in `dashboard/`, uses the same pinned actions, and keeps read-only permissions; the `example-app` job is unchanged.
-
 ### docs-dashboard
 - **Goal:** Document setup, the four views, the Milestone 1 security model, and what is not built yet.
 - **Files:** `README.md`, `../README.md`, `../docs/architecture.md`, `../docs/setup.md`, `../docs/run-log.md`
@@ -317,6 +312,12 @@ _None._
 - **Files:** `tests/helpers/safety-scan.ts`, `tests/public-safety.test.ts`, and four client tests whose image-tag fixtures are now built at runtime
 - **Definition of done:** `tests/public-safety.test.ts` passes on the repo and fails on fixtures containing an email address, an absolute local path, a filled-in key, a person image, or a remote font.
 - **Result:** done. 402 tests pass, typecheck and build clean. It also rejects the retired product name and other agent tools, and scans `docs/run-log.md` and `.env.example`.
+
+### ci-dashboard
+- **Goal:** Add a `dashboard` job to the CI workflow.
+- **Files:** `../.github/workflows/ci.yml`, `tests/ci-workflow.test.ts`
+- **Definition of done:** the YAML parses; the new job runs `npm ci`, `npm test`, `npm run typecheck`, and `npm run build` in `dashboard/`, uses the same pinned actions, and keeps read-only permissions; the `example-app` job is unchanged.
+- **Result:** done. YAML parsed with an external parser; 406 tests pass, typecheck and build clean. The workflow has not run on GitHub yet.
 
 ## Phase 2: real agent execution
 
