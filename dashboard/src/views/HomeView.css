@@ -1,0 +1,34 @@
+.home-view {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-4);
+  width: 100%;
+  max-width: 48rem;
+  margin-inline: auto;
+}
+
+.home-orb { width: min(14rem, 38vw); }
+
+.home-title {
+  text-transform: uppercase;
+  letter-spacing: 0.6em;
+  padding-left: 0.6em;
+  font-weight: 600;
+  font-size: clamp(1.25rem, 3vw, 2.5rem);
+  line-height: 1.15;
+  text-align: center;
+  text-shadow: 0 0 24px var(--color-teal-glow);
+}
+
+.home-subtitle {
+  color: var(--color-text-muted);
+  text-align: center;
+}
+
+.home-chat { width: 100%; min-width: 0; }
+.home-chat .chat-panel {
+  min-height: 18rem;
+  max-height: min(34rem, 60vh);
+  height: clamp(18rem, calc(100dvh - 30rem), 34rem);
+}

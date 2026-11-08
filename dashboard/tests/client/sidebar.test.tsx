@@ -5,7 +5,11 @@ import { useAgentStatus } from '../../src/hooks/useAgentStatus';
 import { api } from '../../src/lib/api';
 import App from '../../src/App';
 
-vi.mock('../../src/lib/api', () => ({ api: { getHealth: vi.fn() } }));
+vi.mock('../../src/lib/api', () => ({ api: {
+  getHealth: vi.fn(),
+  getChatSuggestions: vi.fn().mockResolvedValue({ suggestions: [] }),
+  sendChat: vi.fn(),
+} }));
 
 afterEach(() => {
   cleanup();
