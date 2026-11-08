@@ -122,3 +122,14 @@ The write-enabled sandbox has no network access, so Codex cannot run `npm instal
 ## Environment steps summary
 
 Dependencies were installed by the orchestrator once, during task 1, because the Codex sandbox has no network. No task after that needed new dependencies, so there were no further installs.
+
+## D1. scaffold
+
+| | |
+|---|---|
+| Branch | `task/scaffold` |
+| Codex attempts | 1 |
+| Result | Done |
+
+- **Attempt 1:** Codex wrote the Vite, React, TypeScript, Vitest, and Express project files in `dashboard/` (dependencies pinned to caret ranges given in the task prompt), plus `tests/app.test.tsx` covering the Harness heading and the Vite config (host `127.0.0.1`, `/api` proxy). It could not install dependencies (no network).
+- **Orchestrator check:** the orchestrator ran `npm install` once to create `package-lock.json`, then deleted `node_modules` and `dist` and verified from a clean `npm ci`: `npm test` passed (1 file, 2 tests), `npm run typecheck` was clean, and `npm run build` passed. npm warns that the `esbuild` install script is not yet covered by `allowScripts`; the build and tests are unaffected.
