@@ -166,3 +166,14 @@ Dependencies were installed by the orchestrator once, during task 1, because the
 
 - **Attempt 1:** Codex wrote `shared/api.ts` with strict Zod schemas and inferred types for plan tasks and boards, run-log entries, commits, galaxy nodes, agent cards, health, chat request and response, and the API error shape, plus `tests/shared/api.test.ts`. The orchestrator fixed the field shapes in the task prompt so later parsers and models share one contract.
 - **Orchestrator check:** reviewed the schemas; `npm test` passed (4 files, 91 tests), `npm run typecheck` was clean, and `npm run build` passed.
+
+## D5. plan-parser
+
+| | |
+|---|---|
+| Branch | `task/plan-parser` |
+| Codex attempts | 1 |
+| Result | Done |
+
+- **Attempt 1:** Codex wrote `parsePlan(markdown, source)` in `server/data/plan.ts`: columns from the level-2 headings, tasks from level-3 headings with field bullets, group headings applied to the following tasks, other level-2 sections (including Phase 2) ignored, and no throws on malformed input. `tests/server/plan.test.ts` uses inline fixtures plus the real `dashboard/PLAN.md` and `example-app/PLAN.md`.
+- **Orchestrator check:** reviewed the code; `npm test` passed (5 files, 105 tests), `npm run typecheck` was clean, and `npm run build` passed.

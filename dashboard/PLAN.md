@@ -55,11 +55,6 @@ Work in the order listed. A milestone closes only after these steps, in order:
 
 ### Milestone 1: dashboard visible
 
-### plan-parser
-- **Goal:** Parse a `PLAN.md` into Pending, In progress, and Done tasks.
-- **Files:** `server/data/plan.ts`, `tests/server/plan.test.ts`
-- **Definition of done:** `tests/server/plan.test.ts` passes: goal, files, definition of done, and result are extracted; `_None._` gives an empty column; a level-3 heading with no task fields is kept as the milestone group of the tasks after it; the Phase 2 section is excluded; malformed input does not throw.
-
 ### runlog-parser
 - **Goal:** Parse `docs/run-log.md` into entries, separating example-app entries (`## 1. name`) from dashboard entries (`## D1. name`).
 - **Files:** `server/data/runlog.ts`, `tests/server/runlog.test.ts`
@@ -298,6 +293,12 @@ _None._
 - **Files:** `shared/api.ts`, `tests/shared/api.test.ts`
 - **Definition of done:** `tests/shared/api.test.ts` passes: valid plan, run-log, commit, galaxy, agent card, and chat payloads are accepted; unknown enum values and unknown fields are rejected.
 - **Result:** done. 91 tests pass, typecheck and build clean.
+
+### plan-parser
+- **Goal:** Parse a `PLAN.md` into Pending, In progress, and Done tasks.
+- **Files:** `server/data/plan.ts`, `tests/server/plan.test.ts`
+- **Definition of done:** `tests/server/plan.test.ts` passes: goal, files, definition of done, and result are extracted; `_None._` gives an empty column; a level-3 heading with no task fields is kept as the milestone group of the tasks after it; the Phase 2 section is excluded; malformed input does not throw.
+- **Result:** done. 105 tests pass, typecheck and build clean.
 
 ## Phase 2: real agent execution
 
