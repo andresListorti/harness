@@ -2,24 +2,7 @@ import request from 'supertest';
 import { describe, expect, it } from 'vitest';
 import { createApp } from '../src/app.js';
 import { errorBody } from '../src/errors.js';
-import { createTaskStore, type TaskStore } from '../src/store.js';
-
-// Test-only wrapper: mark selected tasks completed in returned copies without
-// changing the store's public API or relying on mutations of its internal data.
-function withCompletedTasks(store: TaskStore, completedIds: string[]): TaskStore {
-  const decorate = (task: ReturnType<TaskStore['create']>) => ({
-    ...task,
-    completed: completedIds.includes(task.id),
-  });
-  return {
-    ...store,
-    list: () => store.list().map(decorate),
-    get: (id) => {
-      const task = store.get(id);
-      return task === undefined ? undefined : decorate(task);
-    },
-  };
-}
+import { createTaskStore } from '../src/store.js';
 
 describe('GET /tasks', () => {
   it('returns an empty array when there are no tasks', async () => {
@@ -40,16 +23,17 @@ describe('GET /tasks', () => {
   });
 
   it.each(['true', 'false'])('filters by completed=%s', async (completed) => {
-    const base = createTaskStore();
-    const first = base.create({ title: 'First task' });
-    const second = base.create({ title: 'Second task' });
-    const third = base.create({ title: 'Third task' });
-    const store = withCompletedTasks(base, [first.id, third.id]);
+    const store = createTaskStore();
+    const first = store.create({ title: 'First task' });
+    const second = store.create({ title: 'Second task' });
+    const third = store.create({ title: 'Third task' });
+    const completedFirst = store.complete(first.id);
+    const completedThird = store.complete(third.id);
     const response = await request(createApp({ store })).get(`/tasks?completed=${completed}`);
 
     expect(response.status).toBe(200);
     expect(response.body).toEqual(completed === 'true'
-      ? [{ ...first, completed: true }, { ...third, completed: true }]
+      ? [completedFirst, completedThird]
       : [second]);
   });
 

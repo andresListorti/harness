@@ -10,11 +10,6 @@ A to-do REST API built with TypeScript, Node, Express, and Vitest. Tasks are sto
 
 ## Pending
 
-### complete-task
-- **Goal:** Add `POST /tasks/:id/complete` as an idempotent operation.
-- **Files:** `src/routes/tasks.ts`, `tests/complete-task.test.ts`
-- **Definition of done:** `tests/complete-task.test.ts` passes: returns 200 with `completed: true`; a repeated call returns 200 and does not change `updatedAt`; an unknown ID returns 404.
-
 ### delete-task
 - **Goal:** Add `DELETE /tasks/:id`.
 - **Files:** `src/routes/tasks.ts`, `tests/delete-task.test.ts`
@@ -71,3 +66,9 @@ _None._
 - **Files:** `src/routes/tasks.ts`, `tests/edit-task.test.ts`
 - **Definition of done:** `tests/edit-task.test.ts` passes: partial updates leave other fields unchanged and refresh `updatedAt`; invalid or empty body returns 400; attempts to set `id` or `completed` return 400; an unknown ID returns 404.
 - **Result:** done. 93 tests pass, typecheck clean.
+
+### complete-task
+- **Goal:** Add `POST /tasks/:id/complete` as an idempotent operation.
+- **Files:** `src/store.ts`, `src/routes/tasks.ts`, `tests/complete-task.test.ts`, `tests/store.test.ts`, `tests/list-tasks.test.ts`
+- **Definition of done:** `tests/complete-task.test.ts` passes: returns 200 with `completed: true`; a repeated call returns 200 and does not change `updatedAt`; an unknown ID returns 404.
+- **Result:** done. 97 tests pass, typecheck clean.

@@ -45,6 +45,16 @@ export function createTasksRouter(store: TaskStore) {
     response.status(201).json(store.create(result.data));
   });
 
+  router.post('/:id/complete', (request, response) => {
+    const task = store.complete(request.params.id);
+    if (!task) {
+      response.status(404).json(errorBody('TASK_NOT_FOUND', 'Task not found.'));
+      return;
+    }
+
+    response.status(200).json(task);
+  });
+
   router.patch('/:id', (request, response) => {
     const result = updateTaskSchema.safeParse(request.body);
     if (!result.success) {

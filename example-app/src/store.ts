@@ -39,6 +39,16 @@ export function createTaskStore() {
       return { ...task };
     },
 
+    complete(id: string): Task | undefined {
+      const task = tasks.get(id);
+      if (!task) return undefined;
+      if (!task.completed) {
+        task.completed = true;
+        task.updatedAt = new Date().toISOString();
+      }
+      return { ...task };
+    },
+
     delete(id: string): boolean {
       return tasks.delete(id);
     },

@@ -42,6 +42,7 @@ describe('task store', () => {
     const store = createTaskStore();
     expect(store.get('unknown')).toBeUndefined();
     expect(store.update('unknown', { title: 'Updated' })).toBeUndefined();
+    expect(store.complete('unknown')).toBeUndefined();
     expect(store.delete('unknown')).toBe(false);
     expect(store.list()).toEqual([]);
   });
@@ -61,6 +62,31 @@ describe('task store', () => {
       description: '',
     });
     expect(store.get(original.id)?.title).toBe('Updated');
+  });
+
+  it('completes a task once and returns defensive copies on every call', () => {
+    const store = createTaskStore();
+    const original = store.create({ title: 'Task', description: 'Details' });
+    vi.setSystemTime(new Date('2026-01-02T00:00:00.000Z'));
+    const expected = {
+      ...original,
+      completed: true,
+      updatedAt: '2026-01-02T00:00:00.000Z',
+    };
+    const completed = store.complete(original.id)!;
+    expect(completed).toEqual(expected);
+    expect(store.get(original.id)).toEqual(expected);
+    completed.completed = false;
+    completed.updatedAt = 'mutated';
+
+    vi.setSystemTime(new Date('2026-01-03T00:00:00.000Z'));
+    const repeated = store.complete(original.id)!;
+    expect(repeated).toEqual(expected);
+    expect(repeated).not.toBe(completed);
+    repeated.completed = false;
+    repeated.updatedAt = 'mutated again';
+    expect(store.get(original.id)).toEqual(expected);
+    expect(original.completed).toBe(false);
   });
 
   it('deletes existing tasks', () => {
