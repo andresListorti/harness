@@ -377,3 +377,14 @@ Dependencies were installed by the orchestrator once, during task 1, because the
 
 - **Attempt 1:** Codex wrote `tests/helpers/safety-scan.ts` (a pure scanner for emails, absolute local paths, filled-in secrets, remote fonts, forbidden product and tool names, and image references, with masked excerpts) and `tests/public-safety.test.ts` (self-tests with fixtures built at runtime, a real scan of `dashboard/`, the run log, and `.env.example`, a ban on image files, a check that `.env` is ignored, and a guard against a vacuous scan). Its first run flagged literal image tags in four older client tests; Codex changed those fixtures to be assembled at runtime without changing what they assert.
 - **Orchestrator check:** reviewed the scanner and confirmed no file has a byte order mark; `npm test` passed (25 files, 402 tests), `npm run typecheck` was clean, and `npm run build` passed.
+
+## D24. ci-dashboard
+
+| | |
+|---|---|
+| Branch | `task/ci-dashboard` |
+| Codex attempts | 1 |
+| Result | Done |
+
+- **Attempt 1:** Codex added a `dashboard` job to `.github/workflows/ci.yml` (same pinned actions, Node 24, npm cache keyed on `dashboard/package-lock.json`, then `npm ci`, `npm test`, `npm run typecheck`, `npm run build` in `dashboard/`), leaving the `example-app` job and the read-only permissions untouched. It also wrote `dashboard/tests/ci-workflow.test.ts`, which checks the workflow text: permissions, both jobs and their steps in order, 40-character SHAs that match across jobs, and no secrets or tabs. Like the first CI task, this one writes outside its own folder, which the task prompt allowed explicitly.
+- **Orchestrator check:** the YAML was parsed with a YAML library installed outside the repo (valid; triggers `push` and `pull_request`; both jobs and their steps as expected); `npm test` passed (26 files, 406 tests), `npm run typecheck` was clean, and `npm run build` passed. The workflow itself has not run on GitHub yet.
