@@ -1,6 +1,8 @@
 import { randomUUID } from 'node:crypto';
 import type { Task, CreateTaskInput, UpdateTaskInput } from './validation.js';
 
+export type TaskStore = ReturnType<typeof createTaskStore>;
+
 export function createTaskStore() {
   const tasks = new Map<string, Task>();
 

@@ -10,11 +10,6 @@ A to-do REST API built with TypeScript, Node, Express, and Vitest. Tasks are sto
 
 ## Pending
 
-### create-task
-- **Goal:** Add `POST /tasks` using the validation schema and the store.
-- **Files:** `src/routes/tasks.ts`, `src/app.ts`, `tests/create-task.test.ts`
-- **Definition of done:** `tests/create-task.test.ts` passes: valid body returns 201 with the created task; invalid body returns 400 with code `VALIDATION_ERROR` and details; nothing is stored after a rejected request.
-
 ### list-and-get-tasks
 - **Goal:** Add `GET /tasks`, with an optional `completed` filter, and `GET /tasks/:id`.
 - **Files:** `src/routes/tasks.ts`, `tests/list-tasks.test.ts`
@@ -68,3 +63,9 @@ _None._
 - **Files:** `src/store.ts`, `tests/store.test.ts`
 - **Definition of done:** `tests/store.test.ts` passes: create assigns a unique ID, `completed: false`, and timestamps; list keeps insertion order; get, update, and delete return `undefined` or `false` for unknown IDs; update changes `updatedAt` but not `id` or `createdAt`; each store instance is isolated.
 - **Result:** done. 55 tests pass, typecheck clean.
+
+### create-task
+- **Goal:** Add `POST /tasks` using the validation schema and the store.
+- **Files:** `src/routes/tasks.ts`, `src/errors.ts`, `src/app.ts`, `src/store.ts`, `tests/create-task.test.ts`
+- **Definition of done:** `tests/create-task.test.ts` passes: valid body returns 201 with the created task; invalid body returns 400 with code `VALIDATION_ERROR` and details; nothing is stored after a rejected request.
+- **Result:** done. 62 tests pass, typecheck clean.
