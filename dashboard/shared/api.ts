@@ -20,6 +20,19 @@ export type TtsRequest = z.infer<typeof ttsRequestSchema>;
 export const agentIdSchema = z.enum(['claude-code', 'codex']);
 export type AgentId = z.infer<typeof agentIdSchema>;
 
+export const voiceChoiceSchema = z.enum(['browser', 'fish-audio', 'elevenlabs', 'openai']);
+export type VoiceChoice = z.infer<typeof voiceChoiceSchema>;
+
+export const settingsSchema = z.object({
+  orchestrator: agentIdSchema,
+  voice: voiceChoiceSchema,
+}).strict();
+export type Settings = z.infer<typeof settingsSchema>;
+
+export const settingsResponseSchema = settingsSchema.extend({ worker: agentIdSchema }).strict();
+export type SettingsResponse = z.infer<typeof settingsResponseSchema>;
+
+
 export const planColumnSchema = z.enum(['pending', 'in_progress', 'done']);
 export type PlanColumn = z.infer<typeof planColumnSchema>;
 

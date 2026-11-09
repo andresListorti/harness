@@ -2,6 +2,7 @@ import express, { type Express } from 'express';
 import { applySecurity, jsonErrorHandler, type SecurityOptions } from './security';
 import { createDataRouter, type DataDeps } from './routes/data';
 
+import { createSettingsRouter } from './routes/settings';
 import { createChatRouter } from './routes/chat';
 import { createTtsRouter, type TtsDeps } from './routes/tts';
 import { DEFAULT_STATIC_DIR, securityHeaders, serveStatic } from './static';
@@ -24,6 +25,7 @@ export function createApp(options: AppOptions = {}) {
   });
 
   options.routes?.(app);
+  app.use('/api', createSettingsRouter(options.data));
   app.use('/api', createDataRouter(options.data));
   app.use('/api', createChatRouter(options.data));
   app.use('/api', createTtsRouter(options.voice));

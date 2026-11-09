@@ -11,7 +11,10 @@ import { getRepoRoot, listTestFiles, readCommits } from '../data/git';
 import { parsePlan } from '../data/plan';
 import { parseRunLog } from '../data/runlog';
 
+import { defaultSettingsPath, readSettings } from '../settings';
+
 export interface DataDeps {
+  settingsPath?: string;
   repoRoot?: string;
   readCommits?: typeof readCommits;
   listTestFiles?: typeof listTestFiles;
@@ -59,10 +62,12 @@ export function createDataRouter(deps: DataDeps = {}): Router {
     res.json(commitsSchema.parse(await commits(repoRoot, Number.isFinite(limit) ? limit : 20)));
   });
   router.get('/galaxy', async (_req, res) => {
-    const [[example, dashboard], history, testFiles] = await Promise.all([
+    const [[example, dashboard], history, testFiles, settings] = await Promise.all([
       sources(), commits(repoRoot, 20), tests(repoRoot),
+      readSettings(deps.settingsPath ?? defaultSettingsPath()),
     ]);
     res.json(galaxySchema.parse(buildGalaxy({
+      orchestrator: settings.orchestrator,
       tasks: [...dashboard.tasks, ...example.tasks],
       runLog: [...example.runLog, ...dashboard.runLog], commits: history.commits, testFiles,
     })));

@@ -145,10 +145,7 @@ Work in the order listed. A milestone closes only after these steps, in order:
 
 ## In progress
 
-### settings-store
-- **Goal:** Persist the orchestrator and voice settings in the ignored `.data/settings.json`, expose them over the API, and use the saved roles in the galaxy.
-- **Files:** `server/settings.ts`, `server/routes/settings.ts`, `server/routes/data.ts`, `server/app.ts`, `shared/api.ts`, `tests/server/settings.test.ts`
-- **Definition of done:** `tests/server/settings.test.ts` passes: defaults apply when the file is missing or corrupt; a save survives a reload; invalid values return 400; choosing one orchestrator makes the other agent the worker; the galaxy route reflects the saved roles; historical agent cards do not change.
+_None._
 
 ## Done
 
@@ -385,6 +382,12 @@ Work in the order listed. A milestone closes only after these steps, in order:
 - **Files:** `server/routes/tts.ts`, `server/app.ts`, `shared/api.ts`, `tests/server/tts-route.test.ts`
 - **Definition of done:** `tests/server/tts-route.test.ts` passes: providers returns availability only; audio is returned with the right content type; an unconfigured provider returns 409; over-limit text returns 400; a provider failure returns 502 with no secret in the body.
 - **Result:** done in 1 attempt. 641 tests pass, typecheck and build clean. Adapters are injectable for tests; the voice configuration is read on every request, so `.env` edits apply without a restart.
+
+### settings-store
+- **Goal:** Persist the orchestrator and voice settings in the ignored `.data/settings.json`, expose them over the API, and use the saved roles in the galaxy.
+- **Files:** `server/settings.ts`, `server/routes/settings.ts`, `server/routes/data.ts`, `server/app.ts`, `shared/api.ts`, `tests/server/settings.test.ts`
+- **Definition of done:** `tests/server/settings.test.ts` passes: defaults apply when the file is missing or corrupt; a save survives a reload; invalid values return 400; choosing one orchestrator makes the other agent the worker; the galaxy route reflects the saved roles; historical agent cards do not change.
+- **Result:** done in 1 attempt. 659 tests pass, typecheck and build clean. Settings are validated on read and write, saved atomically, and fall back to defaults when the file is missing or corrupt. The agent cards ignore the setting.
 
 ## Phase 2: real agent execution
 
