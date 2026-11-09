@@ -546,3 +546,16 @@ Dependencies were installed by the orchestrator once, during task 1, because the
 
 - **Attempt 1:** Codex added `synthesizeFishAudio` (POST with bearer header, JSON body with text, voice reference, and mp3 format, a 30-second timeout, injectable `fetch`), the shared `TtsProviderError` in `server/voice/errors.ts` with a generic message and the upstream status only, and mocked-fetch tests. It also exported the `VoiceConfig` type.
 - **Orchestrator check:** read the adapter and error class; the error message carries no key, voice ID, response body, or request text, and thrown fetch errors are replaced rather than rethrown; no byte order marks; `npm test` passed (30 files, 612 tests), `npm run typecheck` was clean, and `npm run build` passed.
+
+## D37. tts-elevenlabs
+
+| | |
+|---|---|
+| Branch | `task/tts-elevenlabs` |
+| Codex attempts | 1 |
+| Codex model | not reported |
+| Duration | 58s |
+| Result | Done |
+
+- **Attempt 1:** Codex added `synthesizeElevenLabs` (POST to the text-to-speech path with the URL-encoded voice ID, `xi-api-key` header, JSON body with text and model, a 30-second timeout, injectable `fetch`) and mocked-fetch tests, reusing `TtsProviderError` unchanged.
+- **Orchestrator check:** read the adapter; thrown fetch errors are replaced rather than rethrown and no secret reaches an error; no byte order marks; `npm test` passed (31 files, 619 tests), `npm run typecheck` was clean, and `npm run build` passed.
