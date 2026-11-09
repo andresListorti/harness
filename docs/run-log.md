@@ -559,3 +559,16 @@ Dependencies were installed by the orchestrator once, during task 1, because the
 
 - **Attempt 1:** Codex added `synthesizeElevenLabs` (POST to the text-to-speech path with the URL-encoded voice ID, `xi-api-key` header, JSON body with text and model, a 30-second timeout, injectable `fetch`) and mocked-fetch tests, reusing `TtsProviderError` unchanged.
 - **Orchestrator check:** read the adapter; thrown fetch errors are replaced rather than rethrown and no secret reaches an error; no byte order marks; `npm test` passed (31 files, 619 tests), `npm run typecheck` was clean, and `npm run build` passed.
+
+## D38. tts-openai
+
+| | |
+|---|---|
+| Branch | `task/tts-openai` |
+| Codex attempts | 1 |
+| Codex model | not reported |
+| Duration | 54s |
+| Result | Done |
+
+- **Attempt 1:** Codex added `synthesizeOpenAi` (POST to the speech endpoint with a bearer header, JSON body with model, text, voice, and mp3 format, a 30-second timeout, injectable `fetch`) and mocked-fetch tests, reusing `TtsProviderError` unchanged.
+- **Orchestrator check:** read the adapter; no secret can reach an error; no byte order marks; `npm test` passed (32 files, 626 tests), `npm run typecheck` was clean, and `npm run build` passed.

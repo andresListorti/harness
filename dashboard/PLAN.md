@@ -155,10 +155,7 @@ Work in the order listed. A milestone closes only after these steps, in order:
 
 ## In progress
 
-### tts-openai
-- **Goal:** Add the OpenAI TTS adapter.
-- **Files:** `server/voice/openai-tts.ts`, `tests/server/tts-openai.test.ts`
-- **Definition of done:** `tests/server/tts-openai.test.ts` passes with a mocked `fetch`: URL, headers, and body are correct; audio bytes are returned; provider errors become a typed error that contains no key.
+_None._
 
 ## Done
 
@@ -383,6 +380,12 @@ Work in the order listed. A milestone closes only after these steps, in order:
 - **Files:** `server/voice/elevenlabs.ts`, `tests/server/tts-elevenlabs.test.ts`
 - **Definition of done:** `tests/server/tts-elevenlabs.test.ts` passes with a mocked `fetch`: URL, headers, and body are correct; audio bytes are returned; provider errors become a typed error that contains no key.
 - **Result:** done in 1 attempt. 619 tests pass, typecheck and build clean. The voice ID is URL-encoded in the request path; errors reuse `TtsProviderError`.
+
+### tts-openai
+- **Goal:** Add the OpenAI TTS adapter.
+- **Files:** `server/voice/openai-tts.ts`, `tests/server/tts-openai.test.ts`
+- **Definition of done:** `tests/server/tts-openai.test.ts` passes with a mocked `fetch`: URL, headers, and body are correct; audio bytes are returned; provider errors become a typed error that contains no key.
+- **Result:** done in 1 attempt. 626 tests pass, typecheck and build clean.
 
 ## Phase 2: real agent execution
 
