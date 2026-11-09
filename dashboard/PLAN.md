@@ -100,10 +100,7 @@ Work in the order listed. A milestone closes only after these steps, in order:
 
 ## In progress
 
-### voice-reply-on-navigation
-- **Goal:** Speak the reply of a Hands-free chat request even when the user navigates away from Home before it arrives (finding from the third Codex review of Milestone 2).
-- **Files:** `src/voice/VoiceProvider.tsx`, `src/components/ChatPanel.tsx`, `tests/client/voice-controls.test.tsx`, `tests/client/chat-panel.test.tsx`
-- **Definition of done:** a test reproduces the bug first: with Hands-free and Reply with voice on, a transcript is submitted on Home through the chat panel, the user navigates to another view before the request resolves, and the reply is never spoken. After the fix the reply is spoken exactly once whether the chat panel is still mounted or not (no double playback when it is mounted), and it is still saved in the history as before. Playback is owned by the persistent provider or the pending request is handed over when the chat unmounts. A request abandoned on purpose with New chat is not spoken, Reply with voice off speaks nothing, and a failed request speaks nothing and shows its error as before.
+_None._
 
 ## Done
 
@@ -430,6 +427,12 @@ Work in the order listed. A milestone closes only after these steps, in order:
 - **Files:** `src/voice/useSpeechInput.ts`, `src/voice/VoiceProvider.tsx`, `src/App.tsx`, `tests/client/speech-input.test.tsx`, `tests/client/voice-controls.test.tsx`, `tests/client/widget.test.tsx`
 - **Definition of done:** a test reproduces the bug first: with the widget open, starting recognition from the widget Talk button and then blurring or hiding the main window stops recognition. After the fix, while the widget is open, a session started from a Talk button is not stopped by the blur or hidden-tab events of the main window; it still stops when Talk is pressed again, when recognition ends or fails, and when the widget closes. A session started by holding Space still stops on key release, blur, and hidden tab, and without the widget open the current stop behavior on blur and hidden tab is unchanged (the microphone is never left on in a hidden dashboard with no widget). The listeners are removed on unmount and nothing updates state after it.
 - **Result:** done in 1 attempt. 811 tests pass, typecheck and build clean. Both reproducing tests failed before the fix. While the widget is open, a session started from a Talk button survives blur and hidden-tab events of the main window; Space sessions and the no-widget case keep stopping as before, and closing the widget stops recognition.
+
+### voice-reply-on-navigation
+- **Goal:** Speak the reply of a Hands-free chat request even when the user navigates away from Home before it arrives (finding from the third Codex review of Milestone 2).
+- **Files:** `src/voice/VoiceProvider.tsx`, `src/components/ChatPanel.tsx`, `tests/client/voice-controls.test.tsx`, `tests/client/chat-panel.test.tsx`
+- **Definition of done:** a test reproduces the bug first: with Hands-free and Reply with voice on, a transcript is submitted on Home through the chat panel, the user navigates to another view before the request resolves, and the reply is never spoken. After the fix the reply is spoken exactly once whether the chat panel is still mounted or not (no double playback when it is mounted), and it is still saved in the history as before. Playback is owned by the persistent provider or the pending request is handed over when the chat unmounts. A request abandoned on purpose with New chat is not spoken, Reply with voice off speaks nothing, and a failed request speaks nothing and shows its error as before.
+- **Result:** done in 1 attempt. 817 tests pass, typecheck and build clean. The reproducing test failed before the fix (zero playback calls). The persistent voice provider now speaks the reply exactly once, whether or not the chat panel is still mounted; New chat, Reply with voice off, and failed requests speak nothing. Known limit: New chat in a freshly mounted panel does not cancel a request started by an earlier, unmounted panel.
 
 ## Phase 2: real agent execution
 
