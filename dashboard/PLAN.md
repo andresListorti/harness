@@ -61,11 +61,6 @@ Work in the order listed. A milestone closes only after these steps, in order:
 
 ### Milestone 2: voice and widget
 
-### tts-fish-audio
-- **Goal:** Add the Fish Audio adapter.
-- **Files:** `server/voice/fish-audio.ts`, `tests/server/tts-fish-audio.test.ts`
-- **Definition of done:** `tests/server/tts-fish-audio.test.ts` passes with a mocked `fetch`: URL, headers, and body are correct; audio bytes are returned; provider errors become a typed error that contains no key.
-
 ### tts-elevenlabs
 - **Goal:** Add the ElevenLabs adapter.
 - **Files:** `server/voice/elevenlabs.ts`, `tests/server/tts-elevenlabs.test.ts`
@@ -170,7 +165,10 @@ Work in the order listed. A milestone closes only after these steps, in order:
 
 ## In progress
 
-_None._
+### tts-fish-audio
+- **Goal:** Add the Fish Audio adapter.
+- **Files:** `server/voice/fish-audio.ts`, `tests/server/tts-fish-audio.test.ts`
+- **Definition of done:** `tests/server/tts-fish-audio.test.ts` passes with a mocked `fetch`: URL, headers, and body are correct; audio bytes are returned; provider errors become a typed error that contains no key.
 
 ## Done
 
