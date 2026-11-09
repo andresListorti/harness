@@ -419,14 +419,17 @@ test('assistant sources survive history and response notices are excluded from r
   expect(tracked).toHaveBeenCalledOnce();
 });
 
-test('missing CLI server message reaches the existing error display as plain text', async () => {
+test.each([
+  [429, 'CHAT_BUSY', 'A chat answer is already running. Please try again when it finishes.'],
+  [504, 'TIMEOUT', 'Claude Code timed out. Please try again.'],
+  [503, 'CLI_NOT_FOUND', 'Claude Code CLI is not installed. <b>Install it</b>'],
+] as const)('%s %s server message reaches the existing error display as plain text', async (status, code, message) => {
   const { client, user } = setup();
-  const message = 'Claude Code CLI is not installed. <b>Install it</b>';
-  const fetchMock = vi.fn<typeof fetch>().mockResolvedValue(Response.json({ error: { code: 'CLI_NOT_FOUND', message } }, { status: 503 }));
+  const fetchMock = vi.fn<typeof fetch>().mockResolvedValue(Response.json({ error: { code, message } }, { status }));
   client.sendChat.mockImplementation(createApiClient(fetchMock).sendChat);
   render(<ChatPanel client={client} />);
   await user.click(await screen.findByRole('button', { name: 'What is next?' }));
   await screen.findByRole('alert');
-  await waitFor(() => expect(screen.getByRole('alert')).toHaveTextContent(message));
+  await waitFor(() => expect(screen.getByRole('alert')).toHaveTextContent(`Could not get an answer: ${message}`));
   expect(screen.getByRole('alert').querySelector('b')).toBeNull();
 });

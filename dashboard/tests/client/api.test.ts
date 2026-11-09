@@ -149,3 +149,41 @@ test('clearChatHistory uses DELETE and validates history responses', async () =>
     await expect(invalid.client[method]()).rejects.toMatchObject({ code: 'INVALID_RESPONSE' });
   }
 });
+
+test.each([
+  [429, 'CHAT_BUSY', 'A chat answer is already running. Please try again when it finishes.'],
+  [504, 'TIMEOUT', 'Claude Code timed out. Please try again.'],
+  [503, 'CLI_NOT_FOUND', 'Claude Code CLI is not installed. Local questions still work.'],
+] as const)('preserves the server message for %s %s', async (status, code, message) => {
+  const { client } = setup({ error: { code, message } }, status);
+  await expect(client.sendChat('Question')).rejects.toMatchObject({
+    name: 'ApiError', status, code, message,
+  });
+});
+
+test.each([429, 504, 503, 400, 500])('keeps other error messages generic with status %s', async status => {
+  for (const code of ['CHAT_BUSY', 'TIMEOUT', 'CLI_NOT_FOUND', 'OTHER']) {
+    if ((status === 429 && code === 'CHAT_BUSY')
+      || (status === 504 && code === 'TIMEOUT')
+      || (status === 503 && code === 'CLI_NOT_FOUND')) continue;
+    const { client } = setup({ error: { code, message: 'Server detail' } }, status);
+    await expect(client.sendChat('Question')).rejects.toMatchObject({
+      name: 'ApiError', status, code, message: 'API request failed.',
+    });
+  }
+});
+
+test.each([
+  [429, 'CHAT_BUSY'], [504, 'TIMEOUT'], [503, 'CLI_NOT_FOUND'],
+] as const)('keeps malformed error bodies generic for %s %s', async (status, code) => {
+  for (const body of [
+    null, {}, { error: 'Server detail' }, { error: { code } },
+    { error: { code, message: 42 } },
+    { error: { code, message: 'Server detail', extra: true } },
+  ]) {
+    const { client } = setup(body, status);
+    await expect(client.sendChat('Question')).rejects.toMatchObject({
+      name: 'ApiError', status, code: 'HTTP_ERROR', message: 'API request failed.',
+    });
+  }
+});
