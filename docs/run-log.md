@@ -585,3 +585,16 @@ Dependencies were installed by the orchestrator once, during task 1, because the
 
 - **Attempt 1:** Codex added `ttsRequestSchema`, the router with `GET /api/voice/providers` (availability only) and `POST /api/tts` (400 invalid request, 409 provider not configured, audio on success, 502 with a fixed generic message on any adapter failure), injectable configuration and adapters, and the mount in `server/app.ts`. The tests cover secrets absent from every response and the global Host, Origin, and content-type guards on the new route.
 - **Orchestrator check:** read the router; the failure path discards the error entirely, so nothing from it, the key, the voice ID, or the text can reach the response; no byte order marks; `npm test` passed (33 files, 641 tests), `npm run typecheck` was clean, and `npm run build` passed.
+
+## D40. settings-store
+
+| | |
+|---|---|
+| Branch | `task/settings-store` |
+| Codex attempts | 1 |
+| Codex model | not reported |
+| Duration | 2m 49s |
+| Result | Done |
+
+- **Attempt 1:** Codex added the settings schemas (orchestrator and voice choice, with the worker derived as the other agent), `server/settings.ts` (defaults, validated read that falls back to defaults on a missing or corrupt file, atomic write through a temporary file and rename), `GET` and `PUT /api/settings`, and the galaxy route now builds its roles from the saved orchestrator. The tests cover the 400 and 500 paths, persistence across app instances, no leftover temporary files, unchanged agent cards, and the global guards.
+- **Orchestrator check:** read the store and the router; error responses carry no paths; no byte order marks; the tests use temporary folders outside `dashboard/`; `npm test` passed (34 files, 659 tests), `npm run typecheck` was clean, and `npm run build` passed.
