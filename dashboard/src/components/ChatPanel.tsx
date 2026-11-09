@@ -18,14 +18,16 @@ export function ChatPanel({ client = api }: { client?: Pick<typeof api, 'getChat
   const request = useRef(0);
   const busy = useRef(false);
   const nextId = useRef(0);
+  const historyLoad = useRef(0);
   const list = useRef<HTMLDivElement>(null);
   const fieldId = useId();
 
   useEffect(() => {
     let active = true;
     const initialRequest = request.current;
+    const initialLoad = ++historyLoad.current;
     void client.getChatHistory().then(history => {
-      if (active && request.current === initialRequest) {
+      if (active && request.current === initialRequest && initialLoad === historyLoad.current) {
         setMessages(history.messages.map(message => ({ ...message, id: nextId.current++ })));
       }
     }).catch(() => {});
@@ -72,10 +74,26 @@ export function ChatPanel({ client = api }: { client?: Pick<typeof api, 'getChat
   const sendRef = useRef(send);
   sendRef.current = send;
   const subscribe = voice?.onTranscript;
-  useEffect(() => subscribe?.((transcript, isFinal) => {
+  const registerChatSink = voice?.registerChatSink;
+  const onChatSettled = voice?.onChatSettled;
+  useEffect(() => subscribe?.(transcript => {
     setText(transcript);
-    if (isFinal && latestVoice.current?.handsFree) void sendRef.current(transcript);
   }), [subscribe]);
+  useEffect(() => registerChatSink?.(value => sendRef.current(value)), [registerChatSink]);
+  useEffect(() => {
+    let active = true;
+    const unsubscribe = onChatSettled?.(() => {
+      if (busy.current) return;
+      const current = request.current;
+      const currentLoad = ++historyLoad.current;
+      void client.getChatHistory().then(history => {
+        if (active && !busy.current && current === request.current && currentLoad === historyLoad.current) {
+          setMessages(history.messages.map(message => ({ ...message, id: nextId.current++ })));
+        }
+      }).catch(() => {});
+    });
+    return () => { active = false; unsubscribe?.(); };
+  }, [client, onChatSettled]);
 
   async function reset() {
     try {

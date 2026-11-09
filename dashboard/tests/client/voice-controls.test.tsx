@@ -1,13 +1,15 @@
 // @vitest-environment jsdom
+import * as React from 'react';
 import { act, cleanup, fireEvent, render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { VoiceProvider } from '../../src/voice/VoiceProvider';
+import { VoiceProvider, useVoice } from '../../src/voice/VoiceProvider';
 import { speaker as defaultSpeaker, type VoiceState } from '../../src/voice/speak';
 import { SPEECH_PRIVACY_NOTICE } from '../../src/voice/useSpeechInput';
 import { VoiceControls } from '../../src/components/VoiceControls';
 import { Sidebar } from '../../src/components/Sidebar';
 import { ChatPanel } from '../../src/components/ChatPanel';
 import App from '../../src/App';
+import { WidgetView } from '../../src/widget/WidgetView';
 import { api } from '../../src/lib/api';
 import { SettingsView } from '../../src/views/SettingsView';
 import { notifySettingsChanged, SETTINGS_CHANGED_EVENT } from '../../src/lib/settings-events';
@@ -15,6 +17,7 @@ import { notifySettingsChanged, SETTINGS_CHANGED_EVENT } from '../../src/lib/set
 vi.mock('../../src/lib/api', async importOriginal => {
   const original = await importOriginal<typeof import('../../src/lib/api')>();
   return { ...original, api: {
+    getAgents: vi.fn().mockResolvedValue({ agents: [] }),
     getHealth: vi.fn().mockResolvedValue({ status: 'ok' }),
     getSettings: vi.fn().mockResolvedValue({ orchestrator: 'codex', worker: 'claude-code', voice: 'browser' }),
     getVoiceProviders: vi.fn().mockResolvedValue({ providers: [] }),
@@ -233,4 +236,154 @@ test('a settings refresh cannot overwrite a newer voice selection', async () => 
   await waitFor(() => expect(screen.getByRole('combobox', { name: 'Voice' })).toHaveValue('openai'));
   await act(async () => resolve({ orchestrator: 'codex', worker: 'claude-code', voice: 'browser' }));
   expect(screen.getByRole('combobox', { name: 'Voice' })).toHaveValue('openai');
+});
+
+
+test('Hands-free from Agents submits after Home chat unmounts', async () => {
+  vi.mocked(api.sendChat).mockClear();
+  render(<App />);
+  await waitFor(() => expect(screen.getByRole('switch', { name: 'Hands-free' })).toBeInTheDocument());
+  fireEvent.click(screen.getByRole('switch', { name: 'Hands-free' }));
+  fireEvent.click(screen.getByRole('button', { name: 'Agents' }));
+  expect(screen.queryByRole('region', { name: 'Chat' })).not.toBeInTheDocument();
+  fireEvent.click(screen.getByRole('button', { name: 'Talk' }));
+  act(() => Recognition.latest.result('Review the tasks', true));
+  await waitFor(() => expect(api.sendChat).toHaveBeenCalledExactlyOnceWith('Review the tasks'));
+  vi.mocked(api.getChatHistory).mockResolvedValueOnce({ messages: [
+    { role: 'user', text: 'Review the tasks' }, { role: 'assistant', text: 'New reply', source: 'local' },
+  ] });
+  fireEvent.click(screen.getByRole('button', { name: 'Harness' }));
+  await screen.findByText('New reply');
+  await waitFor(() => expect(screen.getByRole('log').querySelectorAll('.chat-message')).toHaveLength(2));
+});
+
+
+function detached(s: ReturnType<typeof setup>, widget = false) {
+  s.rerender(<VoiceProvider client={s.client} speaker={s.speaker}>
+    {widget ? <WidgetView /> : <VoiceControls collapsed={false} />}
+  </VoiceProvider>);
+}
+
+function enableHandsFree() {
+  fireEvent.click(screen.getByRole('switch', { name: 'Hands-free' }));
+}
+
+test.each([false, true])('direct Talk submits once without a chat (widget: %s)', async widget => {
+  const s = setup();
+  await ready();
+  enableHandsFree();
+  detached(s, widget);
+  fireEvent.click(screen.getByRole('button', { name: 'Talk' }));
+  await act(async () => Recognition.latest.result('  Direct question  ', true));
+  await waitFor(() => expect(s.client.sendChat).toHaveBeenCalledExactlyOnceWith('Direct question'));
+  expect(s.speaker.speak).not.toHaveBeenCalled();
+});
+
+test.each([false, true])('Hands-free off never submits without a chat (widget: %s)', async widget => {
+  const s = setup();
+  await ready();
+  detached(s, widget);
+  fireEvent.click(screen.getByRole('button', { name: 'Talk' }));
+  await act(async () => Recognition.latest.result('Do not send', true));
+  expect(s.client.sendChat).not.toHaveBeenCalled();
+});
+
+test('direct sends ignore interim, empty and concurrent finals and use latest playback switch', async () => {
+  const s = setup();
+  await ready();
+  enableHandsFree();
+  detached(s);
+  fireEvent.click(screen.getByRole('button', { name: 'Talk' }));
+  await act(async () => {
+    Recognition.latest.result('draft', false);
+    Recognition.latest.result('', true);
+    Recognition.latest.result('   ', true);
+  });
+  expect(s.client.sendChat).not.toHaveBeenCalled();
+  let resolve!: (value: { reply: string; source: string }) => void;
+  s.client.sendChat.mockReturnValueOnce(new Promise(res => { resolve = res; }));
+  act(() => {
+    Recognition.latest.result('First', true);
+    Recognition.latest.result('Second', true);
+  });
+  expect(s.client.sendChat).toHaveBeenCalledExactlyOnceWith('First');
+  s.rerender(s.tree(false));
+  fireEvent.click(screen.getByRole('switch', { name: 'Reply with voice' }));
+  await act(async () => resolve({ reply: 'Direct reply', source: 'local' }));
+  await waitFor(() => expect(s.speaker.speak).toHaveBeenCalledExactlyOnceWith('Direct reply', 'browser'));
+  fireEvent.click(screen.getByRole('switch', { name: 'Reply with voice' }));
+  detached(s);
+  await act(async () => Recognition.latest.result('Third', true));
+  expect(s.client.sendChat).toHaveBeenCalledTimes(2);
+  expect(s.speaker.speak).toHaveBeenCalledOnce();
+});
+
+test('direct failure exposes a short error, settles once and permits another send', async () => {
+  const s = setup();
+  await ready();
+  enableHandsFree();
+  detached(s, true);
+  s.client.sendChat.mockRejectedValueOnce(new Error('Unavailable'));
+  fireEvent.click(screen.getByRole('button', { name: 'Talk' }));
+  await act(async () => Recognition.latest.result('Question', true));
+  await waitFor(() => expect(screen.getByRole('status')).toHaveTextContent('Could not get an answer.'));
+  await act(async () => Recognition.latest.result('Retry', true));
+  await waitFor(() => expect(s.client.sendChat).toHaveBeenCalledTimes(2));
+  expect(screen.getByRole('status')).not.toHaveTextContent('Could not get an answer.');
+});
+
+test.each([false, true])('direct exchange appears once when chat mounts (settles after mount: %s)', async afterMount => {
+  const s = setup();
+  await ready();
+  enableHandsFree();
+  detached(s);
+  let resolve!: (value: { reply: string; source: string }) => void;
+  s.client.sendChat.mockReturnValueOnce(new Promise(res => { resolve = res; }));
+  fireEvent.click(screen.getByRole('button', { name: 'Talk' }));
+  act(() => Recognition.latest.result('Away question', true));
+  if (afterMount) {
+    s.rerender(s.tree(false));
+    await waitFor(() => expect(s.client.getChatHistory).toHaveBeenCalledTimes(2));
+  }
+  s.client.getChatHistory.mockResolvedValue({ messages: [
+    { role: 'user', text: 'Away question' }, { role: 'assistant', text: 'Away reply', source: 'local' },
+  ] });
+  await act(async () => resolve({ reply: 'Away reply', source: 'local' }));
+  if (!afterMount) s.rerender(s.tree(false));
+  await screen.findByText('Away reply');
+  await waitFor(() => {
+    expect(screen.getByRole('log').querySelectorAll('.chat-message')).toHaveLength(2);
+    expect(s.client.getChatHistory).toHaveBeenCalledTimes(afterMount ? 3 : 2);
+  });
+  expect(s.client.sendChat).toHaveBeenCalledOnce();
+});
+
+
+function DirectObserver({ settled }: { settled: () => void }) {
+  const voice = useVoice();
+  const subscribe = voice?.onChatSettled;
+  React.useEffect(() => subscribe?.(settled), [subscribe, settled]);
+  return <button onClick={() => voice?.setHandsFree(true)}>Enable automatic sending</button>;
+}
+
+test('direct success and failure each notify once; missing sendChat stays safe', async () => {
+  const s = setup();
+  await ready();
+  const settled = vi.fn();
+  const tree = (client: Parameters<typeof VoiceProvider>[0]['client']) => <VoiceProvider client={client} speaker={s.speaker}>
+    <DirectObserver settled={settled} /><WidgetView />
+  </VoiceProvider>;
+  s.rerender(tree(s.client));
+  fireEvent.click(screen.getByRole('button', { name: 'Enable automatic sending' }));
+  fireEvent.click(screen.getByRole('button', { name: 'Talk' }));
+  await act(async () => Recognition.latest.result('Success', true));
+  await waitFor(() => expect(settled).toHaveBeenCalledOnce());
+  s.client.sendChat.mockRejectedValueOnce(new Error('Unavailable'));
+  await act(async () => Recognition.latest.result('Failure', true));
+  await waitFor(() => expect(settled).toHaveBeenCalledTimes(2));
+  const { sendChat: _sendChat, ...client } = s.client;
+  s.rerender(tree(client));
+  await act(async () => Recognition.latest.result('No method', true));
+  expect(settled).toHaveBeenCalledTimes(2);
+  expect(s.client.sendChat).toHaveBeenCalledTimes(2);
 });
