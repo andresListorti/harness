@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import type { Settings, SettingsResponse, VoiceChoice, VoiceProviders } from '../../shared/api';
 import { api, ApiError } from '../lib/api';
-import { notifySettingsChanged } from '../lib/settings-events';
+import { notifySettingsChanged, SETTINGS_CHANGED_EVENT } from '../lib/settings-events';
 import './SettingsView.css';
 
 const agents = [{ id: 'claude-code', name: 'Claude Code' }, { id: 'codex', name: 'Codex' }] as const;
@@ -20,6 +20,7 @@ export function SettingsView({ client = api }: { client?: Client }) {
   const [saving, setSaving] = useState(false);
   const request = useRef(0);
   const savingRef = useRef(false);
+  const refreshVersion = useRef(0);
 
   const load = useCallback(async () => {
     const current = ++request.current;
@@ -45,9 +46,27 @@ export function SettingsView({ client = api }: { client?: Client }) {
     return () => { request.current += 1; };
   }, [load]);
 
+  useEffect(() => {
+    let active = true;
+    const refresh = () => {
+      if (savingRef.current) return;
+      const current = ++refreshVersion.current;
+      void Promise.resolve().then(() => client.getSettings()).then(result => {
+        if (active && current === refreshVersion.current) setSettings(result);
+      }).catch(() => {});
+    };
+    window.addEventListener(SETTINGS_CHANGED_EVENT, refresh);
+    return () => {
+      active = false;
+      refreshVersion.current += 1;
+      window.removeEventListener(SETTINGS_CHANGED_EVENT, refresh);
+    };
+  }, [client]);
+
   async function save(next: Settings) {
     if (savingRef.current) return;
     savingRef.current = true;
+    refreshVersion.current += 1;
     const current = request.current;
     setSaving(true);
     setSaveError(null);

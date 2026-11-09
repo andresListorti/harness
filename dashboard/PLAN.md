@@ -105,10 +105,7 @@ Work in the order listed. A milestone closes only after these steps, in order:
 
 ## In progress
 
-### settings-view-sync
-- **Goal:** Keep the Settings view in sync with voice changes made from the sidebar, so saving an orchestrator never reverts the voice (second finding from the Codex review of Milestone 2).
-- **Files:** `src/views/SettingsView.tsx`, `tests/client/settings-view.test.tsx`
-- **Definition of done:** a test reproduces the bug first: with Settings open, the voice is changed through the sidebar selector (the settings-changed event fires and the server now holds the new voice), the user then chooses an orchestrator, and the saved payload carries the old voice. After the fix the Settings view listens for the settings-changed event, re-reads the settings (ignoring stale or failed reads and reads that finish after a newer save, and removing the listener on unmount), and the next save carries the current voice; a failed re-read keeps the previous values; saving from Settings itself does not trigger a redundant extra read loop.
+_None._
 
 ## Done
 
@@ -417,6 +414,12 @@ Work in the order listed. A milestone closes only after these steps, in order:
 - **Files:** `server/chat/history.ts`, `server/routes/chat.ts`, `tests/server/chat-history.test.ts`
 - **Definition of done:** a test reproduces the bug first: a chat request is held while it reads repo data, the history is cleared, the request is released, and the cleared conversation reappears. After the fix the history stays empty: each history path has a generation that clearing increments, a chat request captures the generation before it reads anything, and its save is skipped when the generation changed; the reply is still returned to the caller; requests that start after a clear are saved normally; concurrent requests without a clear lose nothing; two app instances over the same file share the generation.
 - **Result:** done in 1 attempt. 778 tests pass, typecheck and build clean. The reproducing test failed before the fix. Each history path has a shared in-memory generation that clearing bumps immediately; a chat request captures it before reading anything and its save is skipped when it changed, while the reply is still returned. Requests started after a clear and concurrent requests without a clear are saved normally.
+
+### settings-view-sync
+- **Goal:** Keep the Settings view in sync with voice changes made from the sidebar, so saving an orchestrator never reverts the voice (second finding from the Codex review of Milestone 2).
+- **Files:** `src/views/SettingsView.tsx`, `tests/client/settings-view.test.tsx`
+- **Definition of done:** a test reproduces the bug first: with Settings open, the voice is changed through the sidebar selector (the settings-changed event fires and the server now holds the new voice), the user then chooses an orchestrator, and the saved payload carries the old voice. After the fix the Settings view listens for the settings-changed event, re-reads the settings (ignoring stale or failed reads and reads that finish after a newer save, and removing the listener on unmount), and the next save carries the current voice; a failed re-read keeps the previous values; saving from Settings itself does not trigger a redundant extra read loop.
+- **Result:** done in 1 attempt. 784 tests pass, typecheck and build clean. The reproducing test failed before the fix. Settings now re-reads the saved settings when the sidebar changes them, ignoring failed or stale reads and any read during or before its own save.
 
 ## Phase 2: real agent execution
 
