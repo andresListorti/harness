@@ -887,3 +887,16 @@ Dependencies were installed by the orchestrator once, during task 1, because the
 
 - **Attempt 1:** Codex added the Claude Code model selector, which saves the choice and restores it if the save fails, a running status, a label on each reply saying whether it was local or from the orchestrator, and the Codex notice with a link to the isolation document. The panel follows changes made in Settings. The API client now passes on the server's message for a missing CLI. Two tests outside the list needed the new settings mocks.
 - **Orchestrator check:** read the diff; no byte order marks; 45 files and 914 tests passed, `npm run typecheck` was clean, `npm run build` passed, and the real `dashboard/.data/chat-history.json` has the same hash before and after the suite. Known limit: busy and timeout errors still show the generic "API request failed" text in the chat.
+
+## D62. docs-chat
+
+| | |
+|---|---|
+| Branch | `task/docs-chat` |
+| Codex attempts | 1 |
+| Codex model | not reported |
+| Duration | 1m 55s |
+| Result | Done |
+
+- **Attempt 1:** Codex documented the routing of chat questions, the isolation flags, what is sent to the model and through which account, setup, the Codex restriction, and the limits of the isolation check, and removed the statements that the chat never starts an agent or was not built yet. Each of the three documents links to `docs/chat-isolation.md`.
+- **Orchestrator check:** read the diff; no byte order marks; a search of the changed files finds no personal data or local paths; 45 files and 914 tests passed, `npm run typecheck` was clean, `npm run build` passed, and the real `dashboard/.data/chat-history.json` has the same hash before and after the suite.
