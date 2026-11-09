@@ -63,11 +63,6 @@ Work in the order listed. A milestone closes only after these steps, in order:
 
 ### Milestone 3: chat with the orchestrator
 
-### chat-prompt
-- **Goal:** Build the capped prompt from the repo snapshot and chat history.
-- **Files:** `server/chat/prompt.ts`, `tests/server/chat-prompt.test.ts`
-- **Definition of done:** `tests/server/chat-prompt.test.ts` passes: repo content sits inside a marked untrusted block; closing markers inside repo content are neutralized; size and history limits are enforced; the read-only instruction is present; the prompt tells the agent that it has no tools and must not try to use them or print tool-call markup.
-
 ### chat-runner
 - **Goal:** Run Claude Code with the isolation rules in the security model and return a clean reply. The runner cannot start Codex.
 - **Files:** `server/chat/runner.ts`, `server/chat/models.ts`, `server/chat/reply.ts`, `tests/server/chat-runner.test.ts`, `tests/server/chat-reply.test.ts`
@@ -95,7 +90,10 @@ Work in the order listed. A milestone closes only after these steps, in order:
 
 ## In progress
 
-_None._
+### chat-prompt
+- **Goal:** Build the capped prompt from the repo snapshot and chat history.
+- **Files:** `server/chat/prompt.ts`, `tests/server/chat-prompt.test.ts`
+- **Definition of done:** `tests/server/chat-prompt.test.ts` passes: repo content sits inside a marked untrusted block; closing markers inside repo content are neutralized; size and history limits are enforced; the read-only instruction is present; the prompt tells the agent that it has no tools and must not try to use them or print tool-call markup.
 
 ## Done
 
