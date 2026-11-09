@@ -63,17 +63,12 @@ Work in the order listed. A milestone closes only after these steps, in order:
 
 ### Milestone 3: chat with the orchestrator
 
+## In progress
+
 ### m3-acceptance
 - **Goal:** Check the orchestrator chat in a real browser. Performed by the orchestrator.
 - **Files:** none
 - **Definition of done:** from a clean `npm ci`, all checks pass; with Claude Code a free-text question is answered with repo data; no file changes in the repo after a chat; a prompt asking the agent to write a file does not change anything and shows no tool-call markup; with Codex selected no CLI starts, the answer is local, and the notice and its link work. Then follow "Closing a milestone".
-
-## In progress
-
-### chat-error-messages
-- **Goal:** Show the server's clear message in the chat for a busy chat (429) and a timeout (504).
-- **Files:** `src/lib/api.ts`, `tests/client/api.test.ts`, `tests/client/chat-panel.test.tsx`
-- **Definition of done:** a test reproduces the bug first: a 429 `CHAT_BUSY` or 504 `TIMEOUT` response produces the generic message. After the fix the chat shows the server message for those two and for 503 `CLI_NOT_FOUND`; every other error keeps the generic message.
 
 ## Done
 
@@ -442,6 +437,12 @@ Work in the order listed. A milestone closes only after these steps, in order:
 - **Files:** `README.md`, `../docs/architecture.md`, `../docs/setup.md`
 - **Definition of done:** the documents match the implemented behavior and link to `docs/chat-isolation.md`; a search of the changed files finds no personal data or local paths.
 - **Result:** done in 1 attempt. Docs checked against the code by Codex and reviewed by the orchestrator; 914 tests pass, typecheck and build clean.
+
+### chat-error-messages
+- **Goal:** Show the server's clear message in the chat for a busy chat (429) and a timeout (504).
+- **Files:** `src/lib/api.ts`, `tests/client/api.test.ts`, `tests/client/chat-panel.test.tsx`
+- **Definition of done:** a test reproduces the bug first: a 429 `CHAT_BUSY` or 504 `TIMEOUT` response produces the generic message. After the fix the chat shows the server message for those two and for 503 `CLI_NOT_FOUND`; every other error keeps the generic message.
+- **Result:** done in 1 attempt. 927 tests pass, typecheck and build clean. The reproducing tests failed before the fix. The chat shows the server message for busy, timeout, and missing CLI; other errors stay generic.
 
 ## Phase 2: real agent execution
 
