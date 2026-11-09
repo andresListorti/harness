@@ -118,6 +118,16 @@ export type Agents = z.infer<typeof agentsSchema>;
 export const healthSchema = z.object({ status: z.literal('ok') }).strict();
 export type Health = z.infer<typeof healthSchema>;
 
+export const chatHistoryMessageSchema = z.object({
+  role: z.enum(['user', 'assistant']),
+  text: z.string().max(10000),
+  source: z.literal('local').optional(),
+}).strict();
+export type ChatHistoryMessage = z.infer<typeof chatHistoryMessageSchema>;
+
+export const chatHistorySchema = z.object({ messages: z.array(chatHistoryMessageSchema) }).strict();
+export type ChatHistory = z.infer<typeof chatHistorySchema>;
+
 export const chatRequestSchema = z.object({
   message: z.string().trim().min(1).max(2000),
 }).strict();

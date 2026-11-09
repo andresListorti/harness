@@ -4,7 +4,7 @@ import './ChatPanel.css';
 
 type Message = { id: number; role: 'user' | 'assistant'; text: string; source?: 'local' };
 
-export function ChatPanel({ client = api }: { client?: Pick<typeof api, 'getChatSuggestions' | 'sendChat'> }) {
+export function ChatPanel({ client = api }: { client?: Pick<typeof api, 'getChatSuggestions' | 'sendChat' | 'getChatHistory' | 'clearChatHistory'> }) {
   const [messages, setMessages] = useState<Message[]>([]);
   const [suggestions, setSuggestions] = useState<string[]>([]);
   const [text, setText] = useState('');
@@ -18,6 +18,12 @@ export function ChatPanel({ client = api }: { client?: Pick<typeof api, 'getChat
 
   useEffect(() => {
     let active = true;
+    const initialRequest = request.current;
+    void client.getChatHistory().then(history => {
+      if (active && request.current === initialRequest) {
+        setMessages(history.messages.map(message => ({ ...message, id: nextId.current++ })));
+      }
+    }).catch(() => {});
     setSuggestions([]);
     void client.getChatSuggestions().then(result => {
       if (active) setSuggestions(result.suggestions);
@@ -57,7 +63,13 @@ export function ChatPanel({ client = api }: { client?: Pick<typeof api, 'getChat
     }
   }
 
-  function reset() {
+  async function reset() {
+    try {
+      await client.clearChatHistory();
+    } catch {
+      setError('Could not clear the saved history.');
+      return;
+    }
     request.current += 1;
     busy.current = false;
     setPending(false);

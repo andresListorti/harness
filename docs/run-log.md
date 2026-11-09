@@ -611,3 +611,18 @@ Dependencies were installed by the orchestrator once, during task 1, because the
 
 - **Attempt 1:** Codex added the Settings view (orchestrator and voice radio groups, the worker shown from the server response, unconfigured providers disabled and labelled, no key field), the API client methods, the sidebar entry, and tests. Its first two test runs failed on missing spacing in the radio labels' accessible names and it fixed that within the attempt. The delegating agent's final report did not arrive, so the orchestrator verified the working tree directly.
 - **Orchestrator check:** read the view; a failed save keeps the previous selection and shows an alert; no byte order marks; `npm test` passed (35 files, 671 tests), `npm run typecheck` was clean, and `npm run build` passed.
+
+## D42. chat-history
+
+| | |
+|---|---|
+| Branch | `task/chat-history` |
+| Codex attempts | 2 |
+| Codex model | not reported |
+| Duration | 4m 51s |
+| Result | Done |
+
+- **Attempt 1:** Codex added `server/chat/history.ts` (validated read, capped atomic append with serialized writes, clear), `GET` and `DELETE /api/chat/history`, saving of each question and reply in `POST /api/chat`, the API client methods, and the chat panel changes (load on mount, clear on New chat, error when the clear fails). Duration of attempt 1: 2m 58s.
+- **Orchestrator review of attempt 1:** after the suite ran, the real `dashboard/.data/chat-history.json` existed. Existing tests that post to `/api/chat` used the default history path, so running the tests would overwrite a user's saved conversation. The orchestrator deleted that file and sent the finding back.
+- **Attempt 2:** Codex gave every test that builds the app its own temporary storage under the system temp folder (a shared `tests/test-app.ts` helper), and added a global safeguard (`tests/storage-safeguard.ts`) that fails the suite if the default storage files appear. Duration of attempt 2: 1m 53s.
+- **Orchestrator check:** after `npm test` the `.data` folder does not exist; no byte order marks; 36 files and 683 tests passed, `npm run typecheck` was clean, and `npm run build` passed.

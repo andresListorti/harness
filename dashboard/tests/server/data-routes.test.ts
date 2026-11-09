@@ -4,8 +4,10 @@ import { join } from 'node:path';
 import { tmpdir } from 'node:os';
 import request from 'supertest';
 import { afterEach, beforeEach, expect, test, vi } from 'vitest';
-import { createApp } from '../../server/app';
+import { useTestApp } from '../test-app';
 import { agentsSchema, commitsSchema, galaxySchema, planBoardSchema, runLogSchema } from '../../shared/api';
+
+const createApp = useTestApp();
 
 let repoRoot: string;
 const history = { commits: [{ hash: 'abcdef1', subject: 'Fixture commit', date: '2026-01-01T00:00:00Z' }] };

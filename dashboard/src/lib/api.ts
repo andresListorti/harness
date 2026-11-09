@@ -1,6 +1,6 @@
 import type { z } from 'zod';
 import {
-  agentsSchema, apiErrorSchema, chatResponseSchema, chatSuggestionsSchema,
+  agentsSchema, apiErrorSchema, chatHistorySchema, chatResponseSchema, chatSuggestionsSchema,
   commitsSchema, galaxySchema, healthSchema, planBoardSchema, runLogSchema,
   settingsResponseSchema, voiceProvidersSchema, type Settings, type PlanSource,
 } from '../../shared/api';
@@ -66,6 +66,10 @@ export function createApiClient(fetchImpl: typeof fetch = (...args) => fetch(...
     getGalaxy: () => get('/api/galaxy', galaxySchema),
     getAgents: () => get('/api/agents', agentsSchema),
     getChatSuggestions: () => get('/api/chat/suggestions', chatSuggestionsSchema),
+    getChatHistory: () => get('/api/chat/history', chatHistorySchema),
+    clearChatHistory: () => request('/api/chat/history', chatHistorySchema, {
+      method: 'DELETE', headers: { Accept: 'application/json' },
+    }),
     sendChat: (message: string) => request('/api/chat', chatResponseSchema, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },

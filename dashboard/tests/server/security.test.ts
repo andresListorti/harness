@@ -1,13 +1,18 @@
 // @vitest-environment node
 import request from 'supertest';
-import { expect, test } from 'vitest';
-import { createApp } from '../../server/app';
+import { beforeEach, expect, test } from 'vitest';
+import { useTestApp } from '../test-app';
 
-const app = createApp({
+const createApp = useTestApp();
+
+let app: ReturnType<typeof createApp>;
+beforeEach(() => {
+  app = createApp({
   routes: (app) => {
     app.all('/api/echo', (req, res) => res.json({ body: req.body ?? null }));
     app.get('/api/throw', () => { throw new Error('Private exception details'); });
   },
+  });
 });
 
 function post() {

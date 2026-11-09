@@ -4,11 +4,13 @@ import { join } from 'node:path';
 import { tmpdir } from 'node:os';
 import request from 'supertest';
 import { expect, test } from 'vitest';
-import { createApp } from '../../server/app';
+import { useTestApp } from '../test-app';
 import {
   answerLocally, CAPABILITY_NOTICE, LOCAL_SUGGESTIONS, type LocalContext,
 } from '../../server/chat/local';
 import type { PlanTask } from '../../shared/api';
+
+const createApp = useTestApp();
 
 const task = (title: string): PlanTask => ({
   id: title, title, group: null, goal: '', files: '', definitionOfDone: '', result: null,

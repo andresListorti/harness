@@ -3,7 +3,9 @@ import request from 'supertest';
 import { expect, test } from 'vitest';
 import { z } from 'zod';
 import * as api from '../../shared/api';
-import { createApp } from '../../server/app';
+import { useTestApp } from '../test-app';
+
+const createApp = useTestApp();
 
 const task = {
   id: 'api-contract', title: 'Define API', group: 'Milestone 1', goal: '',

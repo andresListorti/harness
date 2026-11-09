@@ -33,6 +33,7 @@ test.each([
   ['getCommits', '/api/commits', commits],
   ['getGalaxy', '/api/galaxy', galaxy],
   ['getAgents', '/api/agents', agents],
+  ['getChatHistory', '/api/chat/history', { messages: [] }],
   ['getChatSuggestions', '/api/chat/suggestions', suggestions],
 ] as const)('%s requests and validates its response', async (method, url, body) => {
   const { fetchMock, client } = setup(body);
@@ -133,5 +134,18 @@ test.each(['getSettings', 'saveSettings', 'getVoiceProviders'] as const)('%s rej
     const { client } = setup(body, status);
     const result = method === 'saveSettings' ? client.saveSettings({ orchestrator: 'codex', voice: 'browser' }) : client[method]();
     await expect(result).rejects.toMatchObject({ name: 'ApiError', status, code });
+  }
+});
+
+
+test('clearChatHistory uses DELETE and validates history responses', async () => {
+  const { client, fetchMock } = setup({ messages: [] });
+  expect(await client.clearChatHistory()).toEqual({ messages: [] });
+  expect(fetchMock).toHaveBeenCalledExactlyOnceWith('/api/chat/history', {
+    method: 'DELETE', headers: { Accept: 'application/json' },
+  });
+  for (const method of ['getChatHistory', 'clearChatHistory'] as const) {
+    const invalid = setup({ messages: [{ role: 'system', text: 'invalid' }] });
+    await expect(invalid.client[method]()).rejects.toMatchObject({ code: 'INVALID_RESPONSE' });
   }
 });

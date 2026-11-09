@@ -17,6 +17,8 @@ function deferred<T>() {
 
 function setup() {
   const client = {
+    getChatHistory: vi.fn().mockResolvedValue({ messages: [] }),
+    clearChatHistory: vi.fn().mockResolvedValue({ messages: [] }),
     getChatSuggestions: vi.fn().mockResolvedValue({ suggestions: ['What is next?', 'Latest commits?'] }),
     sendChat: vi.fn<(text: string) => Promise<ChatResponse>>().mockResolvedValue({ reply: 'The next task.', source: 'local' }),
   };
@@ -162,4 +164,60 @@ test.each([true, false])('ignores suggestions arriving after unmount (success: %
   unmount();
   await act(async () => { if (success) suggestions.resolve({ suggestions: ['Late'] }); else suggestions.reject(new Error()); });
   expect(screen.queryByRole('button', { name: 'Late' })).not.toBeInTheDocument();
+});
+
+
+test('loads saved history literally and restores it after remount', async () => {
+  const { client, user } = setup();
+  const messages = [{ role: 'user', text: '<b>saved</b>' }, { role: 'assistant', text: 'Saved reply', source: 'local' }];
+  client.getChatHistory.mockResolvedValue({ messages });
+  const first = render(<ChatPanel client={client} />);
+  await screen.findByText('Saved reply');
+  await waitFor(() => expect(screen.getByRole('log').querySelectorAll('.chat-message')).toHaveLength(2));
+  expect(screen.getByText('<b>saved</b>')).toBeInTheDocument();
+  expect(screen.getByRole('log').querySelector('b')).toBeNull();
+  first.unmount();
+  render(<ChatPanel client={client} />);
+  await screen.findByText('Saved reply');
+  await waitFor(() => expect(client.getChatHistory).toHaveBeenCalledTimes(2));
+  await user.click(screen.getByRole('button', { name: 'New chat' }));
+  await waitFor(() => expect(screen.getByRole('log').querySelector('.chat-message')).toBeNull());
+  expect(client.clearChatHistory).toHaveBeenCalledOnce();
+});
+
+test('failed clear keeps the conversation and shows a safe alert', async () => {
+  const { client, user } = setup();
+  client.getChatHistory.mockResolvedValue({ messages: [{ role: 'user', text: 'Saved question' }] });
+  client.clearChatHistory.mockRejectedValue(new Error('private detail'));
+  render(<ChatPanel client={client} />);
+  await screen.findByText('Saved question');
+  await waitFor(() => expect(screen.getByRole('button', { name: 'New chat' })).toBeEnabled());
+  await user.click(screen.getByRole('button', { name: 'New chat' }));
+  await screen.findByRole('alert');
+  await waitFor(() => expect(screen.getByRole('alert')).toHaveTextContent('Could not clear the saved history.'));
+  expect(screen.getByText('Saved question')).toBeInTheDocument();
+});
+
+test('failed history load leaves an empty usable conversation', async () => {
+  const { client, user } = setup();
+  client.getChatHistory.mockRejectedValue(new Error());
+  render(<ChatPanel client={client} />);
+  await screen.findByRole('group');
+  await waitFor(() => expect(client.getChatHistory).toHaveBeenCalledOnce());
+  expect(screen.queryByRole('alert')).not.toBeInTheDocument();
+  expect(screen.getByRole('log').querySelector('.chat-message')).toBeNull();
+  await user.type(screen.getByRole('textbox'), 'tests{Enter}');
+  await waitFor(() => expect(screen.getByText('The next task.')).toBeInTheDocument());
+});
+
+test('late history cannot replace messages sent by the user', async () => {
+  const { client, user } = setup();
+  const history = deferred<{ messages: [] }>();
+  client.getChatHistory.mockReturnValue(history.promise);
+  render(<ChatPanel client={client} />);
+  await user.type(screen.getByRole('textbox'), 'tests{Enter}');
+  await waitFor(() => expect(screen.getByText('The next task.')).toBeInTheDocument());
+  await act(async () => history.resolve({ messages: [] }));
+  expect(screen.getByText('tests')).toBeInTheDocument();
+  expect(screen.getByText('The next task.')).toBeInTheDocument();
 });

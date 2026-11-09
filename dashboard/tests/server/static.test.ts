@@ -3,9 +3,11 @@ import { existsSync, mkdtempSync, mkdirSync, readFileSync, rmSync, writeFileSync
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import request from 'supertest';
-import { afterAll, expect, it } from 'vitest';
-import { createApp } from '../../server/app';
+import { afterAll, beforeEach, expect, it } from 'vitest';
+import { useTestApp } from '../test-app';
 import { CONTENT_SECURITY_POLICY, DEFAULT_STATIC_DIR } from '../../server/static';
+
+const createApp = useTestApp();
 
 const fixture = mkdtempSync(join(tmpdir(), 'dashboard-static-'));
 const index = '<!doctype html><html><body>Fixture dashboard</body></html>';
@@ -17,7 +19,8 @@ writeFileSync(join(fixture, 'robots.txt'), 'User-agent: *');
 writeFileSync(join(fixture, '.secret'), 'private fixture secret');
 const empty = join(fixture, 'empty');
 mkdirSync(empty);
-const app = createApp({ staticDir: fixture });
+let app: ReturnType<typeof createApp>;
+beforeEach(() => { app = createApp({ staticDir: fixture }); });
 const get = (path: string) => request(app).get(path).set('Host', '127.0.0.1:3001');
 
 afterAll(() => rmSync(fixture, { recursive: true, force: true }));

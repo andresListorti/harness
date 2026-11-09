@@ -135,10 +135,7 @@ Work in the order listed. A milestone closes only after these steps, in order:
 
 ## In progress
 
-### chat-history
-- **Goal:** Keep the chat history in the ignored `.data/` folder and restore it when the page reloads; "New chat" deletes it.
-- **Files:** `server/chat/history.ts`, `server/routes/chat.ts`, `shared/api.ts`, `src/components/ChatPanel.tsx`, `src/lib/api.ts`, `tests/server/chat-history.test.ts`, `tests/client/chat-panel.test.tsx`
-- **Definition of done:** the history is stored in `.data/chat-history.json` (ignored by git, written atomically, capped in size, validated on read, with a corrupt file treated as empty); `GET /api/chat/history` returns it and `DELETE /api/chat/history` clears it, both behind the existing Host and Origin guards; the chat panel loads the history on mount and renders it as plain text; every sent message and reply is saved; `New chat` deletes the stored history; a reload shows the previous conversation.
+_None._
 
 ## Done
 
@@ -387,6 +384,12 @@ Work in the order listed. A milestone closes only after these steps, in order:
 - **Files:** `src/views/SettingsView.tsx`, `src/views/SettingsView.css`, `src/components/Sidebar.tsx`, `src/App.tsx`, `src/lib/api.ts`, `tests/client/settings-view.test.tsx`, `tests/client/sidebar.test.tsx`, `tests/client/api.test.ts`
 - **Definition of done:** `tests/client/settings-view.test.tsx` passes: Settings appears in the sidebar; choosing an orchestrator saves it and shows the other as worker; unconfigured voice providers are disabled; no key field exists.
 - **Result:** done in 1 attempt. 671 tests pass, typecheck and build clean. Adds `getSettings`, `saveSettings`, and `getVoiceProviders` to the API client. If the providers request fails, only the browser voice stays selectable.
+
+### chat-history
+- **Goal:** Keep the chat history in the ignored `.data/` folder and restore it when the page reloads; "New chat" deletes it.
+- **Files:** `server/chat/history.ts`, `server/routes/chat.ts`, `server/routes/data.ts`, `shared/api.ts`, `src/components/ChatPanel.tsx`, `src/lib/api.ts`, `tests/server/chat-history.test.ts`, `tests/client/chat-panel.test.tsx`, `tests/test-app.ts`, `tests/storage-safeguard.ts`, `vitest.config.ts`, and the tests that build the app or mock the client
+- **Definition of done:** the history is stored in `.data/chat-history.json` (ignored by git, written atomically, capped in size, validated on read, with a corrupt file treated as empty); `GET /api/chat/history` returns it and `DELETE /api/chat/history` clears it, both behind the existing Host and Origin guards; the chat panel loads the history on mount and renders it as plain text; every sent message and reply is saved; `New chat` deletes the stored history; a reload shows the previous conversation.
+- **Result:** done in 2 attempts. 683 tests pass, typecheck and build clean. The server saves each question and reply in `POST /api/chat` (capped at 200 messages and 100000 characters, written atomically, writes serialized). A history write failure never blocks an answer. A failed clear keeps the conversation and shows an error. A suite-wide safeguard fails the tests if they ever touch the real `.data` files.
 
 ## Phase 2: real agent execution
 

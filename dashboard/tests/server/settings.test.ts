@@ -5,9 +5,11 @@ import { join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import request from 'supertest';
 import { afterEach, beforeEach, expect, test } from 'vitest';
-import { createApp } from '../../server/app';
+import { useTestApp } from '../test-app';
 import { DEFAULT_SETTINGS, defaultSettingsPath, readSettings, writeSettings } from '../../server/settings';
 import { galaxySchema, settingsResponseSchema } from '../../shared/api';
+
+const createApp = useTestApp();
 
 let root: string;
 let settingsPath: string;
