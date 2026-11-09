@@ -693,3 +693,16 @@ Dependencies were installed by the orchestrator once, during task 1, because the
 
 - **Attempt 1:** Codex added `openWidget` (Document Picture-in-Picture first, then a popup, a message instead of an exception when the popup is blocked, same-origin stylesheets cloned into the new window), `WidgetView` (only the orb, a status line, and a Talk button), a Widget mode button in the sidebar footer, and the App wiring: the widget is rendered into the new window through a portal, so it shares the voice state of the main app, and closing it through the toggle, the window itself, or unmounting the app cleans up once.
 - **Orchestrator check:** read the opener, the view, and the App changes; no remote source is used and nothing is fetched; no byte order marks; `.data` absent after the suite; 41 files and 761 tests passed, `npm run typecheck` was clean, and `npm run build` passed. Real Picture-in-Picture behavior is checked in `m2-acceptance`.
+
+## D48. docs-voice
+
+| | |
+|---|---|
+| Branch | `task/docs-voice` |
+| Codex attempts | 1 |
+| Codex model | not reported |
+| Duration | 2m 8s |
+| Result | Done |
+
+- **Attempt 1:** Codex documented the voice providers and `.env` setup, the new routes with their status codes, Settings, chat history and its caps, the voice controls and Reply with voice and Hands-free, the browser speech notice, widget mode, live refresh, the content security policy change, and what is still not built, in the dashboard README, `docs/architecture.md`, and `docs/setup.md`. It checked each claim against the code and states that live provider calls were not verified.
+- **Orchestrator check:** read the full diff against the code facts; the setup text about the ChatGPT login was adjusted by Codex because `.env.example` now lists optional speech keys, and it is still accurate; no personal data, keys, or local paths; no byte order marks; 41 files and 761 tests passed (the safety scan covers these documents), `npm run typecheck` was clean, and `npm run build` passed.

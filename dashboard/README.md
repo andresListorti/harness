@@ -1,6 +1,6 @@
 # Harness dashboard
 
-A local web dashboard for Harness, with a React, TypeScript, and Vite front end and a small Node and Express backend. Everything is served on `127.0.0.1`; milestone 1 is read-only and local.
+A local web dashboard for Harness, with a React, TypeScript, and Vite front end and a small Node and Express backend. Everything is served on `127.0.0.1`; chat answers come from local repo data.
 
 ## Requirements
 
@@ -41,8 +41,34 @@ Open `http://127.0.0.1:5173`. Vite proxies `/api` to port 3001, so keep the back
   recorded in the run-log rows `Codex model` and `Duration` and are hidden otherwise.
   Output is wrapped plain text limited to four lines
   (the full text is in the tooltip). Choose 1, 2x2, or 3x3 layouts with pagination.
-- **Galaxy:** an animated canvas with the Harness core, Claude Code, Codex, Tasks, Commits, and Tests. Details use recorded tasks and attempts, recent commits, tracked test files, and recorded test results. Wheel to zoom, drag to pan, or click a planet; the button legend also opens details from the keyboard. Roles currently default to Claude Code as orchestrator and Codex as worker.
+- **Galaxy:** an animated canvas with the Harness core, Claude Code, Codex, Tasks, Commits, and Tests. Details use recorded tasks and attempts, recent commits, tracked test files, and recorded test results. Wheel to zoom, drag to pan, or click a planet; the button legend also opens details from the keyboard. Settings controls the orchestrator and worker roles; the defaults are Claude Code as orchestrator and Codex as worker.
 - **Plan:** a Pending, In progress, and Done board with task details and the run log. The source selector switches between the dashboard and example-app plans. Future milestone tasks can appear as pending; Phase 2 is excluded from the board.
+
+- **Settings:** choose the orchestrator and voice. The other agent becomes the worker. This changes Galaxy roles; Agents cards still describe recorded plans and runs. Unconfigured voice providers are disabled, and there is no key field. Settings are saved atomically in the ignored `dashboard/.data/settings.json`. A missing or corrupt file restores the default orchestrator and browser voice.
+
+After a successful initial load, Agents and Plan refresh every 5 seconds. Refresh pauses while the tab is hidden and resumes when visible. Failed refreshes keep the last data.
+
+### Voice controls and widget
+
+The sidebar has Talk, Mute, and a voice selector. Talk toggles listening; hold Space to talk when focus is outside inputs, editable fields, buttons, and links. Chat also has a microphone button, **Reply with voice**, and **Hands-free**. Both switches start off and stay in memory only. Reply with voice speaks new replies; Hands-free sends a final transcript automatically. The orb follows listening and speaking.
+
+Speech input uses the browser Web Speech API. Browser support varies. The UI shows this notice: "Your browser may send microphone audio to its vendor's speech service for transcription."
+
+Widget mode opens a compact window containing only the orb, status, and Talk button, sharing the main window's voice state. It uses Document Picture-in-Picture when available, otherwise a popup. If opening fails or the popup is blocked, the UI shows: "The widget window was blocked. Allow pop-ups for this page and try again."
+
+Chat history is restored on reload from the ignored `dashboard/.data/chat-history.json`. Saved history keeps at most 200 messages and 100,000 text characters, dropping the oldest messages first; each message is limited to 10,000 characters. **New chat** deletes saved history and clears the conversation after deletion succeeds. Missing or corrupt history loads as empty, and a history save failure never blocks an answer. Replies still come only from local answers.
+
+## Voice setup
+
+Browser voice is the default and needs no setup. Fish Audio, ElevenLabs, and OpenAI text-to-speech are optional. Copy the root `.env.example` to root `.env`, then uncomment and fill in both values for each provider you want:
+
+- Fish Audio: `FISH_AUDIO_API_KEY` and `FISH_AUDIO_VOICE_ID`.
+- ElevenLabs: `ELEVENLABS_API_KEY` and `ELEVENLABS_VOICE_ID`.
+- OpenAI: `OPENAI_TTS_API_KEY` and `OPENAI_TTS_VOICE`.
+
+Keep credentials in root `.env`, never in the browser or committed files. Process environment variables override file values. Both values must be non-empty for a provider to be available. The backend reads `.env` on each provider availability or synthesis request, so edits need no restart; reload the view to refresh its availability choices.
+
+Only provider IDs and availability reach the browser, never keys or voice IDs. Provider failures return the generic message "Voice synthesis failed." without secrets. Failed provider requests or audio playback fall back to browser voice, where supported. Provider speech uses the first 1,000 characters of the trimmed reply. Provider adapters are covered by mocked tests; live services have not been verified by those tests.
 
 ## Data sources
 
@@ -63,20 +89,37 @@ All routes are relative to the backend. The allowed `source` values are `dashboa
 | `GET /api/chat/suggestions` | Supported local question suggestions. |
 | `POST /api/chat` | Accepts only `{ "message": "What is pending?" }`, with a trimmed message of 1–2000 characters; returns a plain-text `reply` and `source: "local"`. |
 
+The new routes return these status codes after the shared guards pass:
+
+| Route | Response and status |
+|---|---|
+| `GET /api/voice/providers` | 200: provider IDs and availability only. |
+| `POST /api/tts` | Accepts only `provider` (`fish-audio`, `elevenlabs`, or `openai`) and trimmed `text` of 1-1000 characters. 200: MP3 audio; 400: invalid request; 409: provider not configured; 502: provider failure. |
+| `GET /api/settings` | 200: `orchestrator`, `voice`, and derived `worker`, using defaults if storage cannot be read or validated. |
+| `PUT /api/settings` | Accepts only `orchestrator` (`claude-code` or `codex`) and `voice` (`browser` or a provider ID). 200: saved settings and worker; 400: invalid request; 500: save failed. |
+| `GET /api/chat/history` | 200: `messages`, empty if storage cannot be read or validated. |
+| `DELETE /api/chat/history` | 200: empty `messages`; 500: deletion failed. |
+
+Shared guards can return 403 for a forbidden Host or Origin, 415 for a non-JSON body on a state-changing request, 400 for malformed JSON, and 413 for an oversized JSON body. Unexpected server errors return a generic 500.
+
 ## Security
 
 - The backend binds only to `127.0.0.1`. A Host allowlist for loopback names and configured ports guards against DNS rebinding.
-- State-changing requests require an allowlisted Origin; bodies on those requests must use a JSON content type. JSON bodies have a 16 kb limit, and chat input is validated with a strict Zod schema.
+- State-changing requests require an allowlisted Origin; bodies on those requests must use a JSON content type. These guards also cover voice, Settings, and history routes. JSON bodies have a 16 kb limit, and chat input is validated with a strict Zod schema.
 - Repo data uses a fixed file allowlist, with no file path taken from requests. Git runs through `execFile` without a shell, using fixed argument structures and a bounded commit limit; author names and emails are never requested.
-- The backend sends a strict Content Security Policy allowing resources and connections only from the same origin, blocking objects and framing. It also sends `X-Content-Type-Options: nosniff`, `Referrer-Policy: no-referrer`, and `X-Frame-Options: DENY`.
+- The backend sends a strict Content Security Policy allowing resources and connections only from the same origin, with `media-src 'self' blob:` for generated audio. Remote sources remain blocked; objects and framing are blocked. It also sends `X-Content-Type-Options: nosniff`, `Referrer-Policy: no-referrer`, and `X-Frame-Options: DENY`.
+- Voice keys stay on the server and are never sent to the browser. Optional synthesis sends reply text from the server to the selected provider. The browser speech disclosure above also applies to microphone input.
 - Chat builds answers locally from repo data and launches no agent process. Its shared data reader can invoke the fixed read-only git commands above. Replies render as plain text, so reply content cannot become HTML.
 
 ## Project layout
 
 ```text
 server/  Express app, security, static serving, routes, data readers, local answers
+server/voice/  Provider configuration, adapters, and sanitized errors
 shared/  Zod API schemas and TypeScript types
 src/     React views, components, API client, styles, galaxy canvas
+src/voice/  Shared voice state, browser speech input, and speech output with fallback
+src/widget/  Compact widget view and window opening
 tests/   Server, shared contract, client, CI, and public-safety checks
 ```
 
@@ -94,4 +137,4 @@ Tests use Vitest and React Testing Library. The public-safety scan checks dashbo
 
 ## Not built yet
 
-There is no voice input or output, widget mode, settings view, orchestrator selection, text-to-speech provider, chat with an agent, or way to launch agents from the dashboard yet. The [roadmap](PLAN.md) places voice and widget in milestone 2, chat with the orchestrator in milestone 3, and real agent execution in Phase 2.
+Chat with the orchestrator agent remains planned for milestone 3. Real agent execution, including launching agents from the dashboard, remains planned for Phase 2. See the [roadmap](PLAN.md).
