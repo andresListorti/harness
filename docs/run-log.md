@@ -518,3 +518,18 @@ Dependencies were installed by the orchestrator once, during task 1, because the
 - **Why:** the `/codex:review` of Milestone 1 reported one P2 finding: the chat matched intent keywords as substrings, so `now` matched inside `know` and `unknown` (for example "Do you know what is pending?" returned the in-progress answer).
 - **Attempt 1:** Codex replaced the substring helper with a whole-word matcher (Unicode-aware word boundaries, an optional trailing `s`, flexible spaces inside phrases) and added `currently` to the in-progress keywords. Intent order, replies, and action detection are unchanged. It added tests for the reported question, for questions that only contain `unknown`, for look-alikes (`nowhere`, `leftover`, `commitment`, `currency`), and for real keywords with plurals, capitals, and punctuation. Its first run after adding two extra cases failed on existing normalization behavior and it fixed that within the same attempt.
 - **Orchestrator check:** probing 42 phrases through the real function gave the expected classification for all of them; a bare `commit` stays an action request under the unchanged verb-first rule, while `commits` returns the commit list. `npm test` passed (28 files, 592 tests), `npm run typecheck` was clean, and `npm run build` passed.
+
+## D35. tts-config
+
+| | |
+|---|---|
+| Branch | `task/tts-config` |
+| Codex attempts | 2 |
+| Codex model | not reported |
+| Duration | 3m 28s |
+| Result | Done |
+
+- **Attempt 1:** Codex added the shared `voiceProvidersSchema`, `server/voice/config.ts` (a small `.env` parser, `loadVoiceConfig`, and `toPublicProviders`), the commented voice variables in `.env.example`, and tests. Its first run flagged two fake-key fixtures in the public-safety test and it fixed them within the attempt. Duration of attempt 1: 2m 29s.
+- **Orchestrator review of attempt 1:** a probe showed that when the `.env` file was missing, process environment values were ignored, although the spec says they override the file.
+- **Attempt 2:** the orchestrator sent the probe back. Codex made a missing or unreadable file mean "no values from the file" and added regression tests. Duration of attempt 2: 58s.
+- **Orchestrator check:** the same probe now returns the provider as available with env values and none without them; no byte order marks; `npm test` passed (29 files, 605 tests), `npm run typecheck` was clean, and `npm run build` passed.

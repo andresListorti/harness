@@ -170,10 +170,7 @@ Work in the order listed. A milestone closes only after these steps, in order:
 
 ## In progress
 
-### tts-config
-- **Goal:** Load voice settings from the root `.env` and expose only provider availability.
-- **Files:** `server/voice/config.ts`, `shared/api.ts`, `../.env.example`, `tests/server/tts-config.test.ts`
-- **Definition of done:** `tests/server/tts-config.test.ts` passes: a provider is available only with both key and voice ID; the public view contains no key or voice ID. `.env.example` no longer says it is intentionally empty, and has empty, commented `FISH_AUDIO_API_KEY`, `FISH_AUDIO_VOICE_ID`, `ELEVENLABS_API_KEY`, `ELEVENLABS_VOICE_ID`, `OPENAI_TTS_API_KEY`, and `OPENAI_TTS_VOICE`.
+_None._
 
 ## Done
 
@@ -380,6 +377,12 @@ Work in the order listed. A milestone closes only after these steps, in order:
 - **Files:** `tests/client/galaxy-view.test.tsx`, `tests/client/chat-panel.test.tsx`, `tests/public-safety.test.ts`, `tests/server/chat-local.test.ts`, `tests/server/data-routes.test.ts`
 - **Definition of done:** no test creates a temporary directory inside `dashboard/`; the safety scan tolerates files that disappear during the walk; the galaxy test waits for the canvas effect; the suite passes repeatedly, including under CPU load.
 - **Result:** done. 409 tests pass; 12 of 12 parallel runs under CPU load pass (6 of 12 earlier runs had failed in a similar stress test).
+
+### tts-config
+- **Goal:** Load voice settings from the root `.env` and expose only provider availability.
+- **Files:** `server/voice/config.ts`, `shared/api.ts`, `../.env.example`, `tests/server/tts-config.test.ts`
+- **Definition of done:** `tests/server/tts-config.test.ts` passes: a provider is available only with both key and voice ID; the public view contains no key or voice ID. `.env.example` no longer says it is intentionally empty, and has empty, commented `FISH_AUDIO_API_KEY`, `FISH_AUDIO_VOICE_ID`, `ELEVENLABS_API_KEY`, `ELEVENLABS_VOICE_ID`, `OPENAI_TTS_API_KEY`, and `OPENAI_TTS_VOICE`.
+- **Result:** done in 2 attempts. 605 tests pass, typecheck and build clean. Adds the shared `voiceProvidersSchema`, an `.env` parser with no new dependency, and a public view with only `id` and `available`. Process env values override the file and still work when the file is missing.
 
 ## Phase 2: real agent execution
 

@@ -1,5 +1,16 @@
 import { z } from 'zod';
 
+export const voiceProviderIdSchema = z.enum(['fish-audio', 'elevenlabs', 'openai']);
+export type VoiceProviderId = z.infer<typeof voiceProviderIdSchema>;
+
+export const voiceProvidersSchema = z.object({
+  providers: z.array(z.object({
+    id: voiceProviderIdSchema,
+    available: z.boolean(),
+  }).strict()),
+}).strict();
+export type VoiceProviders = z.infer<typeof voiceProvidersSchema>;
+
 export const agentIdSchema = z.enum(['claude-code', 'codex']);
 export type AgentId = z.infer<typeof agentIdSchema>;
 
