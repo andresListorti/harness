@@ -3,11 +3,13 @@ import { applySecurity, jsonErrorHandler, type SecurityOptions } from './securit
 import { createDataRouter, type DataDeps } from './routes/data';
 
 import { createChatRouter } from './routes/chat';
+import { createTtsRouter, type TtsDeps } from './routes/tts';
 import { DEFAULT_STATIC_DIR, securityHeaders, serveStatic } from './static';
 
 interface AppOptions extends SecurityOptions {
   staticDir?: string | false;
   data?: DataDeps;
+  voice?: TtsDeps;
   routes?: (app: Express) => void;
 }
 
@@ -24,6 +26,7 @@ export function createApp(options: AppOptions = {}) {
   options.routes?.(app);
   app.use('/api', createDataRouter(options.data));
   app.use('/api', createChatRouter(options.data));
+  app.use('/api', createTtsRouter(options.voice));
 
   app.use('/api', (_req, res) => {
     res.status(404).json({

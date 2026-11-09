@@ -11,6 +11,12 @@ export const voiceProvidersSchema = z.object({
 }).strict();
 export type VoiceProviders = z.infer<typeof voiceProvidersSchema>;
 
+export const ttsRequestSchema = z.object({
+  provider: voiceProviderIdSchema,
+  text: z.string().trim().min(1).max(1000),
+}).strict();
+export type TtsRequest = z.infer<typeof ttsRequestSchema>;
+
 export const agentIdSchema = z.enum(['claude-code', 'codex']);
 export type AgentId = z.infer<typeof agentIdSchema>;
 
