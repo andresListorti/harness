@@ -61,11 +61,6 @@ Work in the order listed. A milestone closes only after these steps, in order:
 
 ### Milestone 2: voice and widget
 
-### tts-elevenlabs
-- **Goal:** Add the ElevenLabs adapter.
-- **Files:** `server/voice/elevenlabs.ts`, `tests/server/tts-elevenlabs.test.ts`
-- **Definition of done:** `tests/server/tts-elevenlabs.test.ts` passes with a mocked `fetch`: URL, headers, and body are correct; audio bytes are returned; provider errors become a typed error that contains no key.
-
 ### tts-openai
 - **Goal:** Add the OpenAI TTS adapter.
 - **Files:** `server/voice/openai-tts.ts`, `tests/server/tts-openai.test.ts`
@@ -165,7 +160,10 @@ Work in the order listed. A milestone closes only after these steps, in order:
 
 ## In progress
 
-_None._
+### tts-elevenlabs
+- **Goal:** Add the ElevenLabs adapter.
+- **Files:** `server/voice/elevenlabs.ts`, `tests/server/tts-elevenlabs.test.ts`
+- **Definition of done:** `tests/server/tts-elevenlabs.test.ts` passes with a mocked `fetch`: URL, headers, and body are correct; audio bytes are returned; provider errors become a typed error that contains no key.
 
 ## Done
 
