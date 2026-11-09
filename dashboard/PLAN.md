@@ -63,11 +63,6 @@ Work in the order listed. A milestone closes only after these steps, in order:
 
 ### Milestone 3: chat with the orchestrator
 
-### chat-isolation-check
-- **Goal:** Verify on this machine what each CLI can reach with the exact chat flags, including how to launch each one without a shell on Windows. Performed by the orchestrator, not Codex.
-- **Files:** `docs/chat-isolation.md`
-- **Definition of done:** the document records the result of asking each CLI to read a canary file outside its working directory, write a file, and run a command. Claude Code must fail all three. If Codex can read the canary, Codex chat stays limited to local answers until the user decides.
-
 ### chat-prompt
 - **Goal:** Build the capped prompt from the repo snapshot and chat history.
 - **Files:** `server/chat/prompt.ts`, `tests/server/chat-prompt.test.ts`
@@ -100,7 +95,10 @@ Work in the order listed. A milestone closes only after these steps, in order:
 
 ## In progress
 
-_None._
+### chat-isolation-check
+- **Goal:** Verify on this machine what each CLI can reach with the exact chat flags, including how to launch each one without a shell on Windows. Performed by the orchestrator, not Codex.
+- **Files:** `docs/chat-isolation.md`
+- **Definition of done:** the document records the result of asking each CLI to read a canary file outside its working directory, write a file, and run a command. Claude Code must fail all three. If Codex can read the canary, Codex chat stays limited to local answers until the user decides.
 
 ## Done
 
