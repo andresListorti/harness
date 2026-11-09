@@ -7,7 +7,7 @@ import { SettingsView } from '../../src/views/SettingsView';
 
 afterEach(() => { cleanup(); vi.restoreAllMocks(); });
 
-const initial: SettingsResponse = { orchestrator: 'claude-code', worker: 'codex', voice: 'openai' };
+const initial: SettingsResponse = { orchestrator: 'claude-code', worker: 'codex', voice: 'openai', chatModel: 'sonnet' };
 function clientFor() {
   const client = {
     getSettings: vi.fn().mockResolvedValue(initial),
@@ -15,11 +15,11 @@ function clientFor() {
       { id: 'fish-audio', available: false }, { id: 'elevenlabs', available: true }, { id: 'openai', available: true },
     ] }),
     saveSettings: vi.fn(async (settings: Settings): Promise<SettingsResponse> => ({
-      ...settings, worker: settings.orchestrator === 'codex' ? 'claude-code' : 'codex',
+      ...settings, chatModel: settings.chatModel ?? 'sonnet', worker: settings.orchestrator === 'codex' ? 'claude-code' : 'codex',
     })),
   };
   client.saveSettings.mockImplementation(async settings => {
-    const result: SettingsResponse = { ...settings, worker: settings.orchestrator === 'codex' ? 'claude-code' : 'codex' };
+    const result: SettingsResponse = { ...settings, chatModel: settings.chatModel ?? 'sonnet', worker: settings.orchestrator === 'codex' ? 'claude-code' : 'codex' };
     client.getSettings.mockResolvedValue(result);
     return result;
   });
@@ -65,7 +65,7 @@ test('saves the orchestrator with the current voice and uses server roles', asyn
   expect(client.saveSettings).toHaveBeenCalledExactlyOnceWith({ orchestrator: 'codex', voice: 'openai' });
   for (const radio of screen.getAllByRole('radio')) expect(radio).toBeDisabled();
   expect(screen.getByRole('radio', { name: 'Claude Code Orchestrator' })).toBeChecked();
-  await act(async () => resolve({ orchestrator: 'codex', worker: 'claude-code', voice: 'browser' }));
+  await act(async () => resolve({ orchestrator: 'codex', worker: 'claude-code', voice: 'browser', chatModel: 'sonnet' }));
   await waitFor(() => expect(screen.getByRole('radio', { name: 'Codex Orchestrator' })).toBeChecked());
   expect(screen.getByRole('radio', { name: 'Claude Code Worker' })).not.toBeChecked();
   expect(screen.getByRole('radio', { name: 'Browser voice' })).toBeChecked();
@@ -190,7 +190,7 @@ test('ignores pending reads after a save and skips events during the save withou
   await userEvent.click(screen.getByRole('radio', { name: 'Codex Worker' }));
   await act(async () => notifySettingsChanged());
   expect(client.getSettings).toHaveBeenCalledTimes(2);
-  await act(async () => saved.resolve({ orchestrator: 'codex', worker: 'claude-code', voice: 'browser' }));
+  await act(async () => saved.resolve({ orchestrator: 'codex', worker: 'claude-code', voice: 'browser', chatModel: 'sonnet' }));
   await waitFor(() => expect(screen.getByRole('radio', { name: 'Codex Orchestrator' })).toBeChecked());
   await act(async () => older.resolve(initial));
   expect(screen.getByRole('radio', { name: 'Browser voice' })).toBeChecked();

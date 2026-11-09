@@ -134,3 +134,24 @@ test('accepts the existing server error response', async () => {
   expect(response.status).toBe(404);
   expect(api.apiErrorSchema.parse(response.body)).toEqual(error);
 });
+
+
+test('Claude models have one allowlist and settings default to sonnet', () => {
+  expect(api.CLAUDE_MODELS).toEqual(['sonnet', 'opus', 'haiku']);
+  for (const model of api.CLAUDE_MODELS) expect(api.claudeModelSchema.parse(model)).toBe(model);
+  expect(api.claudeModelSchema.safeParse('unknown').success).toBe(false);
+  expect(api.settingsSchema.parse({ orchestrator: 'codex', voice: 'openai' }))
+    .toEqual({ orchestrator: 'codex', voice: 'openai', chatModel: 'sonnet' });
+  expect(api.settingsSchema.safeParse({ orchestrator: 'codex', voice: 'browser', chatModel: 'unknown' }).success).toBe(false);
+});
+test('chat responses and history accept orchestrator sources and optional response notices', () => {
+  for (const source of ['local', 'orchestrator']) {
+    expect(api.chatResponseSchema.parse({ reply: 'Reply', source, notice: api.CODEX_CHAT_NOTICE }))
+      .toEqual({ reply: 'Reply', source, notice: api.CODEX_CHAT_NOTICE });
+    expect(api.chatHistoryMessageSchema.parse({ role: 'assistant', text: 'Reply', source }))
+      .toEqual({ role: 'assistant', text: 'Reply', source });
+  }
+  expect(api.chatResponseSchema.safeParse({ reply: 'Reply', source: 'unknown' }).success).toBe(false);
+  expect(api.chatHistoryMessageSchema.safeParse({ role: 'assistant', text: 'Reply', source: 'unknown' }).success).toBe(false);
+  expect(api.chatResponseSchema.safeParse({ reply: 'Reply', source: 'local', notice: 1 }).success).toBe(false);
+});

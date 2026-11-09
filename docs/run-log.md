@@ -860,3 +860,17 @@ Dependencies were installed by the orchestrator once, during task 1, because the
 
 - **Attempt 1:** Codex added the runner for Claude Code only, with the exact isolation flags including `--safe-mode` and `--no-session-persistence`, no shell, the prompt on stdin, an empty temporary working directory removed after each run, voice keys removed from the child environment, a server-side model allowlist, a 60 second timeout, and an output cap. On Windows it resolves the native `claude.exe` and never starts a `.cmd` file. It also added `cleanChatReply`, which replaces tool-call markup with a short notice.
 - **Orchestrator check:** read the code; no byte order marks; 44 files and 879 tests passed with a mocked spawn, `npm run typecheck` was clean, `npm run build` passed, and the real `dashboard/.data/chat-history.json` has the same hash before and after the suite. The real CLI is exercised in `m3-acceptance`.
+
+## D60. chat-route
+
+| | |
+|---|---|
+| Branch | `task/chat-route` |
+| Codex attempts | 2 |
+| Codex model | not reported |
+| Duration | 5m 28s |
+| Result | Done |
+
+- **Attempt 1:** Codex stopped once to ask about a one-line type change in `ChatPanel.tsx`, outside its file list, which the orchestrator allowed, and then finished in the same thread. Known questions and action requests stay local. Other questions go to Claude Code with the saved model, or stay local with a notice when Codex is the orchestrator, and no CLI starts in that case. One run at a time returns 429 when busy; a missing CLI returns 503, a timeout 504, and other failures 502, with no diagnostics in the body. Old settings files keep loading, saves without `chatModel` keep the saved value, and `GET /api/docs/chat-isolation` serves that one fixed file as plain text. The review found that a reply over the 10000-character history limit failed validation and silently lost the exchange.
+- **Attempt 2:** Codex first wrote a test that reproduces it and confirmed it failed, then stored long replies cut to the limit with a short marker. The caller still gets the full reply.
+- **Orchestrator check:** read the diff; no byte order marks; 45 files and 905 tests passed, `npm run typecheck` was clean, `npm run build` passed, and the real `dashboard/.data/chat-history.json` has the same hash before and after the suite.
