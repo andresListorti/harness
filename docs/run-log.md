@@ -928,3 +928,17 @@ Dependencies were installed by the orchestrator once, during task 1, because the
 - **Why:** the clean `npm ci` run of `m3-acceptance` failed because the test on the real plan required at least one pending task, which stops being true when the last task of a milestone starts.
 - **Attempt 1:** Codex confirmed the failure and removed that one assertion. An inline fixture already covers grouping of pending tasks.
 - **Orchestrator check:** read the diff; no byte order marks; 45 files and 927 tests passed, `npm run typecheck` was clean, and `npm run build` passed.
+
+## D65. chat-orchestrator-plain-text
+
+| | |
+|---|---|
+| Branch | `task/chat-orchestrator-plain-text` |
+| Codex attempts | 1 |
+| Codex model | not reported |
+| Duration | 1m 50s |
+| Result | Done |
+
+- **Why:** in `m3-acceptance`, Claude Code replies showed bold markers and backticks literally in the chat.
+- **Attempt 1:** Codex first wrote a test that reproduces it and confirmed it failed, then passed orchestrator replies through `toPlainText` after the tool-markup cleanup, so the response and the saved history are both clean.
+- **Orchestrator check:** read the diff; no byte order marks; 45 files and 930 tests passed, `npm run typecheck` was clean, `npm run build` passed, and the real `dashboard/.data/chat-history.json` has the same hash before and after the suite.
