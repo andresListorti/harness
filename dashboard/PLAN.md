@@ -61,11 +61,6 @@ Work in the order listed. A milestone closes only after these steps, in order:
 
 ### Milestone 2: voice and widget
 
-### tts-route
-- **Goal:** Add `GET /api/voice/providers` and `POST /api/tts`, which dispatches to the selected adapter.
-- **Files:** `server/routes/tts.ts`, `server/app.ts`, `shared/api.ts`, `tests/server/tts-route.test.ts`
-- **Definition of done:** `tests/server/tts-route.test.ts` passes: providers returns availability only; audio is returned with the right content type; an unconfigured provider returns 409; over-limit text returns 400; a provider failure returns 502 with no secret in the body.
-
 ### settings-store
 - **Goal:** Persist the orchestrator and voice settings in the ignored `.data/settings.json`, expose them over the API, and use the saved roles in the galaxy.
 - **Files:** `server/settings.ts`, `server/routes/settings.ts`, `server/routes/data.ts`, `server/app.ts`, `shared/api.ts`, `tests/server/settings.test.ts`
@@ -155,7 +150,10 @@ Work in the order listed. A milestone closes only after these steps, in order:
 
 ## In progress
 
-_None._
+### tts-route
+- **Goal:** Add `GET /api/voice/providers` and `POST /api/tts`, which dispatches to the selected adapter.
+- **Files:** `server/routes/tts.ts`, `server/app.ts`, `shared/api.ts`, `tests/server/tts-route.test.ts`
+- **Definition of done:** `tests/server/tts-route.test.ts` passes: providers returns availability only; audio is returned with the right content type; an unconfigured provider returns 409; over-limit text returns 400; a provider failure returns 502 with no secret in the body.
 
 ## Done
 
