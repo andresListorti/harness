@@ -1,18 +1,23 @@
 import { useEffect, useId, useRef, useState } from 'react';
 import { api, ApiError } from '../lib/api';
 import './ChatPanel.css';
+import { CLAUDE_MODELS, CODEX_CHAT_NOTICE, type ClaudeModel, type SettingsResponse } from '../../shared/api';
+import { notifySettingsChanged, SETTINGS_CHANGED_EVENT } from '../lib/settings-events';
 import { useVoice } from '../voice/VoiceProvider';
 import { MicrophoneIcon } from './VoiceControls';
 
 type Message = { id: number; role: 'user' | 'assistant'; text: string; source?: 'local' | 'orchestrator' };
 
-export function ChatPanel({ client = api }: { client?: Pick<typeof api, 'getChatSuggestions' | 'sendChat' | 'getChatHistory' | 'clearChatHistory'> }) {
+export function ChatPanel({ client = api }: { client?: Pick<typeof api, 'getChatSuggestions' | 'sendChat' | 'getChatHistory' | 'clearChatHistory' | 'getSettings' | 'saveSettings'> }) {
   const voice = useVoice();
   const [messages, setMessages] = useState<Message[]>([]);
   const [suggestions, setSuggestions] = useState<string[]>([]);
   const [text, setText] = useState('');
   const [pending, setPending] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [settings, setSettings] = useState<SettingsResponse | null>(null);
+  const [savingModel, setSavingModel] = useState(false);
+  const settingsVersion = useRef(0);
   const request = useRef(0);
   const conversation = useRef(0);
   const busy = useRef(false);
@@ -20,6 +25,48 @@ export function ChatPanel({ client = api }: { client?: Pick<typeof api, 'getChat
   const historyLoad = useRef(0);
   const list = useRef<HTMLDivElement>(null);
   const fieldId = useId();
+
+  useEffect(() => {
+    let active = true;
+    setSettings(null);
+    setSavingModel(false);
+    const read = () => {
+      const version = ++settingsVersion.current;
+      void client.getSettings().then(result => {
+        if (active && version === settingsVersion.current) setSettings(result);
+      }).catch(() => {
+        if (active && version === settingsVersion.current) setSettings(null);
+      });
+    };
+    read();
+    window.addEventListener(SETTINGS_CHANGED_EVENT, read);
+    return () => {
+      active = false;
+      settingsVersion.current += 1;
+      window.removeEventListener(SETTINGS_CHANGED_EVENT, read);
+    };
+  }, [client]);
+
+  async function changeModel(chatModel: ClaudeModel) {
+    if (!settings || savingModel) return;
+    const previous = settings;
+    const version = ++settingsVersion.current;
+    setSettings({ ...previous, chatModel });
+    setSavingModel(true);
+    setError(null);
+    try {
+      const saved = await client.saveSettings({ orchestrator: previous.orchestrator, voice: previous.voice, chatModel });
+      if (version !== settingsVersion.current) return;
+      setSettings(saved);
+      notifySettingsChanged();
+    } catch {
+      if (version !== settingsVersion.current) return;
+      setSettings(previous);
+      setError('Could not save the chat model.');
+    } finally {
+      setSavingModel(false);
+    }
+  }
 
   useEffect(() => {
     let active = true;
@@ -120,13 +167,22 @@ export function ChatPanel({ client = api }: { client?: Pick<typeof api, 'getChat
         <label><input type="checkbox" role="switch" checked={voice.handsFree} onChange={event => voice.setHandsFree(event.target.checked)} />Hands-free</label>
       </>}
       <button type="button" onClick={reset} disabled={!messages.length && !error}>New chat</button></div>
+    {settings?.orchestrator === 'claude-code' && <label className="chat-model">
+      Claude Code model
+      <select value={settings.chatModel} disabled={savingModel} onChange={event => void changeModel(event.target.value as ClaudeModel)}>
+        {CLAUDE_MODELS.map(model => <option key={model} value={model}>{model}</option>)}
+      </select>
+    </label>}
+    {settings?.orchestrator === 'codex' && <p className="chat-notice">
+      {CODEX_CHAT_NOTICE} <a href="/api/docs/chat-isolation" target="_blank" rel="noopener noreferrer">Why?</a>
+    </p>}
     <div ref={list} className="chat-messages" role="log" aria-live="polite" aria-label="Conversation">
-      {!messages.length && <p className="chat-empty">Ask about tasks, commits, runs, or tests. Answers come straight from the repo; no agent runs.</p>}
+      {!messages.length && <p className="chat-empty">Ask about tasks, commits, runs, or tests.</p>}
       {messages.map(message => <div key={message.id} className={`chat-message chat-message--${message.role}`}>
         <p>{message.text}</p>
-        {message.source === 'local' && <small className="chat-source">Local answer</small>}
+        {message.role === 'assistant' && message.source && <small className="chat-source">{message.source === 'local' ? 'Local answer' : 'Orchestrator answer'}</small>}
       </div>)}
-      {pending && <p className="chat-thinking">Thinking…</p>}
+      {pending && <p className="chat-thinking" role="status">Thinking...</p>}
     </div>
     {error && <p className="chat-error" role="alert">{error}</p>}
     {suggestions.length > 0 && <div className="chat-suggestions" role="group" aria-label="Suggested questions">

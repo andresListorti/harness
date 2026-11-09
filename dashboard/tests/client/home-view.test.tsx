@@ -12,6 +12,8 @@ const read = (path: string) => readFileSync(fileURLToPath(new URL(path, import.m
 
 function fakeClient() {
   return {
+    getSettings: vi.fn().mockResolvedValue({ orchestrator: 'codex', worker: 'claude-code', voice: 'browser', chatModel: 'sonnet' }),
+    saveSettings: vi.fn(),
     getChatHistory: vi.fn().mockResolvedValue({ messages: [] }),
     clearChatHistory: vi.fn().mockResolvedValue({ messages: [] }),
     getChatSuggestions: vi.fn().mockResolvedValue({ suggestions: [] }),

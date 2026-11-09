@@ -874,3 +874,16 @@ Dependencies were installed by the orchestrator once, during task 1, because the
 - **Attempt 1:** Codex stopped once to ask about a one-line type change in `ChatPanel.tsx`, outside its file list, which the orchestrator allowed, and then finished in the same thread. Known questions and action requests stay local. Other questions go to Claude Code with the saved model, or stay local with a notice when Codex is the orchestrator, and no CLI starts in that case. One run at a time returns 429 when busy; a missing CLI returns 503, a timeout 504, and other failures 502, with no diagnostics in the body. Old settings files keep loading, saves without `chatModel` keep the saved value, and `GET /api/docs/chat-isolation` serves that one fixed file as plain text. The review found that a reply over the 10000-character history limit failed validation and silently lost the exchange.
 - **Attempt 2:** Codex first wrote a test that reproduces it and confirmed it failed, then stored long replies cut to the limit with a short marker. The caller still gets the full reply.
 - **Orchestrator check:** read the diff; no byte order marks; 45 files and 905 tests passed, `npm run typecheck` was clean, `npm run build` passed, and the real `dashboard/.data/chat-history.json` has the same hash before and after the suite.
+
+## D61. chat-panel-orchestrator
+
+| | |
+|---|---|
+| Branch | `task/chat-panel-orchestrator` |
+| Codex attempts | 1 |
+| Codex model | not reported |
+| Duration | 3m 4s |
+| Result | Done |
+
+- **Attempt 1:** Codex added the Claude Code model selector, which saves the choice and restores it if the save fails, a running status, a label on each reply saying whether it was local or from the orchestrator, and the Codex notice with a link to the isolation document. The panel follows changes made in Settings. The API client now passes on the server's message for a missing CLI. Two tests outside the list needed the new settings mocks.
+- **Orchestrator check:** read the diff; no byte order marks; 45 files and 914 tests passed, `npm run typecheck` was clean, `npm run build` passed, and the real `dashboard/.data/chat-history.json` has the same hash before and after the suite. Known limit: busy and timeout errors still show the generic "API request failed" text in the chat.
