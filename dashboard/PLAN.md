@@ -105,10 +105,7 @@ Work in the order listed. A milestone closes only after these steps, in order:
 
 ## In progress
 
-### docs-voice
-- **Goal:** Document voice providers, `.env` setup, Settings, widget mode, and the browser speech disclosure.
-- **Files:** `README.md`, `../docs/architecture.md`, `../docs/setup.md`
-- **Definition of done:** the documents match the implemented behavior; a search of the changed files finds no personal data, keys, or local paths.
+_None._
 
 ## Done
 
@@ -393,6 +390,12 @@ Work in the order listed. A milestone closes only after these steps, in order:
 - **Files:** `src/widget/openWidget.ts`, `src/widget/WidgetView.tsx`, `src/widget/WidgetView.css`, `src/components/Sidebar.tsx`, `src/App.tsx`, `tests/client/widget.test.tsx`
 - **Definition of done:** `tests/client/widget.test.tsx` passes with mocks: Picture-in-Picture is used when available; the popup is used otherwise; a blocked popup shows a message; the widget renders only its three elements; closing it cleans up.
 - **Result:** done in 1 attempt. 761 tests pass, typecheck and build clean. The widget is rendered by a portal from the main app, so it shares the voice state; a blocked popup shows a message, and closing the window (or toggling) cleans up once.
+
+### docs-voice
+- **Goal:** Document voice providers, `.env` setup, Settings, widget mode, and the browser speech disclosure.
+- **Files:** `README.md`, `../docs/architecture.md`, `../docs/setup.md`
+- **Definition of done:** the documents match the implemented behavior; a search of the changed files finds no personal data, keys, or local paths.
+- **Result:** done in 1 attempt. Docs checked against the code by Codex and reviewed by the orchestrator; 761 tests pass, typecheck and build clean. Live provider calls are stated as not verified.
 
 ## Phase 2: real agent execution
 

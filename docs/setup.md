@@ -21,7 +21,7 @@ codex --version
 codex login
 ```
 
-Choose **Sign in with ChatGPT**. Never use an OpenAI API key with this project: the harness runs on the fixed-price plan.
+Choose **Sign in with ChatGPT**. Use the fixed-price plan for agent login. Optional dashboard speech providers are configured separately below.
 
 ## 3. Install the plugin
 
@@ -80,9 +80,19 @@ npm run build
 npm start
 ```
 
-Open `http://127.0.0.1:3001`. Set `PORT` to change the backend port. No API key is needed for milestone 1: `.env.example` is still intentionally empty, and the dashboard reads no environment setting except `PORT`. It does not load `.env`.
+Open `http://127.0.0.1:3001`. Set `PORT` to change the backend port. No API key is needed for local chat or the default browser voice.
 
 See [the dashboard guide](../dashboard/README.md) for development mode, views, security, and what is not built yet.
+
+## Voice (optional)
+
+Browser voice needs no setup. To enable an optional provider:
+
+1. Copy `.env.example` to `.env` at the repo root. Keep `.env` private and ignored by git; leave `.env.example` empty.
+2. Uncomment and fill in both variables for the chosen provider: `FISH_AUDIO_API_KEY` and `FISH_AUDIO_VOICE_ID` for Fish Audio; `ELEVENLABS_API_KEY` and `ELEVENLABS_VOICE_ID` for ElevenLabs; or `OPENAI_TTS_API_KEY` and `OPENAI_TTS_VOICE` for OpenAI text-to-speech.
+3. Open Settings and choose an available voice. There is no key field; unconfigured providers are disabled. Enable Reply with voice in chat to hear new replies.
+
+Both provider values must be set. Process environment variables override `.env`. The backend reads the file on each availability or synthesis request, so edits need no restart; reload the view to update its choices. Provider failures fall back to browser voice. See [the dashboard guide](../dashboard/README.md) for controls, the browser speech privacy notice, and widget behavior.
 
 ## Run the example app
 
