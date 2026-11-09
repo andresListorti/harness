@@ -1,10 +1,15 @@
 import { useEffect, useId, useRef, useState } from 'react';
 import { api, ApiError } from '../lib/api';
 import './ChatPanel.css';
+import { useVoice } from '../voice/VoiceProvider';
+import { MicrophoneIcon } from './VoiceControls';
 
 type Message = { id: number; role: 'user' | 'assistant'; text: string; source?: 'local' };
 
 export function ChatPanel({ client = api }: { client?: Pick<typeof api, 'getChatSuggestions' | 'sendChat' | 'getChatHistory' | 'clearChatHistory'> }) {
+  const voice = useVoice();
+  const latestVoice = useRef(voice);
+  latestVoice.current = voice;
   const [messages, setMessages] = useState<Message[]>([]);
   const [suggestions, setSuggestions] = useState<string[]>([]);
   const [text, setText] = useState('');
@@ -52,6 +57,7 @@ export function ChatPanel({ client = api }: { client?: Pick<typeof api, 'getChat
       if (current !== request.current) return;
       const reply: Message = { id: nextId.current++, role: 'assistant', text: result.reply, source: result.source };
       setMessages(previous => [...previous, reply]);
+      latestVoice.current?.speakReply(result.reply);
     } catch (cause) {
       if (current !== request.current) return;
       setError(cause instanceof ApiError ? `Could not get an answer: ${cause.message}` : 'Could not get an answer.');
@@ -62,6 +68,14 @@ export function ChatPanel({ client = api }: { client?: Pick<typeof api, 'getChat
       }
     }
   }
+
+  const sendRef = useRef(send);
+  sendRef.current = send;
+  const subscribe = voice?.onTranscript;
+  useEffect(() => subscribe?.((transcript, isFinal) => {
+    setText(transcript);
+    if (isFinal && latestVoice.current?.handsFree) void sendRef.current(transcript);
+  }), [subscribe]);
 
   async function reset() {
     try {
@@ -79,7 +93,13 @@ export function ChatPanel({ client = api }: { client?: Pick<typeof api, 'getChat
   }
 
   return <section className="chat-panel" aria-label="Chat">
-    <div className="chat-header"><button type="button" onClick={reset} disabled={!messages.length && !error}>New chat</button></div>
+    <div className="chat-header">
+      {voice && <>
+        <button type="button" aria-label="Microphone" aria-pressed={voice.listening} onClick={voice.talk}><MicrophoneIcon /></button>
+        <label><input type="checkbox" role="switch" checked={voice.replyWithVoice} onChange={event => voice.setReplyWithVoice(event.target.checked)} />Reply with voice</label>
+        <label><input type="checkbox" role="switch" checked={voice.handsFree} onChange={event => voice.setHandsFree(event.target.checked)} />Hands-free</label>
+      </>}
+      <button type="button" onClick={reset} disabled={!messages.length && !error}>New chat</button></div>
     <div ref={list} className="chat-messages" role="log" aria-live="polite" aria-label="Conversation">
       {!messages.length && <p className="chat-empty">Ask about tasks, commits, runs, or tests. Answers come straight from the repo; no agent runs.</p>}
       {messages.map(message => <div key={message.id} className={`chat-message chat-message--${message.role}`}>

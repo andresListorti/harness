@@ -115,10 +115,7 @@ Work in the order listed. A milestone closes only after these steps, in order:
 
 ## In progress
 
-### voice-controls
-- **Goal:** Add Talk, Mute, and voice selector to the sidebar, plus Reply with voice, Hands-free, and microphone to the chat, and connect voice to the orb.
-- **Files:** `src/components/VoiceControls.tsx`, `src/components/Sidebar.tsx`, `src/components/ChatPanel.tsx`, `src/views/HomeView.tsx`, `tests/client/voice-controls.test.tsx`
-- **Definition of done:** `tests/client/voice-controls.test.tsx` passes: Talk and Mute call the voice modules; the selector lists available voices; orb state follows voice state; Reply with voice speaks replies only when on; Hands-free sends the final transcript.
+_None._
 
 ## Done
 
@@ -391,6 +388,12 @@ Work in the order listed. A milestone closes only after these steps, in order:
 - **Files:** `src/voice/speak.ts`, `server/static.ts`, `tests/client/speech-output.test.ts`, `tests/server/static.test.ts`
 - **Definition of done:** `tests/client/speech-output.test.ts` passes with mocks: the browser provider never calls the backend; other providers do; a new reply cancels the previous one; Mute stops playback; a backend failure falls back to the browser voice. `tests/server/static.test.ts` passes: the CSP allows generated audio and still blocks remote sources.
 - **Result:** done in 1 attempt. 739 tests pass, typecheck and build clean. A stale or superseded request never plays, and any provider failure falls back to the browser voice with no error text exposed. The policy lives in `server/static.ts` and now allows `media-src 'self' blob:` only; every remote source is still blocked.
+
+### voice-controls
+- **Goal:** Add Talk, Mute, and voice selector to the sidebar, plus Reply with voice, Hands-free, and microphone to the chat, and connect voice to the orb.
+- **Files:** `src/voice/VoiceProvider.tsx`, `src/lib/settings-events.ts`, `src/components/VoiceControls.tsx`, `src/components/VoiceControls.css`, `src/components/Sidebar.tsx`, `src/components/ChatPanel.tsx`, `src/components/ChatPanel.css`, `src/views/SettingsView.tsx`, `src/App.tsx`, `tests/client/voice-controls.test.tsx`
+- **Definition of done:** `tests/client/voice-controls.test.tsx` passes: Talk and Mute call the voice modules; the selector lists available voices; orb state follows voice state; Reply with voice speaks replies only when on; Hands-free sends the final transcript.
+- **Result:** done in 2 attempts. 750 tests pass, typecheck and build clean. One app-level VoiceProvider holds the voice state so it survives view changes; without a provider the sidebar and chat show no voice controls. Saving the voice in Settings now notifies the provider through a window event, so the sidebar selector and spoken replies follow it.
 
 ## Phase 2: real agent execution
 

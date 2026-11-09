@@ -665,3 +665,18 @@ Dependencies were installed by the orchestrator once, during task 1, because the
 
 - **Attempt 1:** Codex added `createSpeaker` and a shared `speaker` in `src/voice/speak.ts`: the browser voice never calls the backend, other providers go through `POST /api/tts` and play the audio from an object URL that is always revoked, any failure falls back to the browser voice, a new reply cancels the previous one, Mute stops playback and silences later replies, stale async results are dropped, and subscribers get `idle` and `speaking` changes. It added `media-src 'self' blob:` to the content security policy and updated the policy test. The plan listed `server/app.ts`, but the policy lives in `server/static.ts`.
 - **Orchestrator check:** read the speaker and the policy diff; no remote source was allowed; no byte order marks; 39 files and 739 tests passed, `npm run typecheck` was clean, and `npm run build` passed.
+
+## D46. voice-controls
+
+| | |
+|---|---|
+| Branch | `task/voice-controls` |
+| Codex attempts | 2 |
+| Codex model | not reported |
+| Duration | 14m 22s |
+| Result | Done |
+
+- **Attempt 1:** Codex added `VoiceProvider` (one app-level context for listening, speaking, mute, the selected voice, Reply with voice, Hands-free, and transcript listeners), `VoiceControls` in the sidebar (Talk, Mute, a voice selector with only the available voices, and the browser speech notice), the microphone button and the two switches in the chat, and the orb state wiring in `App`. Without a provider the sidebar and chat show no voice controls. Duration of attempt 1: 12m 48s.
+- **Orchestrator review of attempt 1:** the provider read the saved voice once on mount, so changing the voice in Settings left the sidebar selector and spoken replies on the old voice until a reload. The finding was sent back.
+- **Attempt 2:** Codex added `src/lib/settings-events.ts`; Settings announces each successful save, and the provider listens, re-reads the settings, ignores stale or failed reads, and removes the listener on unmount. Duration of attempt 2: 1m 34s.
+- **Orchestrator check:** no byte order marks; `.data` absent after the suite; 40 files and 750 tests passed, `npm run typecheck` was clean, and `npm run build` passed.
