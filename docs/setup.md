@@ -84,6 +84,20 @@ Open `http://127.0.0.1:3001`. Set `PORT` to change the backend port. No API key 
 
 See [the dashboard guide](../dashboard/README.md) for development mode, views, security, and what is not built yet.
 
+## Orchestrator chat setup and limits
+
+Known repo questions and action requests are answered locally, with no agent and no tokens; action requests are declined. Other questions go to Claude Code when it is the selected orchestrator. Claude Code is the only CLI the chat starts, using the model chosen in chat: `sonnet`, `opus`, or `haiku`.
+
+For free-text answers, install Claude Code as shown above and start `claude` to log in with your own account. On Windows, the runner uses the native `claude.exe` inside the global npm package, without a shell. The server environment variable `HARNESS_CLAUDE_BIN` can point to another location of the Claude executable. If the CLI cannot be found, local answers keep working and chat shows "Claude Code CLI was not found. Local questions still work."
+
+A free-text question sent to Claude Code sends the repo snapshot (pending and in-progress tasks, recent run-log notes, commits, and tracked test file names) and recent chat history to the selected model through your own Claude Code login. This uses that account's usage allowance or billing.
+
+With Codex selected as orchestrator, chat gives local answers only and shows a notice explaining why, with a **Why?** link to the isolation document. The check found that its Windows sandbox allowed file reads outside the working directory and command execution. Codex could be enabled only in a future phase, if its reading can be limited to an empty folder.
+
+Claude Code runs with no tools (`--tools ""`), `--strict-mcp-config`, `--safe-mode`, and `--no-session-persistence`. The prompt goes through stdin, no shell is used, and each run gets an empty temporary working directory that is removed afterward. Voice keys and voice configuration variables are removed from the child environment. The server allows only `sonnet`, `opus`, and `haiku`, imposes a 60-second timeout and a 256,000-byte combined stdout/stderr cap, and allows one model run at a time. Stderr is not included in replies. Repo data and history are escaped in a marked `<untrusted_context>` block, and tool-call markup in replies is replaced by "Tools are not available in this chat."
+
+[The chat isolation report](chat-isolation.md) records one non-adversarial check on one Windows machine with specific CLI versions. It does not establish a general isolation guarantee; recheck when CLI versions change.
+
 ## Voice (optional)
 
 Browser voice needs no setup. To enable an optional provider:
