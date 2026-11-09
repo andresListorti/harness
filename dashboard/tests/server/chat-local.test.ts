@@ -6,7 +6,7 @@ import request from 'supertest';
 import { expect, test } from 'vitest';
 import { useTestApp } from '../test-app';
 import {
-  answerLocally, CAPABILITY_NOTICE, LOCAL_SUGGESTIONS, type LocalContext,
+  answerLocally, resolveLocally, CAPABILITY_NOTICE, LOCAL_SUGGESTIONS, type LocalContext,
 } from '../../server/chat/local';
 import type { PlanTask } from '../../shared/api';
 
@@ -113,6 +113,39 @@ test('unrecorded run fields are omitted and earlier matching test notes remain u
 const suggestionList = LOCAL_SUGGESTIONS.map(question => '- ' + question).join('\n');
 const unsupported = "I can't do that. " + CAPABILITY_NOTICE
   + '\nI can answer:\n' + suggestionList;
+
+test.each([
+  'how to do it', 'how to do that', 'how to do',
+  'I want a report and I need your tools to do it', 'what is the best way to do this',
+  'HOW   TO DO?!', 'to do listing', 'to do itemsomething',
+])('treats incidental to do as free text: %s', message => {
+  expect(resolveLocally(message, context)).toEqual({
+    recognized: false,
+    reply: "I didn't understand that. " + CAPABILITY_NOTICE
+      + '\nI can answer:\n' + suggestionList,
+  });
+});
+
+test.each([
+  'what is there to do', "what's left to do", 'show the to do list',
+  'to do items', 'to do item', 'todo', 'what is pending', 'TO   DO?!',
+])('recognizes pending task wording: %s', message => {
+  expect(resolveLocally(message, context)).toEqual({
+    recognized: true, reply: 'Pending tasks: 2\n- Build chat\n- Build client',
+  });
+});
+
+test('keeps action requests ahead of to do classification', () => {
+  expect(resolveLocally('create a to do list', context)).toEqual({
+    recognized: true, reply: unsupported,
+  });
+});
+
+test.each(['write a file', 'hello'])('help includes the exact capability notice: %s', message => {
+  const reply = answerLocally(message, context);
+  expect(reply).toContain("This chat can't run agents or change files. Known questions are answered from this repo's plan, run log, and git history, with no agent; other questions go to the orchestrator (Claude Code) when it is selected.");
+  expect(reply).not.toContain('answer without an agent');
+});
 
 test('knowing about pending tasks does not select the in-progress intent', () => {
   const reply = answerLocally('Do you know what is pending?', context);
