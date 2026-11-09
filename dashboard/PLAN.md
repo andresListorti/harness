@@ -61,11 +61,6 @@ Work in the order listed. A milestone closes only after these steps, in order:
 
 ### Milestone 2: voice and widget
 
-### docs-voice
-- **Goal:** Document voice providers, `.env` setup, Settings, widget mode, and the browser speech disclosure.
-- **Files:** `README.md`, `../docs/architecture.md`, `../docs/setup.md`
-- **Definition of done:** the documents match the implemented behavior; a search of the changed files finds no personal data, keys, or local paths.
-
 ### m2-acceptance
 - **Goal:** Check voice and widget in a real browser. Performed by the orchestrator, with the user for microphone steps.
 - **Files:** none
@@ -110,7 +105,10 @@ Work in the order listed. A milestone closes only after these steps, in order:
 
 ## In progress
 
-_None._
+### docs-voice
+- **Goal:** Document voice providers, `.env` setup, Settings, widget mode, and the browser speech disclosure.
+- **Files:** `README.md`, `../docs/architecture.md`, `../docs/setup.md`
+- **Definition of done:** the documents match the implemented behavior; a search of the changed files finds no personal data, keys, or local paths.
 
 ## Done
 
