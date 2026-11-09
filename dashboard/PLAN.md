@@ -70,6 +70,11 @@ Work in the order listed. A milestone closes only after these steps, in order:
 - **Files:** none
 - **Definition of done:** from a clean `npm ci`, all checks pass; with Claude Code a free-text question is answered with repo data; no file changes in the repo after a chat; a prompt asking the agent to write a file does not change anything and shows no tool-call markup; with Codex selected no CLI starts, the answer is local, and the notice and its link work. Then follow "Closing a milestone".
 
+### plan-test-real-state
+- **Goal:** Make the test on the real plan independent of how far the project has advanced (found by the clean `npm ci` run of `m3-acceptance`).
+- **Files:** `tests/server/plan.test.ts`
+- **Definition of done:** the test on the real `PLAN.md` passes with or without pending tasks, and grouping of pending tasks stays covered by a fixture.
+
 ## Done
 
 ### scaffold
