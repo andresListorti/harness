@@ -2,9 +2,10 @@
 import { readFileSync } from 'node:fs';
 import { act, cleanup, fireEvent, render, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import type { ChatResponse } from '../../shared/api';
+import { CLAUDE_MODELS, CODEX_CHAT_NOTICE, type SettingsResponse, type ChatResponse } from '../../shared/api';
 import { ChatPanel } from '../../src/components/ChatPanel';
-import { ApiError } from '../../src/lib/api';
+import { notifySettingsChanged, SETTINGS_CHANGED_EVENT } from '../../src/lib/settings-events';
+import { ApiError, createApiClient } from '../../src/lib/api';
 import * as voiceContext from '../../src/voice/VoiceProvider';
 
 afterEach(() => { cleanup(); vi.restoreAllMocks(); });
@@ -18,6 +19,8 @@ function deferred<T>() {
 
 function setup() {
   const client = {
+    getSettings: vi.fn<() => Promise<SettingsResponse>>().mockResolvedValue({ orchestrator: 'codex', voice: 'openai', worker: 'claude-code', chatModel: 'opus' }),
+    saveSettings: vi.fn().mockResolvedValue({ orchestrator: 'claude-code', voice: 'openai', worker: 'codex', chatModel: 'haiku' }),
     getChatHistory: vi.fn().mockResolvedValue({ messages: [] }),
     clearChatHistory: vi.fn().mockResolvedValue({ messages: [] }),
     getChatSuggestions: vi.fn().mockResolvedValue({ suggestions: ['What is next?', 'Latest commits?'] }),
@@ -64,7 +67,7 @@ test('pending disables Send, Enter and chips, shows Thinking, and recovers', asy
   render(<ChatPanel client={client} />);
   const chip = await screen.findByRole('button', { name: 'What is next?' });
   await user.click(chip);
-  expect(screen.getByText('Thinking…')).toBeInTheDocument();
+  expect(screen.getByRole('status')).toBeInTheDocument();
   expect(screen.getByRole('button', { name: 'Send' })).toBeDisabled();
   for (const button of within(screen.getByRole('group')).getAllByRole('button')) expect(button).toBeDisabled();
   await user.type(screen.getByRole('textbox'), 'another{Enter}');
@@ -72,7 +75,7 @@ test('pending disables Send, Enter and chips, shows Thinking, and recovers', asy
   await user.click(chip);
   expect(client.sendChat).toHaveBeenCalledTimes(1);
   await act(async () => answer.resolve({ reply: 'Done', source: 'local' }));
-  expect(screen.queryByText('Thinking…')).not.toBeInTheDocument();
+  expect(screen.queryByRole('status')).not.toBeInTheDocument();
   expect(screen.getByRole('button', { name: 'Send' })).toBeEnabled();
   expect(chip).toBeEnabled();
   await user.type(screen.getByRole('textbox'), '{Enter}');
@@ -135,12 +138,12 @@ test.each([true, false])('ignores old results after reset while a new request is
   const chip = await screen.findByRole('button', { name: 'What is next?' });
   await user.click(chip);
   await user.click(screen.getByRole('button', { name: 'New chat' }));
-  expect(screen.queryByText('Thinking…')).not.toBeInTheDocument();
+  expect(screen.queryByRole('status')).not.toBeInTheDocument();
   await user.click(chip);
   await act(async () => { if (success) old.resolve({ reply: 'Stale', source: 'local' }); else old.reject(new Error()); });
   expect(screen.queryByText('Stale')).not.toBeInTheDocument();
   expect(screen.queryByRole('alert')).not.toBeInTheDocument();
-  expect(screen.getByText('Thinking…')).toBeInTheDocument();
+  expect(screen.getByRole('status')).toBeInTheDocument();
   await act(async () => fresh.resolve({ reply: 'Fresh', source: 'local' }));
   expect(screen.getByText('Fresh')).toBeInTheDocument();
 });
@@ -279,4 +282,151 @@ test('settled history replaces messages, ignores older mount history and skips w
   act(() => settled());
   expect(client.getChatHistory).toHaveBeenCalledTimes(2);
   await act(async () => answer.resolve({ reply: 'Live answer', source: 'local' }));
+});
+
+
+const claudeSettings: SettingsResponse = { orchestrator: 'claude-code', worker: 'codex', voice: 'openai', chatModel: 'opus' };
+
+test('Claude selector lists allowlisted models, saves all choices and notifies settings listeners', async () => {
+  const { client, user } = setup();
+  client.getSettings.mockResolvedValue(claudeSettings);
+  const listener = vi.fn();
+  window.addEventListener(SETTINGS_CHANGED_EVENT, listener);
+  try {
+    render(<ChatPanel client={client} />);
+    const selector = await screen.findByRole('combobox', { name: 'Claude Code model' });
+    await waitFor(() => expect(selector).toHaveValue('opus'));
+    expect(within(selector).getAllByRole('option').map(option => option.getAttribute('value'))).toEqual([...CLAUDE_MODELS]);
+    client.getSettings.mockResolvedValue({ ...claudeSettings, chatModel: 'haiku' });
+    await user.selectOptions(selector, 'haiku');
+    await waitFor(() => expect(selector).toHaveValue('haiku'));
+    expect(client.saveSettings).toHaveBeenCalledExactlyOnceWith({ orchestrator: 'claude-code', voice: 'openai', chatModel: 'haiku' });
+    expect(listener).toHaveBeenCalledOnce();
+  } finally {
+    window.removeEventListener(SETTINGS_CHANGED_EVENT, listener);
+  }
+});
+
+test('failed model save restores the previous selection and shows an error', async () => {
+  const { client, user } = setup();
+  client.getSettings.mockResolvedValue(claudeSettings);
+  const save = deferred<SettingsResponse>();
+  client.saveSettings.mockReturnValueOnce(save.promise);
+  render(<ChatPanel client={client} />);
+  const selector = await screen.findByRole('combobox');
+  await waitFor(() => expect(selector).toHaveValue('opus'));
+  await user.selectOptions(selector, 'sonnet');
+  expect(selector).toHaveValue('sonnet');
+  expect(selector).toBeDisabled();
+  await act(async () => save.reject(new Error('private detail')));
+  await screen.findByRole('alert');
+  await waitFor(() => expect(selector).toHaveValue('opus'));
+  expect(selector).toBeEnabled();
+  expect(screen.getByRole('alert')).toHaveTextContent('Could not save the chat model.');
+});
+
+test('Codex notice persists with safe documentation link and switches on settings events', async () => {
+  const { client } = setup();
+  render(<ChatPanel client={client} />);
+  await screen.findByText(CODEX_CHAT_NOTICE);
+  await waitFor(() => expect(client.getSettings).toHaveBeenCalledOnce());
+  expect(screen.queryByRole('combobox')).not.toBeInTheDocument();
+  const link = screen.getByRole('link', { name: 'Why?' });
+  expect(link).toHaveAttribute('href', '/api/docs/chat-isolation');
+  expect(link).toHaveAttribute('target', '_blank');
+  expect(link).toHaveAttribute('rel', 'noopener noreferrer');
+  client.getSettings.mockResolvedValue(claudeSettings);
+  act(() => notifySettingsChanged());
+  await screen.findByRole('combobox');
+  await waitFor(() => expect(screen.queryByText(CODEX_CHAT_NOTICE)).not.toBeInTheDocument());
+  client.getSettings.mockResolvedValue({ ...claudeSettings, orchestrator: 'codex', worker: 'claude-code' });
+  act(() => notifySettingsChanged());
+  await screen.findByText(CODEX_CHAT_NOTICE);
+  await waitFor(() => expect(screen.queryByRole('combobox')).not.toBeInTheDocument());
+});
+
+test('failed settings reads hide controls and notice while chat keeps working', async () => {
+  const { client, user } = setup();
+  client.getSettings.mockRejectedValue(new Error('private detail'));
+  render(<ChatPanel client={client} />);
+  await screen.findByRole('group');
+  await waitFor(() => expect(client.getSettings).toHaveBeenCalledOnce());
+  expect(screen.queryByRole('combobox')).not.toBeInTheDocument();
+  expect(screen.queryByText(CODEX_CHAT_NOTICE)).not.toBeInTheDocument();
+  await user.click(screen.getByRole('button', { name: 'What is next?' }));
+  await screen.findByText('The next task.');
+  await waitFor(() => expect(screen.queryByRole('alert')).not.toBeInTheDocument());
+});
+
+test.each([true, false])('ignores stale settings reads and removes listener on unmount (success: %s)', async success => {
+  const { client } = setup();
+  const old = deferred<SettingsResponse>();
+  client.getSettings.mockReturnValueOnce(old.promise).mockResolvedValue(claudeSettings);
+  const remove = vi.spyOn(window, 'removeEventListener');
+  const view = render(<ChatPanel client={client} />);
+  act(() => notifySettingsChanged());
+  await screen.findByRole('combobox');
+  await waitFor(() => expect(client.getSettings).toHaveBeenCalledTimes(2));
+  await act(async () => {
+    if (success) old.resolve({ ...claudeSettings, orchestrator: 'codex' });
+    else old.reject(new Error());
+  });
+  expect(screen.getByRole('combobox')).toHaveValue('opus');
+  expect(screen.queryByText(CODEX_CHAT_NOTICE)).not.toBeInTheDocument();
+  view.unmount();
+  expect(remove).toHaveBeenCalledWith(SETTINGS_CHANGED_EVENT, expect.any(Function));
+  act(() => notifySettingsChanged());
+  expect(client.getSettings).toHaveBeenCalledTimes(2);
+});
+
+test('latest failed refresh hides previously loaded settings and late unmounted reads are ignored', async () => {
+  const { client } = setup();
+  const view = render(<ChatPanel client={client} />);
+  await screen.findByText(CODEX_CHAT_NOTICE);
+  await waitFor(() => expect(client.getSettings).toHaveBeenCalledOnce());
+  client.getSettings.mockRejectedValueOnce(new Error());
+  act(() => notifySettingsChanged());
+  await waitFor(() => expect(screen.queryByText(CODEX_CHAT_NOTICE)).not.toBeInTheDocument());
+  const late = deferred<SettingsResponse>();
+  client.getSettings.mockReturnValueOnce(late.promise);
+  act(() => notifySettingsChanged());
+  view.unmount();
+  await act(async () => late.resolve(claudeSettings));
+  expect(screen.queryByRole('combobox')).not.toBeInTheDocument();
+});
+
+test('assistant sources survive history and response notices are excluded from replies and voice input', async () => {
+  const { client, user } = setup();
+  client.getChatHistory.mockResolvedValue({ messages: [
+    { role: 'assistant', text: 'Saved local', source: 'local' },
+    { role: 'assistant', text: 'Saved orchestrator', source: 'orchestrator' },
+    { role: 'assistant', text: 'Legacy reply' },
+    { role: 'user', text: 'User message', source: 'local' },
+  ] });
+  client.sendChat.mockResolvedValue({ reply: '<b>New reply</b>', source: 'orchestrator', notice: 'Response notice' });
+  const tracked = vi.fn();
+  vi.spyOn(voiceContext, 'useVoice').mockReturnValue({ trackChatReply: tracked } as unknown as NonNullable<ReturnType<typeof voiceContext.useVoice>>);
+  render(<ChatPanel client={client} />);
+  await screen.findByText('Saved orchestrator');
+  await waitFor(() => expect(screen.getAllByText('Orchestrator answer')).toHaveLength(1));
+  expect(screen.getAllByText('Local answer')).toHaveLength(1);
+  expect(screen.getByText('Legacy reply').parentElement?.querySelector('small')).toBeNull();
+  await user.click(screen.getByRole('button', { name: 'What is next?' }));
+  await screen.findByText('<b>New reply</b>');
+  await waitFor(() => expect(screen.getAllByText('Orchestrator answer')).toHaveLength(2));
+  expect(screen.queryByText('Response notice')).not.toBeInTheDocument();
+  expect(screen.getByRole('log').querySelector('b')).toBeNull();
+  expect(tracked).toHaveBeenCalledOnce();
+});
+
+test('missing CLI server message reaches the existing error display as plain text', async () => {
+  const { client, user } = setup();
+  const message = 'Claude Code CLI is not installed. <b>Install it</b>';
+  const fetchMock = vi.fn<typeof fetch>().mockResolvedValue(Response.json({ error: { code: 'CLI_NOT_FOUND', message } }, { status: 503 }));
+  client.sendChat.mockImplementation(createApiClient(fetchMock).sendChat);
+  render(<ChatPanel client={client} />);
+  await user.click(await screen.findByRole('button', { name: 'What is next?' }));
+  await screen.findByRole('alert');
+  await waitFor(() => expect(screen.getByRole('alert')).toHaveTextContent(message));
+  expect(screen.getByRole('alert').querySelector('b')).toBeNull();
 });

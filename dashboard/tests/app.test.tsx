@@ -3,6 +3,8 @@ import App from '../src/App';
 import viteConfig from '../vite.config';
 
 vi.mock('../src/lib/api', () => ({ api: {
+  getSettings: vi.fn().mockResolvedValue({ orchestrator: 'codex', worker: 'claude-code', voice: 'browser', chatModel: 'sonnet' }),
+  saveSettings: vi.fn(),
   getHealth: vi.fn(() => new Promise(() => {})),
   getPlan: vi.fn().mockResolvedValue({ source: 'dashboard', tasks: [] }),
   getRunLog: vi.fn().mockResolvedValue({ source: 'dashboard', entries: [] }),
