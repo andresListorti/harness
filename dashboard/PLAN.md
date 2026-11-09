@@ -70,10 +70,7 @@ Work in the order listed. A milestone closes only after these steps, in order:
 
 ## In progress
 
-### docs-chat
-- **Goal:** Document the orchestrator chat, its isolation, and its limits.
-- **Files:** `README.md`, `../docs/architecture.md`, `../docs/setup.md`
-- **Definition of done:** the documents match the implemented behavior and link to `docs/chat-isolation.md`; a search of the changed files finds no personal data or local paths.
+_None._
 
 ## Done
 
@@ -436,6 +433,12 @@ Work in the order listed. A milestone closes only after these steps, in order:
 - **Files:** `src/components/ChatPanel.tsx`, `src/components/ChatPanel.css`, `src/lib/api.ts`, `tests/client/chat-panel.test.tsx`
 - **Definition of done:** `tests/client/chat-panel.test.tsx` passes: with Claude Code as orchestrator the selector lists only its allowlisted models and a change is saved; a running state is shown; a reply shows whether it was local or from the orchestrator; a missing CLI message is shown; with Codex as orchestrator there is no selector and a clear notice says the chat uses local answers because on Windows its sandbox does not stop it from reading files or running commands, with a link to the isolation document.
 - **Result:** done in 1 attempt. 914 tests pass, typecheck and build clean. With Claude Code the chat has a model selector; with Codex it shows the notice and its link. Known limit: busy and timeout errors show generic text.
+
+### docs-chat
+- **Goal:** Document the orchestrator chat, its isolation, and its limits.
+- **Files:** `README.md`, `../docs/architecture.md`, `../docs/setup.md`
+- **Definition of done:** the documents match the implemented behavior and link to `docs/chat-isolation.md`; a search of the changed files finds no personal data or local paths.
+- **Result:** done in 1 attempt. Docs checked against the code by Codex and reviewed by the orchestrator; 914 tests pass, typecheck and build clean.
 
 ## Phase 2: real agent execution
 
