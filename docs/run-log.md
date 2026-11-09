@@ -847,3 +847,16 @@ Dependencies were installed by the orchestrator once, during task 1, because the
 - **Attempt 1:** Codex added a pure `buildChatPrompt` function. Repo content and chat history sit inside a marked untrusted block, every angle bracket in them is escaped so closing markers cannot end it, and the prompt says the chat is read-only and that the agent has no tools and must not print tool-call markup. All checks passed, but the review found that history took the budget before the snapshot, so a long conversation could leave the agent with no repo data.
 - **Attempt 2:** Codex first wrote a test that reproduces it and confirmed it failed, then limited history to 8000 characters, keeping the newest messages, and left the rest of the budget to the snapshot.
 - **Orchestrator check:** read the diff; no byte order marks; 42 files and 831 tests passed, `npm run typecheck` was clean, `npm run build` passed, and the real `dashboard/.data/chat-history.json` has the same hash before and after the suite.
+
+## D59. chat-runner
+
+| | |
+|---|---|
+| Branch | `task/chat-runner` |
+| Codex attempts | 1 |
+| Codex model | not reported |
+| Duration | 3m 41s |
+| Result | Done |
+
+- **Attempt 1:** Codex added the runner for Claude Code only, with the exact isolation flags including `--safe-mode` and `--no-session-persistence`, no shell, the prompt on stdin, an empty temporary working directory removed after each run, voice keys removed from the child environment, a server-side model allowlist, a 60 second timeout, and an output cap. On Windows it resolves the native `claude.exe` and never starts a `.cmd` file. It also added `cleanChatReply`, which replaces tool-call markup with a short notice.
+- **Orchestrator check:** read the code; no byte order marks; 44 files and 879 tests passed with a mocked spawn, `npm run typecheck` was clean, `npm run build` passed, and the real `dashboard/.data/chat-history.json` has the same hash before and after the suite. The real CLI is exercised in `m3-acceptance`.
