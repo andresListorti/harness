@@ -1,8 +1,9 @@
 import type { Commit, PlanTask, RunLogEntry } from '../../shared/api';
 import { toPlainText } from '../data/plain-text';
 
-export const CAPABILITY_NOTICE = "In this version I can't run agents or change files. "
-  + "I only read this repo's plan, run log, and git history, and answer without an agent.";
+export const CAPABILITY_NOTICE = "This chat can't run agents or change files. "
+  + "Known questions are answered from this repo's plan, run log, and git history, with no agent; "
+  + 'other questions go to the orchestrator (Claude Code) when it is selected.';
 
 export const LOCAL_SUGGESTIONS: readonly string[] = [
   'What is pending?',
@@ -67,7 +68,9 @@ function buildReply(message: string, context: LocalContext): string | undefined 
     return context.inProgress.map(task => `- ${task.title}`).join('\n')
       || 'Nothing is in progress right now.';
   }
-  if (matches('pending', 'next', 'todo', 'to do', 'remaining', 'left')) {
+  const asksToDo = /(?<![\p{L}\p{N}_])(?<!\bhow )to do(?=$| (?:list|items?)(?![\p{L}\p{N}_]))/u
+    .test(normalized);
+  if (matches('pending', 'next', 'todo', 'remaining', 'left') || asksToDo) {
     const count = context.pending.length;
     if (!count) return 'No tasks are pending.';
     const lines = [

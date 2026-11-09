@@ -60,6 +60,19 @@ test.each(['What is pending?', 'please run the tests', 'write a file', 'launch c
     expect((await readHistory(historyPath)).messages[1].source).toBe('local');
   },
 );
+test.each([
+  'how to do it', 'how to do that', 'how to do',
+  'I want a report and I need your tools to do it', 'what is the best way to do this',
+])('incidental to do reaches the selected orchestrator: %s', async message => {
+  await settings();
+  const s = setup();
+  const response = await s.post(message);
+  expect(response.status).toBe(200);
+  expect(response.body).toEqual({ reply: 'Orchestrator reply', source: 'orchestrator' });
+  expect(s.runner).toHaveBeenCalledOnce();
+  expect(s.runner.mock.calls[0][0]).toContain(message);
+});
+
 test('Claude uses saved model, supplied snapshot and history, and saves the exchange', async () => {
   await settings();
   await appendToHistory(historyPath, [{ role: 'user', text: 'Earlier fixture question' },

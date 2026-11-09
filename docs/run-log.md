@@ -942,3 +942,17 @@ Dependencies were installed by the orchestrator once, during task 1, because the
 - **Why:** in `m3-acceptance`, Claude Code replies showed bold markers and backticks literally in the chat.
 - **Attempt 1:** Codex first wrote a test that reproduces it and confirmed it failed, then passed orchestrator replies through `toPlainText` after the tool-markup cleanup, so the response and the saved history are both clean.
 - **Orchestrator check:** read the diff; no byte order marks; 45 files and 930 tests passed, `npm run typecheck` was clean, `npm run build` passed, and the real `dashboard/.data/chat-history.json` has the same hash before and after the suite.
+
+## D66. chat-local-intent
+
+| | |
+|---|---|
+| Branch | `task/chat-local-intent` |
+| Codex attempts | 1 |
+| Codex model | not reported |
+| Duration | 1m 24s |
+| Result | Done |
+
+- **Why:** in `m3-acceptance`, a sentence ending in `to do it` got the pending-tasks reply, and the local help reply still said that answers come without an agent.
+- **Attempt 1:** Codex first wrote tests that reproduce both and confirmed they failed. `to do` now counts as a pending-tasks question only at the end of the message or before `list` or `item`, and never after `how`. The help reply now says that other questions go to the orchestrator (Claude Code) when it is selected.
+- **Orchestrator check:** read the diff; no byte order marks; 45 files and 954 tests passed, `npm run typecheck` was clean, `npm run build` passed, and the real `dashboard/.data/chat-history.json` has the same hash before and after the suite.
