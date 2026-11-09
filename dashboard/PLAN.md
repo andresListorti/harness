@@ -61,6 +61,11 @@ Work in the order listed. A milestone closes only after these steps, in order:
 
 ### Milestone 2: voice and widget
 
+### space-cancels-speech
+- **Goal:** Make starting speech input with hold Space cancel any spoken output first, like the Talk button (second finding from the Codex review of Milestone 2).
+- **Files:** `src/voice/useSpeechInput.ts`, `src/voice/VoiceProvider.tsx`, `tests/client/speech-input.test.tsx`, `tests/client/voice-controls.test.tsx`
+- **Definition of done:** a test reproduces the bug first: while a reply is being spoken, holding Space starts recognition without cancelling the speaker. After the fix every way of starting recognition (Space, the sidebar Talk button, the chat microphone, and the widget Talk button) cancels the speaker before recognition starts; the key is still ignored inside inputs, buttons, and editable fields and then cancels nothing; releasing Space still stops listening; the cancel runs once per start.
+
 ### Milestone 3: chat with the orchestrator
 
 ### chat-isolation-check
@@ -100,7 +105,10 @@ Work in the order listed. A milestone closes only after these steps, in order:
 
 ## In progress
 
-_None._
+### settings-view-sync
+- **Goal:** Keep the Settings view in sync with voice changes made from the sidebar, so saving an orchestrator never reverts the voice (second finding from the Codex review of Milestone 2).
+- **Files:** `src/views/SettingsView.tsx`, `tests/client/settings-view.test.tsx`
+- **Definition of done:** a test reproduces the bug first: with Settings open, the voice is changed through the sidebar selector (the settings-changed event fires and the server now holds the new voice), the user then chooses an orchestrator, and the saved payload carries the old voice. After the fix the Settings view listens for the settings-changed event, re-reads the settings (ignoring stale or failed reads and reads that finish after a newer save, and removing the listener on unmount), and the next save carries the current voice; a failed re-read keeps the previous values; saving from Settings itself does not trigger a redundant extra read loop.
 
 ## Done
 
