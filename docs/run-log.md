@@ -706,3 +706,16 @@ Dependencies were installed by the orchestrator once, during task 1, because the
 
 - **Attempt 1:** Codex documented the voice providers and `.env` setup, the new routes with their status codes, Settings, chat history and its caps, the voice controls and Reply with voice and Hands-free, the browser speech notice, widget mode, live refresh, the content security policy change, and what is still not built, in the dashboard README, `docs/architecture.md`, and `docs/setup.md`. It checked each claim against the code and states that live provider calls were not verified.
 - **Orchestrator check:** read the full diff against the code facts; the setup text about the ChatGPT login was adjusted by Codex because `.env.example` now lists optional speech keys, and it is still accurate; no personal data, keys, or local paths; no byte order marks; 41 files and 761 tests passed (the safety scan covers these documents), `npm run typecheck` was clean, and `npm run build` passed.
+
+## D49. m2-acceptance
+
+| | |
+|---|---|
+| Branch | `main` (no code changes) |
+| Codex attempts | not applicable (orchestrator task) |
+| Result | Done |
+
+- **Checks:** from a clean `npm ci`, 761 tests, typecheck, and build passed, and the suite left no `.data` folder behind. The real server listened only on `127.0.0.1`; a foreign Host or Origin returned 403; the content security policy included `media-src 'self' blob:` and no remote source. With fake provider credentials in the environment, every API route and every built asset was fetched and none contained the key or the voice ID; the providers route reported availability only. Settings saved before a restart were returned after it, and the galaxy used the saved roles.
+- **Browser (by the user):** microphone input with hold Space, browser voice output, Mute, and widget mode all worked.
+- **Not verified:** Fish Audio, ElevenLabs, and OpenAI with real keys. They are covered only by mocked tests.
+- **Findings:** the orchestrator review found three defects during the milestone, all fixed before merge: environment values ignored when `.env` is missing (D35), tests writing the real `.data` files (D42), and the voice choice not following Settings (D46).

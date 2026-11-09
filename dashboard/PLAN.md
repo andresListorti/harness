@@ -100,10 +100,7 @@ Work in the order listed. A milestone closes only after these steps, in order:
 
 ## In progress
 
-### m2-acceptance
-- **Goal:** Check voice and widget in a real browser. Performed by the orchestrator, with the user for microphone steps.
-- **Files:** none
-- **Definition of done:** from a clean `npm ci`, all checks pass; hold Space to talk and browser voice output work; Settings persists after a restart; widget mode opens; no key or voice ID appears in browser responses; providers without keys are verified only through their mocked tests, and this is reported. Then follow "Closing a milestone".
+_None._
 
 ## Done
 
@@ -394,6 +391,12 @@ Work in the order listed. A milestone closes only after these steps, in order:
 - **Files:** `README.md`, `../docs/architecture.md`, `../docs/setup.md`
 - **Definition of done:** the documents match the implemented behavior; a search of the changed files finds no personal data, keys, or local paths.
 - **Result:** done in 1 attempt. Docs checked against the code by Codex and reviewed by the orchestrator; 761 tests pass, typecheck and build clean. Live provider calls are stated as not verified.
+
+### m2-acceptance
+- **Goal:** Check voice and widget in a real browser. Performed by the orchestrator, with the user for microphone steps.
+- **Files:** none
+- **Definition of done:** from a clean `npm ci`, all checks pass; hold Space to talk and browser voice output work; Settings persists after a restart; widget mode opens; no key or voice ID appears in browser responses; providers without keys are verified only through their mocked tests, and this is reported. Then follow "Closing a milestone".
+- **Result:** done. From a clean `npm ci`, 761 tests, typecheck, and build pass. The server listens only on `127.0.0.1`; no key or voice ID appeared in any response or bundled asset; Settings survived a server restart; the user confirmed microphone input, browser voice output, Mute, and widget mode in a real browser. Fish Audio, ElevenLabs, and OpenAI were verified only through their mocked tests, not with real keys. Waiting for `/codex:review` and the push confirmation.
 
 ## Phase 2: real agent execution
 
