@@ -6,7 +6,7 @@ import { defaultSettingsPath, readSettings } from '../settings';
 import { Router } from 'express';
 import { CHAT_HISTORY_MESSAGE_LIMIT, CODEX_CHAT_NOTICE, chatHistorySchema, chatRequestSchema, chatResponseSchema, chatSuggestionsSchema } from '../../shared/api';
 import { appendToHistory, clearHistory, currentGeneration, defaultHistoryPath, readHistory } from '../chat/history';
-import { resolveLocally, LOCAL_SUGGESTIONS } from '../chat/local';
+import { codexFreeTextReply, resolveLocally, LOCAL_SUGGESTIONS } from '../chat/local';
 import { toPlainText } from '../data/plain-text';
 import { createRepoReader, type DataDeps } from './data';
 
@@ -65,6 +65,7 @@ export function createChatRouter(deps: DataDeps = {}): Router {
     if (!local.recognized) {
       const settings = await readSettings(deps.settingsPath ?? defaultSettingsPath());
       if (settings.orchestrator === 'codex') {
+        reply = codexFreeTextReply();
         notice = CODEX_CHAT_NOTICE;
       } else {
         if (running) {

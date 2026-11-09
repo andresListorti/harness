@@ -82,6 +82,12 @@ function buildReply(message: string, context: LocalContext): string | undefined 
   return undefined;
 }
 
+export function codexFreeTextReply(): string {
+  const suggestions = LOCAL_SUGGESTIONS.map(question => `- ${question}`).join('\n');
+  return 'With Codex as the orchestrator, free-text questions are not sent to a model (see Why?).'
+    + `\nI can answer:\n${suggestions}`;
+}
+
 function helpReply(introduction: string): string {
   const suggestions = LOCAL_SUGGESTIONS.map(question => `- ${question}`).join('\n');
   return `${introduction} ${CAPABILITY_NOTICE}\nI can answer:\n${suggestions}`;
