@@ -1,0 +1,22 @@
+.widget-document {
+  margin: 0;
+  background: var(--color-bg);
+}
+
+.widget {
+  min-height: 100vh;
+  padding: var(--space-4);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-3);
+  color: var(--color-text);
+  background: var(--color-bg);
+  font-family: var(--font-sans);
+  text-align: center;
+}
+
+.widget .orb { width: min(180px, 65vw, 54vh); flex-shrink: 0; }
+.widget p { font-size: var(--text-sm); color: var(--color-text-muted); overflow-wrap: anywhere; }
+.widget button { min-width: 100px; }

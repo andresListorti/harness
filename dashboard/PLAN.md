@@ -110,10 +110,7 @@ Work in the order listed. A milestone closes only after these steps, in order:
 
 ## In progress
 
-### widget-mode
-- **Goal:** Add Widget mode to the sidebar: a compact window with only the orb, status, and Talk button, using Document Picture-in-Picture with a popup fallback.
-- **Files:** `src/widget/openWidget.ts`, `src/widget/WidgetView.tsx`, `src/components/Sidebar.tsx`, `tests/client/widget.test.tsx`
-- **Definition of done:** `tests/client/widget.test.tsx` passes with mocks: Picture-in-Picture is used when available; the popup is used otherwise; a blocked popup shows a message; the widget renders only its three elements; closing it cleans up.
+_None._
 
 ## Done
 
@@ -392,6 +389,12 @@ Work in the order listed. A milestone closes only after these steps, in order:
 - **Files:** `src/voice/VoiceProvider.tsx`, `src/lib/settings-events.ts`, `src/components/VoiceControls.tsx`, `src/components/VoiceControls.css`, `src/components/Sidebar.tsx`, `src/components/ChatPanel.tsx`, `src/components/ChatPanel.css`, `src/views/SettingsView.tsx`, `src/App.tsx`, `tests/client/voice-controls.test.tsx`
 - **Definition of done:** `tests/client/voice-controls.test.tsx` passes: Talk and Mute call the voice modules; the selector lists available voices; orb state follows voice state; Reply with voice speaks replies only when on; Hands-free sends the final transcript.
 - **Result:** done in 2 attempts. 750 tests pass, typecheck and build clean. One app-level VoiceProvider holds the voice state so it survives view changes; without a provider the sidebar and chat show no voice controls. Saving the voice in Settings now notifies the provider through a window event, so the sidebar selector and spoken replies follow it.
+
+### widget-mode
+- **Goal:** Add Widget mode to the sidebar: a compact window with only the orb, status, and Talk button, using Document Picture-in-Picture with a popup fallback.
+- **Files:** `src/widget/openWidget.ts`, `src/widget/WidgetView.tsx`, `src/widget/WidgetView.css`, `src/components/Sidebar.tsx`, `src/App.tsx`, `tests/client/widget.test.tsx`
+- **Definition of done:** `tests/client/widget.test.tsx` passes with mocks: Picture-in-Picture is used when available; the popup is used otherwise; a blocked popup shows a message; the widget renders only its three elements; closing it cleans up.
+- **Result:** done in 1 attempt. 761 tests pass, typecheck and build clean. The widget is rendered by a portal from the main app, so it shares the voice state; a blocked popup shows a message, and closing the window (or toggling) cleans up once.
 
 ## Phase 2: real agent execution
 
