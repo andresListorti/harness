@@ -984,3 +984,17 @@ Dependencies were installed by the orchestrator once, during task 1, because the
 - **Why:** after `m3-acceptance`, the user asked to replace "I didn't understand that" in Codex mode, because a free-text question there is simply not sent to a model.
 - **Attempt 1:** Codex first wrote a test that reproduces it and confirmed it failed, then added `codexFreeTextReply`, which says that free-text questions are not sent to a model, points to Why?, and lists what the chat can answer. The response keeps its local source and notice, and no CLI starts.
 - **Orchestrator check:** read the diff; no byte order marks; from a clean `npm ci`, tests, typecheck, and build passed; the real `dashboard/.data/chat-history.json` has the same hash before and after the suite.
+
+## D69. chat-conversation-generation
+
+| | |
+|---|---|
+| Branch | `task/chat-conversation-generation` |
+| Codex attempts | 1 |
+| Codex model | not reported |
+| Duration | 1m 51s |
+| Result | Done |
+
+- **Why:** the `/codex:review` of Milestone 3 reported that New chat pressed in a freshly mounted panel did not cancel a reply started by an earlier panel, the limit recorded in D55.
+- **Attempt 1:** Codex first wrote a test that reproduces it and confirmed it failed, then moved the conversation generation to the persistent voice provider. `trackChatReply` captures it when a request starts and speaks only if it is unchanged, and New chat in any panel starts a new conversation.
+- **Orchestrator check:** read the diff; no byte order marks; from a clean `npm ci`, tests, typecheck, and build passed; the real `dashboard/.data/chat-history.json` has the same hash before and after the suite.

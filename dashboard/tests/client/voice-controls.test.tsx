@@ -543,3 +543,39 @@ test.each(['mounted', 'away', 'new chat', 'voice off', 'failure'])(
     expect(s.client.sendChat).toHaveBeenCalledOnce();
   },
 );
+
+test('New chat after remount abandons earlier panel replies and speaks fresh requests', async () => {
+  const s = setup();
+  await ready();
+  fireEvent.click(screen.getByRole('switch', { name: 'Reply with voice' }));
+  let resolve!: (value: { reply: string; source: string }) => void;
+  s.client.sendChat.mockReturnValueOnce(new Promise(res => { resolve = res; }));
+  await userEvent.type(screen.getByRole('textbox'), 'Old question{Enter}');
+  expect(s.client.sendChat).toHaveBeenCalledExactlyOnceWith('Old question');
+  detached(s);
+  s.rerender(s.tree(false));
+  await screen.findByText('Saved reply');
+  fireEvent.click(screen.getByRole('button', { name: 'New chat' }));
+  await waitFor(() => expect(screen.getByRole('log').querySelector('.chat-message')).toBeNull());
+  await act(async () => resolve({ reply: 'Abandoned answer', source: 'local' }));
+  expect(s.speaker.speak).not.toHaveBeenCalled();
+  expect(screen.queryByText('Abandoned answer')).not.toBeInTheDocument();
+  await userEvent.type(screen.getByRole('textbox'), 'Fresh question{Enter}');
+  await screen.findByText('New reply');
+  expect(s.speaker.speak).toHaveBeenCalledExactlyOnceWith('New reply', 'browser');
+});
+test('pending reply is spoken exactly once after remount without New chat', async () => {
+  const s = setup();
+  await ready();
+  fireEvent.click(screen.getByRole('switch', { name: 'Reply with voice' }));
+  let resolve!: (value: { reply: string; source: string }) => void;
+  s.client.sendChat.mockReturnValueOnce(new Promise(res => { resolve = res; }));
+  await userEvent.type(screen.getByRole('textbox'), 'Surviving question{Enter}');
+  detached(s);
+  s.rerender(s.tree(false));
+  await screen.findByText('Saved reply');
+  await act(async () => resolve({ reply: 'Surviving answer', source: 'local' }));
+  expect(s.speaker.speak).toHaveBeenCalledExactlyOnceWith('Surviving answer', 'browser');
+  expect(s.client.sendChat).toHaveBeenCalledExactlyOnceWith('Surviving question');
+  expect(screen.queryByText('Surviving answer')).not.toBeInTheDocument();
+});
