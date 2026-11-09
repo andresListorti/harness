@@ -5,8 +5,9 @@ import userEvent from '@testing-library/user-event';
 import type { ChatResponse } from '../../shared/api';
 import { ChatPanel } from '../../src/components/ChatPanel';
 import { ApiError } from '../../src/lib/api';
+import * as voiceContext from '../../src/voice/VoiceProvider';
 
-afterEach(cleanup);
+afterEach(() => { cleanup(); vi.restoreAllMocks(); });
 
 function deferred<T>() {
   let resolve!: (value: T) => void;
@@ -220,4 +221,62 @@ test('late history cannot replace messages sent by the user', async () => {
   await act(async () => history.resolve({ messages: [] }));
   expect(screen.getByText('tests')).toBeInTheDocument();
   expect(screen.getByText('The next task.')).toBeInTheDocument();
+});
+
+
+test('voice sink uses latest send, transcripts only fill input, and unmount unsubscribes', async () => {
+  const first = setup();
+  const second = setup();
+  let sink!: (text: string) => void | Promise<void>;
+  let transcript!: (text: string, final: boolean) => void;
+  const removeSink = vi.fn();
+  const removeTranscript = vi.fn();
+  const removeSettled = vi.fn();
+  const voice = {
+    registerChatSink: vi.fn(handler => { sink = handler; return removeSink; }),
+    onTranscript: vi.fn(handler => { transcript = handler; return removeTranscript; }),
+    onChatSettled: vi.fn(() => removeSettled),
+    speakReply: vi.fn(), handsFree: true,
+  };
+  vi.spyOn(voiceContext, 'useVoice').mockReturnValue(voice as unknown as NonNullable<ReturnType<typeof voiceContext.useVoice>>);
+  const view = render(<ChatPanel client={first.client} />);
+  await waitFor(() => expect(first.client.getChatHistory).toHaveBeenCalledOnce());
+  act(() => transcript('Final draft', true));
+  expect(screen.getByRole('textbox')).toHaveValue('Final draft');
+  expect(first.client.sendChat).not.toHaveBeenCalled();
+  view.rerender(<ChatPanel client={second.client} />);
+  await act(async () => sink('Latest question'));
+  await waitFor(() => expect(second.client.sendChat).toHaveBeenCalledExactlyOnceWith('Latest question'));
+  expect(first.client.sendChat).not.toHaveBeenCalled();
+  expect(voice.registerChatSink).toHaveBeenCalledOnce();
+  view.unmount();
+  expect(removeSink).toHaveBeenCalledOnce();
+  expect(removeTranscript).toHaveBeenCalledOnce();
+  expect(removeSettled).toHaveBeenCalledTimes(2);
+});
+
+test('settled history replaces messages, ignores older mount history and skips while busy', async () => {
+  const { client, user } = setup();
+  const oldHistory = deferred<{ messages: [] }>();
+  client.getChatHistory.mockReturnValueOnce(oldHistory.promise);
+  let settled!: () => void;
+  vi.spyOn(voiceContext, 'useVoice').mockReturnValue({
+    onChatSettled: (listener: () => void) => { settled = listener; return () => {}; },
+    speakReply: vi.fn(),
+  } as unknown as NonNullable<ReturnType<typeof voiceContext.useVoice>>);
+  render(<ChatPanel client={client} />);
+  client.getChatHistory.mockResolvedValue({ messages: [
+    { role: 'user', text: 'Away question' }, { role: 'assistant', text: 'Away answer', source: 'local' },
+  ] });
+  await act(async () => settled());
+  await screen.findByText('Away answer');
+  await waitFor(() => expect(screen.getByRole('log').querySelectorAll('.chat-message')).toHaveLength(2));
+  await act(async () => oldHistory.resolve({ messages: [] }));
+  expect(screen.getByText('Away answer')).toBeInTheDocument();
+  const answer = deferred<ChatResponse>();
+  client.sendChat.mockReturnValueOnce(answer.promise);
+  await user.type(screen.getByRole('textbox'), 'Live question{Enter}');
+  act(() => settled());
+  expect(client.getChatHistory).toHaveBeenCalledTimes(2);
+  await act(async () => answer.resolve({ reply: 'Live answer', source: 'local' }));
 });

@@ -6,16 +6,23 @@ import { notifySettingsChanged, SETTINGS_CHANGED_EVENT } from '../lib/settings-e
 import { speaker as defaultSpeaker } from './speak';
 import { SPEECH_PRIVACY_NOTICE, useSpeechInput } from './useSpeechInput';
 
+type VoiceClient = Pick<typeof api, 'getSettings' | 'saveSettings' | 'getVoiceProviders'> & Partial<Pick<typeof api, 'sendChat'>>;
+type ChatSink = (text: string) => void | Promise<void>;
 type TranscriptListener = (text: string, isFinal: boolean) => void;
 const choices: { id: VoiceChoice; label: string }[] = [
   { id: 'browser', label: 'Browser voice' }, { id: 'fish-audio', label: 'Fish Audio' },
   { id: 'elevenlabs', label: 'ElevenLabs' }, { id: 'openai', label: 'OpenAI' },
 ];
 
-function useVoiceState(client: Pick<typeof api, 'getSettings' | 'saveSettings' | 'getVoiceProviders'>, speaker: typeof defaultSpeaker) {
+function useVoiceState(client: VoiceClient, speaker: typeof defaultSpeaker) {
   const listeners = useRef(new Set<TranscriptListener>());
+  const chatSink = useRef<ChatSink | null>(null);
+  const settledListeners = useRef(new Set<() => void>());
+  const directBusy = useRef(false);
+  const submitRef = useRef<(text: string) => void>(() => {});
   const input = useSpeechInput({ enableSpace: true, onTranscript: (text, final) => {
     for (const listener of listeners.current) listener(text, final);
+    if (final) submitRef.current(text);
   } });
   const [speaking, setSpeaking] = useState(false);
   const [muted, setMuted] = useState(() => speaker.isMuted());
@@ -24,6 +31,38 @@ function useVoiceState(client: Pick<typeof api, 'getSettings' | 'saveSettings' |
   const [error, setError] = useState<string | null>(null);
   const [replyWithVoice, setReplyWithVoice] = useState(false);
   const [handsFree, setHandsFree] = useState(false);
+  const latest = useRef({ handsFree, replyWithVoice, voice });
+  latest.current = { handsFree, replyWithVoice, voice };
+  function speakReply(text: string) {
+    if (latest.current.replyWithVoice) void speaker.speak(text, latest.current.voice);
+  }
+  submitRef.current = text => {
+    if (!latest.current.handsFree) return;
+    if (chatSink.current) { void chatSink.current(text); return; }
+    const message = text.trim();
+    if (!message || directBusy.current || !client.sendChat) return;
+    directBusy.current = true;
+    setError(null);
+    void (async () => {
+      try {
+        const result = await client.sendChat!(message);
+        speakReply(result.reply);
+      } catch {
+        setError('Could not get an answer.');
+      } finally {
+        directBusy.current = false;
+        for (const listener of settledListeners.current) listener();
+      }
+    })();
+  };
+  const registerChatSink = useCallback((handler: ChatSink) => {
+    chatSink.current = handler;
+    return () => { if (chatSink.current === handler) chatSink.current = null; };
+  }, []);
+  const onChatSettled = useCallback((listener: () => void) => {
+    settledListeners.current.add(listener);
+    return () => { settledListeners.current.delete(listener); };
+  }, []);
   const saving = useRef(false);
   const version = useRef(0);
 
@@ -79,8 +118,7 @@ function useVoiceState(client: Pick<typeof api, 'getSettings' | 'saveSettings' |
       setMuted(speaker.isMuted());
     },
     voice, voices, setVoice, replyWithVoice, setReplyWithVoice, handsFree, setHandsFree,
-    speakReply(text: string) { if (replyWithVoice) void speaker.speak(text, voice); },
-    onTranscript,
+    speakReply, onTranscript, registerChatSink, onChatSettled,
   };
 }
 
@@ -88,7 +126,7 @@ const VoiceContext = createContext<ReturnType<typeof useVoiceState> | null>(null
 
 export function VoiceProvider({ children, client = api, speaker = defaultSpeaker }: {
   children: ReactNode;
-  client?: Pick<typeof api, 'getSettings' | 'saveSettings' | 'getVoiceProviders'>;
+  client?: VoiceClient;
   speaker?: typeof defaultSpeaker;
 }) {
   const value = useVoiceState(client, speaker);

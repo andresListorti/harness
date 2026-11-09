@@ -105,10 +105,7 @@ Work in the order listed. A milestone closes only after these steps, in order:
 
 ## In progress
 
-### voice-transcript-provider
-- **Goal:** Send Hands-free transcripts from the persistent voice provider, so they work from any view and from the widget (finding from the Codex review of Milestone 2).
-- **Files:** `src/voice/VoiceProvider.tsx`, `src/components/ChatPanel.tsx`, `tests/client/voice-controls.test.tsx`, `tests/client/chat-panel.test.tsx`
-- **Definition of done:** a test reproduces the bug first: with Hands-free on, navigating to Agents (chat unmounted) and finishing a transcript sends no chat request. After the fix the final transcript is sent exactly once with Hands-free on, from any view and from the widget; when the chat panel is mounted it still shows the exchange live through its own send path (no duplicate request); when it is not mounted the provider sends the message directly, speaks the reply if Reply with voice is on, and a chat panel that mounts later shows the saved exchange from the history, including one that finishes after mounting; with Hands-free off nothing is sent; interim transcripts still only fill the field of a mounted chat.
+_None._
 
 ## Done
 
@@ -405,6 +402,12 @@ Work in the order listed. A milestone closes only after these steps, in order:
 - **Files:** none
 - **Definition of done:** from a clean `npm ci`, all checks pass; hold Space to talk and browser voice output work; Settings persists after a restart; widget mode opens; no key or voice ID appears in browser responses; providers without keys are verified only through their mocked tests, and this is reported. Then follow "Closing a milestone".
 - **Result:** done. From a clean `npm ci`, 761 tests, typecheck, and build pass. The server listens only on `127.0.0.1`; no key or voice ID appeared in any response or bundled asset; Settings survived a server restart; the user confirmed microphone input, browser voice output, Mute, and widget mode in a real browser. Fish Audio, ElevenLabs, and OpenAI were verified only through their mocked tests, not with real keys. Waiting for `/codex:review` and the push confirmation.
+
+### voice-transcript-provider
+- **Goal:** Send Hands-free transcripts from the persistent voice provider, so they work from any view and from the widget (finding from the Codex review of Milestone 2).
+- **Files:** `src/voice/VoiceProvider.tsx`, `src/components/ChatPanel.tsx`, `tests/client/voice-controls.test.tsx`, `tests/client/chat-panel.test.tsx`
+- **Definition of done:** a test reproduces the bug first: with Hands-free on, navigating to Agents (chat unmounted) and finishing a transcript sends no chat request. After the fix the final transcript is sent exactly once with Hands-free on, from any view and from the widget; when the chat panel is mounted it still shows the exchange live through its own send path (no duplicate request); when it is not mounted the provider sends the message directly, speaks the reply if Reply with voice is on, and a chat panel that mounts later shows the saved exchange from the history, including one that finishes after mounting; with Hands-free off nothing is sent; interim transcripts still only fill the field of a mounted chat.
+- **Result:** done in 1 attempt. 773 tests pass, typecheck and build clean. The reproducing test failed before the fix (zero chat requests) and passes now. The provider sends the final Hands-free transcript from any view and from the widget; a mounted chat registers its own send path, so there is no duplicate request, and an exchange that finishes after the chat mounts is loaded from the history.
 
 ## Phase 2: real agent execution
 
