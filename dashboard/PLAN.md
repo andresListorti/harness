@@ -61,11 +61,6 @@ Work in the order listed. A milestone closes only after these steps, in order:
 
 ### Milestone 2: voice and widget
 
-### settings-store
-- **Goal:** Persist the orchestrator and voice settings in the ignored `.data/settings.json`, expose them over the API, and use the saved roles in the galaxy.
-- **Files:** `server/settings.ts`, `server/routes/settings.ts`, `server/routes/data.ts`, `server/app.ts`, `shared/api.ts`, `tests/server/settings.test.ts`
-- **Definition of done:** `tests/server/settings.test.ts` passes: defaults apply when the file is missing or corrupt; a save survives a reload; invalid values return 400; choosing one orchestrator makes the other agent the worker; the galaxy route reflects the saved roles; historical agent cards do not change.
-
 ### settings-view
 - **Goal:** Add the Settings view with orchestrator and voice choices.
 - **Files:** `src/views/SettingsView.tsx`, `src/components/Sidebar.tsx`, `src/App.tsx`, `tests/client/settings-view.test.tsx`
@@ -150,7 +145,10 @@ Work in the order listed. A milestone closes only after these steps, in order:
 
 ## In progress
 
-_None._
+### settings-store
+- **Goal:** Persist the orchestrator and voice settings in the ignored `.data/settings.json`, expose them over the API, and use the saved roles in the galaxy.
+- **Files:** `server/settings.ts`, `server/routes/settings.ts`, `server/routes/data.ts`, `server/app.ts`, `shared/api.ts`, `tests/server/settings.test.ts`
+- **Definition of done:** `tests/server/settings.test.ts` passes: defaults apply when the file is missing or corrupt; a save survives a reload; invalid values return 400; choosing one orchestrator makes the other agent the worker; the galaxy route reflects the saved roles; historical agent cards do not change.
 
 ## Done
 
