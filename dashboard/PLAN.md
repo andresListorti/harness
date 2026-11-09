@@ -70,11 +70,6 @@ Work in the order listed. A milestone closes only after these steps, in order:
 - **Files:** none
 - **Definition of done:** from a clean `npm ci`, all checks pass; with Claude Code a free-text question is answered with repo data; no file changes in the repo after a chat; a prompt asking the agent to write a file does not change anything and shows no tool-call markup; with Codex selected no CLI starts, the answer is local, and the notice and its link work. Then follow "Closing a milestone".
 
-### plan-test-real-state
-- **Goal:** Make the test on the real plan independent of how far the project has advanced (found by the clean `npm ci` run of `m3-acceptance`).
-- **Files:** `tests/server/plan.test.ts`
-- **Definition of done:** the test on the real `PLAN.md` passes with or without pending tasks, and grouping of pending tasks stays covered by a fixture.
-
 ## Done
 
 ### scaffold
@@ -448,6 +443,12 @@ Work in the order listed. A milestone closes only after these steps, in order:
 - **Files:** `src/lib/api.ts`, `tests/client/api.test.ts`, `tests/client/chat-panel.test.tsx`
 - **Definition of done:** a test reproduces the bug first: a 429 `CHAT_BUSY` or 504 `TIMEOUT` response produces the generic message. After the fix the chat shows the server message for those two and for 503 `CLI_NOT_FOUND`; every other error keeps the generic message.
 - **Result:** done in 1 attempt. 927 tests pass, typecheck and build clean. The reproducing tests failed before the fix. The chat shows the server message for busy, timeout, and missing CLI; other errors stay generic.
+
+### plan-test-real-state
+- **Goal:** Make the test on the real plan independent of how far the project has advanced (found by the clean `npm ci` run of `m3-acceptance`).
+- **Files:** `tests/server/plan.test.ts`
+- **Definition of done:** the test on the real `PLAN.md` passes with or without pending tasks, and grouping of pending tasks stays covered by a fixture.
+- **Result:** done in 1 attempt. 927 tests pass, typecheck and build clean. The test on the real plan no longer depends on how far the project has advanced.
 
 ## Phase 2: real agent execution
 
