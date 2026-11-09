@@ -61,11 +61,6 @@ Work in the order listed. A milestone closes only after these steps, in order:
 
 ### Milestone 2: voice and widget
 
-### widget-mode
-- **Goal:** Add Widget mode to the sidebar: a compact window with only the orb, status, and Talk button, using Document Picture-in-Picture with a popup fallback.
-- **Files:** `src/widget/openWidget.ts`, `src/widget/WidgetView.tsx`, `src/components/Sidebar.tsx`, `tests/client/widget.test.tsx`
-- **Definition of done:** `tests/client/widget.test.tsx` passes with mocks: Picture-in-Picture is used when available; the popup is used otherwise; a blocked popup shows a message; the widget renders only its three elements; closing it cleans up.
-
 ### docs-voice
 - **Goal:** Document voice providers, `.env` setup, Settings, widget mode, and the browser speech disclosure.
 - **Files:** `README.md`, `../docs/architecture.md`, `../docs/setup.md`
@@ -115,7 +110,10 @@ Work in the order listed. A milestone closes only after these steps, in order:
 
 ## In progress
 
-_None._
+### widget-mode
+- **Goal:** Add Widget mode to the sidebar: a compact window with only the orb, status, and Talk button, using Document Picture-in-Picture with a popup fallback.
+- **Files:** `src/widget/openWidget.ts`, `src/widget/WidgetView.tsx`, `src/components/Sidebar.tsx`, `tests/client/widget.test.tsx`
+- **Definition of done:** `tests/client/widget.test.tsx` passes with mocks: Picture-in-Picture is used when available; the popup is used otherwise; a blocked popup shows a message; the widget renders only its three elements; closing it cleans up.
 
 ## Done
 
