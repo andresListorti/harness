@@ -160,10 +160,7 @@ Work in the order listed. A milestone closes only after these steps, in order:
 
 ## In progress
 
-### tts-elevenlabs
-- **Goal:** Add the ElevenLabs adapter.
-- **Files:** `server/voice/elevenlabs.ts`, `tests/server/tts-elevenlabs.test.ts`
-- **Definition of done:** `tests/server/tts-elevenlabs.test.ts` passes with a mocked `fetch`: URL, headers, and body are correct; audio bytes are returned; provider errors become a typed error that contains no key.
+_None._
 
 ## Done
 
@@ -382,6 +379,12 @@ Work in the order listed. A milestone closes only after these steps, in order:
 - **Files:** `server/voice/fish-audio.ts`, `server/voice/errors.ts`, `server/voice/config.ts`, `tests/server/tts-fish-audio.test.ts`
 - **Definition of done:** `tests/server/tts-fish-audio.test.ts` passes with a mocked `fetch`: URL, headers, and body are correct; audio bytes are returned; provider errors become a typed error that contains no key.
 - **Result:** done in 1 attempt. 612 tests pass, typecheck and build clean. Adds the shared `TtsProviderError` (no key, voice ID, or response body in its message) that the other adapters reuse.
+
+### tts-elevenlabs
+- **Goal:** Add the ElevenLabs adapter.
+- **Files:** `server/voice/elevenlabs.ts`, `tests/server/tts-elevenlabs.test.ts`
+- **Definition of done:** `tests/server/tts-elevenlabs.test.ts` passes with a mocked `fetch`: URL, headers, and body are correct; audio bytes are returned; provider errors become a typed error that contains no key.
+- **Result:** done in 1 attempt. 619 tests pass, typecheck and build clean. The voice ID is URL-encoded in the request path; errors reuse `TtsProviderError`.
 
 ## Phase 2: real agent execution
 
