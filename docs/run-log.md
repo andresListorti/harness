@@ -776,3 +776,17 @@ Dependencies were installed by the orchestrator once, during task 1, because the
 - **Why:** the second `/codex:review` of Milestone 2 reported that holding Space while a reply was being spoken started recognition without cancelling the speech, unlike the Talk button, so the microphone could transcribe the assistant's own reply and, with Hands-free on, send it as a new question.
 - **Attempt 1:** Codex first wrote a test that reproduces it (Space did not cancel the speaker) and confirmed it failed. It then added an `onBeforeStart` option to the speech input hook, called once at every real start and never on ignored starts (inputs, buttons, key repeat, modified keys, unsupported browsers), and made the voice provider pass the speaker cancel to it, so every way of starting cancels once.
 - **Orchestrator check:** read the diff; no byte order marks; 41 files and 801 tests passed, `npm run typecheck` was clean, `npm run build` passed, and the real `dashboard/.data/chat-history.json` has the same hash before and after the suite.
+
+## D54. voice-widget-focus
+
+| | |
+|---|---|
+| Branch | `task/voice-widget-focus` |
+| Codex attempts | 1 |
+| Codex model | not reported |
+| Duration | 2m 25s |
+| Result | Done |
+
+- **Why:** the third `/codex:review` of Milestone 2 reported that a session started from the widget Talk button was stopped when the main window lost focus or was hidden, which is exactly what happens when the user works in another window with the widget open.
+- **Attempt 1:** Codex first wrote two tests that reproduce it (blur and hidden tab both stopped recognition after Talk was pressed in the widget) and confirmed they failed. It then added an `allowBackground` option to the speech input hook and a widget-open flag in the voice provider, set by the app when the widget opens or closes. While the widget is open, blur and hidden events no longer stop a session started from a Talk button; a session started by holding Space still stops on release, blur, and hidden tab, and without the widget the old behavior is unchanged. Closing the widget stops recognition.
+- **Orchestrator check:** read the diff; no byte order marks; 41 files and 811 tests passed, `npm run typecheck` was clean, `npm run build` passed, and the real `dashboard/.data/chat-history.json` has the same hash before and after the suite.

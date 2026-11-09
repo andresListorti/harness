@@ -1,6 +1,6 @@
 // @vitest-environment jsdom
 import * as React from 'react';
-import { act, cleanup, fireEvent, render, screen, waitFor } from '@testing-library/react';
+import { act, cleanup, fireEvent, render, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { VoiceProvider, useVoice } from '../../src/voice/VoiceProvider';
 import { speaker as defaultSpeaker, type VoiceState } from '../../src/voice/speak';
@@ -438,4 +438,37 @@ test('direct success and failure each notify once; missing sendChat stays safe',
   await act(async () => Recognition.latest.result('No method', true));
   expect(settled).toHaveBeenCalledTimes(2);
   expect(s.client.sendChat).toHaveBeenCalledTimes(2);
+});
+
+
+test.each(['blur', 'hidden'])('widget Talk keeps listening when the main window becomes %s', async event => {
+  const events = new EventTarget();
+  const target = {
+    document: document.implementation.createHTMLDocument('Widget'),
+    addEventListener: events.addEventListener.bind(events), removeEventListener: events.removeEventListener.bind(events), close: vi.fn(), focus: vi.fn(),
+  };
+  Object.defineProperty(target.document, 'defaultView', { value: window });
+  vi.spyOn(window, 'open').mockReturnValue(target as unknown as Window);
+  vi.spyOn(defaultSpeaker, 'cancel').mockImplementation(() => {});
+  render(<App />);
+  fireEvent.click(screen.getByRole('button', { name: 'Widget mode' }));
+  const widget = within(target.document.body);
+  await waitFor(() => expect(widget.getByRole('button', { name: 'Talk' })).toBeInTheDocument());
+  fireEvent.click(widget.getByRole('button', { name: 'Talk' }));
+  const recognition = Recognition.latest;
+  expect(recognition.start).toHaveBeenCalledOnce();
+  if (event === 'blur') fireEvent.blur(window);
+  else {
+    vi.spyOn(document, 'visibilityState', 'get').mockReturnValue('hidden');
+    fireEvent(document, new Event('visibilitychange'));
+  }
+  expect(recognition.stop).not.toHaveBeenCalled();
+  expect(widget.getByRole('button', { name: 'Talk' })).toHaveAttribute('aria-pressed', 'true');
+  fireEvent.click(widget.getByRole('button', { name: 'Talk' }));
+  expect(recognition.stop).toHaveBeenCalledOnce();
+  fireEvent.click(widget.getByRole('button', { name: 'Talk' }));
+  const next = Recognition.latest;
+  if (event === 'blur') fireEvent.click(screen.getByRole('button', { name: 'Widget mode' }));
+  else act(() => { events.dispatchEvent(new Event('pagehide')); });
+  expect(next.stop).toHaveBeenCalledOnce();
 });

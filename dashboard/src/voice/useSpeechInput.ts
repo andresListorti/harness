@@ -35,6 +35,7 @@ export function useSpeechInput(options: {
   onBeforeStart?: () => void;
   lang?: string;
   enableSpace?: boolean;
+  allowBackground?: () => boolean;
 }) {
   const [listening, setListening] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -134,19 +135,22 @@ export function useSpeechInput(options: {
     function keyup(event: KeyboardEvent) {
       if (isSpace(event) && space.current) stop();
     }
+    function focusLost() {
+      if (space.current || !latest.current.allowBackground?.()) stop();
+    }
     function visibility() {
-      if (document.visibilityState === 'hidden') stop();
+      if (document.visibilityState === 'hidden') focusLost();
     }
     if (options.enableSpace !== false) {
       document.addEventListener('keydown', keydown);
       document.addEventListener('keyup', keyup);
     }
-    window.addEventListener('blur', stop);
+    window.addEventListener('blur', focusLost);
     document.addEventListener('visibilitychange', visibility);
     return () => {
       document.removeEventListener('keydown', keydown);
       document.removeEventListener('keyup', keyup);
-      window.removeEventListener('blur', stop);
+      window.removeEventListener('blur', focusLost);
       document.removeEventListener('visibilitychange', visibility);
       if (space.current) stop();
     };

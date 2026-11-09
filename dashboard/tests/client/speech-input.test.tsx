@@ -29,7 +29,7 @@ function down(target: Document | Element = document, extra: KeyboardEventInit = 
   fireEvent(target, event);
   return event;
 }
-function setup(options: { enableSpace?: boolean; lang?: string; onBeforeStart?: () => void } = {}) {
+function setup(options: { enableSpace?: boolean; allowBackground?: () => boolean; lang?: string; onBeforeStart?: () => void } = {}) {
   const callback = vi.fn();
   return { callback, ...renderHook(() => useSpeechInput({ onTranscript: callback, ...options })) };
 }
@@ -281,4 +281,63 @@ test('uses the latest onBeforeStart without restarting active recognition', () =
   expect(first).toHaveBeenCalledOnce();
   expect(latest).toHaveBeenCalledOnce();
   expect(instance().start).toHaveBeenCalledOnce();
+});
+
+
+test.each(['release', 'blur', 'hidden'])('Space still stops on %s with background listening allowed', event => {
+  const { result } = setup({ allowBackground: () => true });
+  down();
+  expect(result.current.listening).toBe(true);
+  if (event === 'release') fireEvent.keyUp(document, { key: ' ' });
+  else if (event === 'blur') fireEvent.blur(window);
+  else {
+    vi.spyOn(document, 'visibilityState', 'get').mockReturnValue('hidden');
+    fireEvent(document, new Event('visibilitychange'));
+  }
+  expect(instance().stop).toHaveBeenCalledOnce();
+  expect(result.current.listening).toBe(false);
+});
+
+test.each(['blur', 'hidden'])('Talk stops on %s without background listening allowed', event => {
+  const { result } = setup();
+  act(() => result.current.start());
+  if (event === 'blur') fireEvent.blur(window);
+  else {
+    vi.spyOn(document, 'visibilityState', 'get').mockReturnValue('hidden');
+    fireEvent(document, new Event('visibilitychange'));
+  }
+  expect(instance().stop).toHaveBeenCalledOnce();
+  expect(result.current.listening).toBe(false);
+});
+
+test.each(['end', 'error'])('background Talk resets on recognition %s and permits a fresh start', event => {
+  const onBeforeStart = vi.fn();
+  const { result } = setup({ allowBackground: () => true, onBeforeStart });
+  act(() => result.current.start());
+  fireEvent.blur(window);
+  fireEvent.keyUp(document, { key: ' ' });
+  expect(result.current.listening).toBe(true);
+  expect(instance().stop).not.toHaveBeenCalled();
+  act(() => {
+    if (event === 'end') instance().onend?.();
+    else instance().onerror?.({ error: 'network' });
+  });
+  expect(result.current.listening).toBe(false);
+  act(() => result.current.start());
+  expect(result.current.listening).toBe(true);
+  expect(onBeforeStart).toHaveBeenCalledTimes(2);
+});
+
+test('focus listeners use the latest background policy without restarting recognition', () => {
+  const { result, rerender } = renderHook(({ allowed }) => useSpeechInput({
+    onTranscript: vi.fn(), allowBackground: () => allowed,
+  }), { initialProps: { allowed: true } });
+  act(() => result.current.start());
+  fireEvent.blur(window);
+  expect(result.current.listening).toBe(true);
+  rerender({ allowed: false });
+  expect(instance().stop).not.toHaveBeenCalled();
+  fireEvent.blur(window);
+  expect(instance().stop).toHaveBeenCalledOnce();
+  expect(result.current.listening).toBe(false);
 });
