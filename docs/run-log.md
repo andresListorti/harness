@@ -833,3 +833,17 @@ Dependencies were installed by the orchestrator once, during task 1, because the
 - **Why:** the user decided that the orchestrator chat uses only Claude Code, and asked for three corrections to `docs/chat-isolation.md`.
 - **What was done:** the first run showed that locally installed plugin hooks still start under `--tools "" --strict-mcp-config`, so the orchestrator repeated the three requests with `--safe-mode --no-session-persistence` added. Duration is the time of that repeated probe only. No hook ran, stderr was empty, and no request succeeded. The document now records both runs, states the limits of the check, and no longer claims which files Codex can read beyond the one tested. The plan was updated: Claude Code only, a notice for Codex, clean replies, and a Phase 2 task for a possible Codex chat.
 - **Orchestrator check:** a search of the changed files finds no local paths, host names, or personal data; the test suite passes.
+
+## D58. chat-prompt
+
+| | |
+|---|---|
+| Branch | `task/chat-prompt` |
+| Codex attempts | 2 |
+| Codex model | not reported |
+| Duration | 2m 57s |
+| Result | Done |
+
+- **Attempt 1:** Codex added a pure `buildChatPrompt` function. Repo content and chat history sit inside a marked untrusted block, every angle bracket in them is escaped so closing markers cannot end it, and the prompt says the chat is read-only and that the agent has no tools and must not print tool-call markup. All checks passed, but the review found that history took the budget before the snapshot, so a long conversation could leave the agent with no repo data.
+- **Attempt 2:** Codex first wrote a test that reproduces it and confirmed it failed, then limited history to 8000 characters, keeping the newest messages, and left the rest of the budget to the snapshot.
+- **Orchestrator check:** read the diff; no byte order marks; 42 files and 831 tests passed, `npm run typecheck` was clean, `npm run build` passed, and the real `dashboard/.data/chat-history.json` has the same hash before and after the suite.
