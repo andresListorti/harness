@@ -61,11 +61,6 @@ Work in the order listed. A milestone closes only after these steps, in order:
 
 ### Milestone 2: voice and widget
 
-### tts-openai
-- **Goal:** Add the OpenAI TTS adapter.
-- **Files:** `server/voice/openai-tts.ts`, `tests/server/tts-openai.test.ts`
-- **Definition of done:** `tests/server/tts-openai.test.ts` passes with a mocked `fetch`: URL, headers, and body are correct; audio bytes are returned; provider errors become a typed error that contains no key.
-
 ### tts-route
 - **Goal:** Add `GET /api/voice/providers` and `POST /api/tts`, which dispatches to the selected adapter.
 - **Files:** `server/routes/tts.ts`, `server/app.ts`, `shared/api.ts`, `tests/server/tts-route.test.ts`
@@ -160,7 +155,10 @@ Work in the order listed. A milestone closes only after these steps, in order:
 
 ## In progress
 
-_None._
+### tts-openai
+- **Goal:** Add the OpenAI TTS adapter.
+- **Files:** `server/voice/openai-tts.ts`, `tests/server/tts-openai.test.ts`
+- **Definition of done:** `tests/server/tts-openai.test.ts` passes with a mocked `fetch`: URL, headers, and body are correct; audio bytes are returned; provider errors become a typed error that contains no key.
 
 ## Done
 
