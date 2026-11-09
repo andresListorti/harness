@@ -105,10 +105,7 @@ Work in the order listed. A milestone closes only after these steps, in order:
 
 ## In progress
 
-### voice-widget-focus
-- **Goal:** Keep microphone input running when it was started from the widget and the main window loses focus or is hidden (finding from the third Codex review of Milestone 2).
-- **Files:** `src/voice/useSpeechInput.ts`, `src/voice/VoiceProvider.tsx`, `src/App.tsx`, `tests/client/speech-input.test.tsx`, `tests/client/voice-controls.test.tsx`, `tests/client/widget.test.tsx`
-- **Definition of done:** a test reproduces the bug first: with the widget open, starting recognition from the widget Talk button and then blurring or hiding the main window stops recognition. After the fix, while the widget is open, a session started from a Talk button is not stopped by the blur or hidden-tab events of the main window; it still stops when Talk is pressed again, when recognition ends or fails, and when the widget closes. A session started by holding Space still stops on key release, blur, and hidden tab, and without the widget open the current stop behavior on blur and hidden tab is unchanged (the microphone is never left on in a hidden dashboard with no widget). The listeners are removed on unmount and nothing updates state after it.
+_None._
 
 ## Done
 
@@ -429,6 +426,12 @@ Work in the order listed. A milestone closes only after these steps, in order:
 - **Files:** `src/voice/useSpeechInput.ts`, `src/voice/VoiceProvider.tsx`, `tests/client/speech-input.test.tsx`, `tests/client/voice-controls.test.tsx`
 - **Definition of done:** a test reproduces the bug first: while a reply is being spoken, holding Space starts recognition without cancelling the speaker. After the fix every way of starting recognition (Space, the sidebar Talk button, the chat microphone, and the widget Talk button) cancels the speaker before recognition starts; the key is still ignored inside inputs, buttons, and editable fields and then cancels nothing; releasing Space still stops listening; the cancel runs once per start.
 - **Result:** done in 1 attempt. 801 tests pass, typecheck and build clean. The reproducing test failed before the fix. The speech input hook has a new `onBeforeStart` option that runs once at every real start, and the voice provider uses it to cancel speech, so Space, the sidebar Talk, the chat microphone, and the widget Talk all cancel the same way.
+
+### voice-widget-focus
+- **Goal:** Keep microphone input running when it was started from the widget and the main window loses focus or is hidden (finding from the third Codex review of Milestone 2).
+- **Files:** `src/voice/useSpeechInput.ts`, `src/voice/VoiceProvider.tsx`, `src/App.tsx`, `tests/client/speech-input.test.tsx`, `tests/client/voice-controls.test.tsx`, `tests/client/widget.test.tsx`
+- **Definition of done:** a test reproduces the bug first: with the widget open, starting recognition from the widget Talk button and then blurring or hiding the main window stops recognition. After the fix, while the widget is open, a session started from a Talk button is not stopped by the blur or hidden-tab events of the main window; it still stops when Talk is pressed again, when recognition ends or fails, and when the widget closes. A session started by holding Space still stops on key release, blur, and hidden tab, and without the widget open the current stop behavior on blur and hidden tab is unchanged (the microphone is never left on in a hidden dashboard with no widget). The listeners are removed on unmount and nothing updates state after it.
+- **Result:** done in 1 attempt. 811 tests pass, typecheck and build clean. Both reproducing tests failed before the fix. While the widget is open, a session started from a Talk button survives blur and hidden-tab events of the main window; Space sessions and the no-widget case keep stopping as before, and closing the widget stops recognition.
 
 ## Phase 2: real agent execution
 
