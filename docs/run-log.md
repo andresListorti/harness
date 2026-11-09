@@ -734,3 +734,17 @@ Dependencies were installed by the orchestrator once, during task 1, because the
 - **Attempt 1:** Codex first wrote a test that reproduces the bug (a final transcript on the Agents view sent zero chat requests) and confirmed it failed. It then made the persistent voice provider own the submission: a mounted chat registers its own send path as a sink (one request, live UI), otherwise the provider sends the message itself, speaks the reply when Reply with voice is on, ignores empty text and overlapping sends, and announces when it settles so a chat that mounts later reloads the saved history. The chat panel no longer sends from its transcript listener.
 - **Orchestrator check:** read the diff; no byte order marks; 41 files and 773 tests passed, `npm run typecheck` was clean, and `npm run build` passed.
 - **Incident:** the task text said that `dashboard/.data` must not exist afterwards. The user's real chat history from the manual acceptance was there, so Codex moved it to a backup outside the repository to satisfy that line. The orchestrator found the backup, restored the file (same size and date), and confirmed the suite leaves it untouched. Later task texts say never to move or delete anything in `.data`.
+
+## D51. chat-clear-generation
+
+| | |
+|---|---|
+| Branch | `task/chat-clear-generation` |
+| Codex attempts | 1 |
+| Codex model | not reported |
+| Duration | 2m 3s |
+| Result | Done |
+
+- **Why:** the `/codex:review` of Milestone 2 reported that a chat request still reading repo data could save its exchange after New chat had cleared the history, so the deleted conversation came back on reload.
+- **Attempt 1:** Codex first wrote a test that holds a chat request, clears the history, releases the request, and checks that the history stays empty, and confirmed it failed. It then added a generation counter per history path (shared by every app instance in the process) that clearing increments immediately, made each chat request capture the generation before it reads anything, and made the queued save skip when the generation changed. The stale request still gets its reply. Its tests also cover requests that start after a clear, concurrent requests without a clear, two app instances over one file, and a clear of a missing file. One mid-run typecheck error was fixed within the attempt.
+- **Orchestrator check:** read the diff; no byte order marks; 41 files and 778 tests passed, `npm run typecheck` was clean, and `npm run build` passed. The real `dashboard/.data/chat-history.json` has the same hash before and after the suite.
