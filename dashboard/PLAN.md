@@ -63,11 +63,6 @@ Work in the order listed. A milestone closes only after these steps, in order:
 
 ### Milestone 3: chat with the orchestrator
 
-### docs-chat
-- **Goal:** Document the orchestrator chat, its isolation, and its limits.
-- **Files:** `README.md`, `../docs/architecture.md`, `../docs/setup.md`
-- **Definition of done:** the documents match the implemented behavior and link to `docs/chat-isolation.md`; a search of the changed files finds no personal data or local paths.
-
 ### m3-acceptance
 - **Goal:** Check the orchestrator chat in a real browser. Performed by the orchestrator.
 - **Files:** none
@@ -75,10 +70,10 @@ Work in the order listed. A milestone closes only after these steps, in order:
 
 ## In progress
 
-### chat-panel-orchestrator
-- **Goal:** Add the Claude Code model selector, a running state, and the Codex notice to the chat.
-- **Files:** `src/components/ChatPanel.tsx`, `src/components/ChatPanel.css`, `src/lib/api.ts`, `tests/client/chat-panel.test.tsx`
-- **Definition of done:** `tests/client/chat-panel.test.tsx` passes: with Claude Code as orchestrator the selector lists only its allowlisted models and a change is saved; a running state is shown; a reply shows whether it was local or from the orchestrator; a missing CLI message is shown; with Codex as orchestrator there is no selector and a clear notice says the chat uses local answers because on Windows its sandbox does not stop it from reading files or running commands, with a link to the isolation document.
+### docs-chat
+- **Goal:** Document the orchestrator chat, its isolation, and its limits.
+- **Files:** `README.md`, `../docs/architecture.md`, `../docs/setup.md`
+- **Definition of done:** the documents match the implemented behavior and link to `docs/chat-isolation.md`; a search of the changed files finds no personal data or local paths.
 
 ## Done
 
@@ -435,6 +430,12 @@ Work in the order listed. A milestone closes only after these steps, in order:
 - **Files:** `server/routes/chat.ts`, `server/settings.ts`, `shared/api.ts`, `tests/server/chat-route.test.ts`, `tests/server/chat-local.test.ts`
 - **Definition of done:** `tests/server/chat-route.test.ts` passes: a known question never spawns a CLI; a free-text question with Claude Code as orchestrator uses the saved model; with Codex as orchestrator no CLI is ever spawned, the reply is local, and the response carries a notice saying why; a concurrent run returns 429; a missing CLI returns a clear message and local answers keep working; invalid bodies return 400; a settings file saved before this task still loads; `GET /api/docs/chat-isolation` serves that one fixed document as plain text with `nosniff`. `tests/server/chat-local.test.ts` is updated so only the agent-free path is covered there.
 - **Result:** done in 2 attempts. 905 tests pass, typecheck and build clean. Free text goes to Claude Code with the saved model; with Codex as orchestrator no CLI starts and the response carries the notice. Replies longer than the history limit are stored shortened and returned in full.
+
+### chat-panel-orchestrator
+- **Goal:** Add the Claude Code model selector, a running state, and the Codex notice to the chat.
+- **Files:** `src/components/ChatPanel.tsx`, `src/components/ChatPanel.css`, `src/lib/api.ts`, `tests/client/chat-panel.test.tsx`
+- **Definition of done:** `tests/client/chat-panel.test.tsx` passes: with Claude Code as orchestrator the selector lists only its allowlisted models and a change is saved; a running state is shown; a reply shows whether it was local or from the orchestrator; a missing CLI message is shown; with Codex as orchestrator there is no selector and a clear notice says the chat uses local answers because on Windows its sandbox does not stop it from reading files or running commands, with a link to the isolation document.
+- **Result:** done in 1 attempt. 914 tests pass, typecheck and build clean. With Claude Code the chat has a model selector; with Codex it shows the notice and its link. Known limit: busy and timeout errors show generic text.
 
 ## Phase 2: real agent execution
 
