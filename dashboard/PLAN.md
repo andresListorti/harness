@@ -63,11 +63,6 @@ Work in the order listed. A milestone closes only after these steps, in order:
 
 ### Milestone 3: chat with the orchestrator
 
-### chat-route
-- **Goal:** Extend `POST /api/chat`: local answer first, then Claude Code with the saved model, which is added to the settings. With Codex as orchestrator the chat stays on local answers.
-- **Files:** `server/routes/chat.ts`, `server/settings.ts`, `shared/api.ts`, `tests/server/chat-route.test.ts`, `tests/server/chat-local.test.ts`
-- **Definition of done:** `tests/server/chat-route.test.ts` passes: a known question never spawns a CLI; a free-text question with Claude Code as orchestrator uses the saved model; with Codex as orchestrator no CLI is ever spawned, the reply is local, and the response carries a notice saying why; a concurrent run returns 429; a missing CLI returns a clear message and local answers keep working; invalid bodies return 400; a settings file saved before this task still loads; `GET /api/docs/chat-isolation` serves that one fixed document as plain text with `nosniff`. `tests/server/chat-local.test.ts` is updated so only the agent-free path is covered there.
-
 ### chat-panel-orchestrator
 - **Goal:** Add the Claude Code model selector, a running state, and the Codex notice to the chat.
 - **Files:** `src/components/ChatPanel.tsx`, `src/components/ChatPanel.css`, `src/lib/api.ts`, `tests/client/chat-panel.test.tsx`
@@ -85,10 +80,10 @@ Work in the order listed. A milestone closes only after these steps, in order:
 
 ## In progress
 
-### chat-runner
-- **Goal:** Run Claude Code with the isolation rules in the security model and return a clean reply. The runner cannot start Codex.
-- **Files:** `server/chat/runner.ts`, `server/chat/models.ts`, `server/chat/reply.ts`, `tests/server/chat-runner.test.ts`, `tests/server/chat-reply.test.ts`
-- **Definition of done:** `tests/server/chat-runner.test.ts` passes with a mocked spawn: exact Claude Code arguments, including `--safe-mode` and `--no-session-persistence`; `shell` is never true; on Windows the native executable is resolved from the global npm package folder or an explicit server-side setting, and a `.cmd` file is never started; no code path starts Codex; the prompt is sent only through stdin; the working directory is empty and is removed afterwards; voice keys are absent from the child environment; a model outside the allowlist is rejected; timeout kills the process; output is capped; stderr is never part of the reply; a missing CLI returns a typed error. `tests/server/chat-reply.test.ts` passes: replies with no markup are unchanged; `invoke`, `parameter`, and `function_calls` blocks, including unclosed ones, are replaced by one short notice that tools are not available in this chat; surrounding text is kept; a reply that is only markup becomes only the notice.
+### chat-route
+- **Goal:** Extend `POST /api/chat`: local answer first, then Claude Code with the saved model, which is added to the settings. With Codex as orchestrator the chat stays on local answers.
+- **Files:** `server/routes/chat.ts`, `server/settings.ts`, `shared/api.ts`, `tests/server/chat-route.test.ts`, `tests/server/chat-local.test.ts`
+- **Definition of done:** `tests/server/chat-route.test.ts` passes: a known question never spawns a CLI; a free-text question with Claude Code as orchestrator uses the saved model; with Codex as orchestrator no CLI is ever spawned, the reply is local, and the response carries a notice saying why; a concurrent run returns 429; a missing CLI returns a clear message and local answers keep working; invalid bodies return 400; a settings file saved before this task still loads; `GET /api/docs/chat-isolation` serves that one fixed document as plain text with `nosniff`. `tests/server/chat-local.test.ts` is updated so only the agent-free path is covered there.
 
 ## Done
 
@@ -433,6 +428,12 @@ Work in the order listed. A milestone closes only after these steps, in order:
 - **Files:** `server/chat/prompt.ts`, `tests/server/chat-prompt.test.ts`
 - **Definition of done:** `tests/server/chat-prompt.test.ts` passes: repo content sits inside a marked untrusted block; closing markers inside repo content are neutralized; size and history limits are enforced; the read-only instruction is present; the prompt tells the agent that it has no tools and must not try to use them or print tool-call markup.
 - **Result:** done in 2 attempts. 831 tests pass, typecheck and build clean. Repo content and chat history are escaped inside a marked untrusted block; history is limited to 12 messages and 8000 characters, so the snapshot always keeps its share of the 24000-character budget.
+
+### chat-runner
+- **Goal:** Run Claude Code with the isolation rules in the security model and return a clean reply. The runner cannot start Codex.
+- **Files:** `server/chat/runner.ts`, `server/chat/models.ts`, `server/chat/reply.ts`, `tests/server/chat-runner.test.ts`, `tests/server/chat-reply.test.ts`
+- **Definition of done:** `tests/server/chat-runner.test.ts` passes with a mocked spawn: exact Claude Code arguments, including `--safe-mode` and `--no-session-persistence`; `shell` is never true; on Windows the native executable is resolved from the global npm package folder or an explicit server-side setting, and a `.cmd` file is never started; no code path starts Codex; the prompt is sent only through stdin; the working directory is empty and is removed afterwards; voice keys are absent from the child environment; a model outside the allowlist is rejected; timeout kills the process; output is capped; stderr is never part of the reply; a missing CLI returns a typed error. `tests/server/chat-reply.test.ts` passes: replies with no markup are unchanged; `invoke`, `parameter`, and `function_calls` blocks, including unclosed ones, are replaced by one short notice that tools are not available in this chat; surrounding text is kept; a reply that is only markup becomes only the notice.
+- **Result:** done in 1 attempt. 879 tests pass with a mocked spawn, typecheck and build clean. Claude Code only, started natively with no shell and the exact isolation flags; tool-call markup in a reply is replaced by a short notice.
 
 ## Phase 2: real agent execution
 
