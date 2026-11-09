@@ -285,7 +285,7 @@ test('chat routes use fixed repo context and enforce contracts and guards', asyn
 });
 
 test('local chat source cannot launch a process', async () => {
-  for (const file of ['../../server/chat/local.ts', '../../server/routes/chat.ts']) {
+  for (const file of ['../../server/chat/local.ts']) {
     const source = await readFile(new URL(file, import.meta.url), 'utf8');
     expect(source).not.toContain('child_process');
     expect(source).not.toContain('spawn');

@@ -4,7 +4,7 @@ import './ChatPanel.css';
 import { useVoice } from '../voice/VoiceProvider';
 import { MicrophoneIcon } from './VoiceControls';
 
-type Message = { id: number; role: 'user' | 'assistant'; text: string; source?: 'local' };
+type Message = { id: number; role: 'user' | 'assistant'; text: string; source?: 'local' | 'orchestrator' };
 
 export function ChatPanel({ client = api }: { client?: Pick<typeof api, 'getChatSuggestions' | 'sendChat' | 'getChatHistory' | 'clearChatHistory'> }) {
   const voice = useVoice();

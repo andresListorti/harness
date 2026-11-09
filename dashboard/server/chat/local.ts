@@ -21,10 +21,15 @@ export interface LocalContext {
 }
 
 export function answerLocally(message: string, context: LocalContext): string {
-  return toPlainText(buildReply(message, context));
+  return resolveLocally(message, context).reply;
 }
 
-function buildReply(message: string, context: LocalContext): string {
+export function resolveLocally(message: string, context: LocalContext): { reply: string; recognized: boolean } {
+  const reply = buildReply(message, context);
+  return { reply: toPlainText(reply ?? helpReply("I didn't understand that.")), recognized: reply !== undefined };
+}
+
+function buildReply(message: string, context: LocalContext): string | undefined {
   const normalized = message.trim().toLowerCase()
     .replace(/\s+/g, ' ').replace(/[\p{P}]+$/u, '').trim();
   if (isAction(normalized)) return helpReply("I can't do that.");
@@ -71,7 +76,7 @@ function buildReply(message: string, context: LocalContext): string {
     if (count > 8) lines.push(`...and ${count - 8} more`);
     return lines.join('\n');
   }
-  return helpReply("I didn't understand that.");
+  return undefined;
 }
 
 function helpReply(introduction: string): string {

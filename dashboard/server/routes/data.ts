@@ -1,3 +1,4 @@
+import type { runClaudeChat } from '../chat/runner';
 import { readFile } from 'node:fs/promises';
 import { join } from 'node:path';
 import { Router, type Request, type Response } from 'express';
@@ -14,6 +15,7 @@ import { parseRunLog } from '../data/runlog';
 import { defaultSettingsPath, readSettings } from '../settings';
 
 export interface DataDeps {
+  runClaudeChat?: typeof runClaudeChat;
   settingsPath?: string;
   historyPath?: string;
   repoRoot?: string;

@@ -39,7 +39,7 @@ test('missing, corrupt, invalid and unreadable history are empty', async () => {
 
 test('POST saves literal text and replies in order across app instances; DELETE removes history', async () => {
   const s = await setup();
-  const message = '<b>hello</b>';
+  const message = '<b>pending</b>';
   const response = await s.post({ message });
   expect(response.status).toBe(200);
   const expected = { messages: [{ role: 'user', text: message },
@@ -88,7 +88,7 @@ test('caps count and characters by dropping oldest messages', async () => {
 
 test('concurrent POSTs lose no messages and leave no temporary files', async () => {
   const s = await setup();
-  const responses = await Promise.all(Array.from({ length: 12 }, (_, i) => s.post({ message: `question ${i}` })));
+  const responses = await Promise.all(Array.from({ length: 12 }, (_, i) => s.post({ message: `pending question ${i}` })));
   responses.forEach(response => expect(response.status).toBe(200));
   const history = JSON.parse(await readFile(s.historyPath, 'utf8'));
   expect(history.messages).toHaveLength(24);
@@ -155,13 +155,13 @@ test('clear during repo reads keeps history empty while the stale request still 
 
 test('requests started after clear are saved while both older requests are discarded across apps', async () => {
   const s = await setup();
-  const first = heldChat(s, 'first stale question');
+  const first = heldChat(s, 'pending first stale question');
   await first.entered;
-  const second = heldChat(s, 'second stale question');
+  const second = heldChat(s, 'pending second stale question');
   await second.entered;
   try {
     expect((await s.clear()).status).toBe(200);
-    expect((await s.post({ message: 'new question' })).status).toBe(200);
+    expect((await s.post({ message: 'pending new question' })).status).toBe(200);
   } finally {
     first.release();
     second.release();
@@ -170,16 +170,16 @@ test('requests started after clear are saved while both older requests are disca
   expect((await second.response).status).toBe(200);
   const history = (await s.get()).body.messages;
   expect(history).toHaveLength(2);
-  expect(history[0]).toEqual({ role: 'user', text: 'new question' });
+  expect(history[0]).toEqual({ role: 'user', text: 'pending new question' });
   expect(history[1].role).toBe('assistant');
   expect(await readdir(s.folder)).toEqual(['history.json']);
 });
 
 test('two held concurrent requests without clear save both exchanges in completion order', async () => {
   const s = await setup();
-  const first = heldChat(s, 'first question');
+  const first = heldChat(s, 'pending first question');
   await first.entered;
-  const second = heldChat(s, 'second question');
+  const second = heldChat(s, 'pending second question');
   await second.entered;
   second.release();
   const secondReply = await second.response;
@@ -188,9 +188,9 @@ test('two held concurrent requests without clear save both exchanges in completi
   expect(firstReply.status).toBe(200);
   expect(secondReply.status).toBe(200);
   expect((await s.get()).body.messages).toEqual([
-    { role: 'user', text: 'second question' },
+    { role: 'user', text: 'pending second question' },
     { role: 'assistant', text: secondReply.body.reply, source: 'local' },
-    { role: 'user', text: 'first question' },
+    { role: 'user', text: 'pending first question' },
     { role: 'assistant', text: firstReply.body.reply, source: 'local' },
   ]);
   expect(await readdir(s.folder)).toEqual(['history.json']);
@@ -205,7 +205,7 @@ test('DELETE of missing history increments the shared resolved-path generation',
   expect((await s.clear()).status).toBe(200);
   expect(currentGeneration(s.historyPath)).toBe(2);
   expect(await readdir(s.folder)).toEqual([]);
-  expect((await s.post({ message: 'after missing clear' })).status).toBe(200);
+  expect((await s.post({ message: 'pending after missing clear' })).status).toBe(200);
   expect((await s.get()).body.messages).toHaveLength(2);
 });
 

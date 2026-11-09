@@ -4,8 +4,8 @@ import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { settingsSchema, type AgentId, type Settings } from '../shared/api';
 
-export const DEFAULT_SETTINGS: Readonly<Settings> = Object.freeze({
-  orchestrator: 'claude-code', voice: 'browser',
+export const DEFAULT_SETTINGS: Readonly<Required<Settings>> = Object.freeze({
+  orchestrator: 'claude-code', voice: 'browser', chatModel: 'sonnet',
 });
 
 export function workerFor(orchestrator: AgentId): AgentId {
@@ -16,7 +16,7 @@ export function defaultSettingsPath(): string {
   return fileURLToPath(new URL('../.data/settings.json', import.meta.url));
 }
 
-export async function readSettings(filePath: string): Promise<Settings> {
+export async function readSettings(filePath: string): Promise<Required<Settings>> {
   try {
     return settingsSchema.parse(JSON.parse(await readFile(filePath, 'utf8')));
   } catch {

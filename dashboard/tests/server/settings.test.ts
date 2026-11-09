@@ -59,7 +59,7 @@ test('unreadable settings fall back to defaults', async () => {
 
 test.each(['browser', 'fish-audio', 'elevenlabs', 'openai'] as const)('persists %s across reloads as atomic JSON', async voice => {
   for (const orchestrator of ['codex', 'claude-code'] as const) {
-    const settings = { orchestrator, voice };
+    const settings = { orchestrator, voice, chatModel: 'sonnet' };
     const expected = { ...settings, worker: orchestrator === 'codex' ? 'claude-code' : 'codex' };
     const saved = await put(settings);
     expect(saved.status).toBe(200);

@@ -2,7 +2,7 @@ import { vi } from 'vitest';
 import { api, ApiError, createApiClient } from '../../src/lib/api';
 import type { PlanSource } from '../../shared/api';
 
-const settings = { orchestrator: 'claude-code', voice: 'browser', worker: 'codex' } as const;
+const settings = { orchestrator: 'claude-code', voice: 'browser', worker: 'codex', chatModel: 'sonnet' } as const;
 const providers = { providers: [{ id: 'openai', available: true }] };
 const health = { status: 'ok' };
 const plan = { source: 'dashboard', tasks: [{

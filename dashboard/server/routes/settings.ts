@@ -17,18 +17,19 @@ export function createSettingsRouter(deps: DataDeps = {}): Router {
     res.json(response(await readSettings(filePath)));
   });
   router.put('/settings', async (req, res) => {
-    const parsed = settingsSchema.safeParse(req.body);
+    const parsed = settingsSchema.extend({ chatModel: settingsSchema.shape.chatModel.removeDefault().optional() }).safeParse(req.body);
     if (!parsed.success) {
       res.status(400).json({ error: { code: 'INVALID_REQUEST', message: 'Valid settings are required, with no extra fields.' } });
       return;
     }
+    const settings = { ...parsed.data, chatModel: parsed.data.chatModel ?? (await readSettings(filePath)).chatModel };
     try {
-      await writeSettings(filePath, parsed.data);
+      await writeSettings(filePath, settings);
     } catch {
       res.status(500).json({ error: { code: 'SETTINGS_WRITE_FAILED', message: 'Settings could not be saved.' } });
       return;
     }
-    res.json(response(parsed.data));
+    res.json(response(settings));
   });
   return router;
 }

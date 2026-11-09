@@ -23,11 +23,19 @@ export type AgentId = z.infer<typeof agentIdSchema>;
 export const voiceChoiceSchema = z.enum(['browser', 'fish-audio', 'elevenlabs', 'openai']);
 export type VoiceChoice = z.infer<typeof voiceChoiceSchema>;
 
+export const CLAUDE_MODELS = ['sonnet', 'opus', 'haiku'] as const;
+export const claudeModelSchema = z.enum(CLAUDE_MODELS);
+export type ClaudeModel = z.infer<typeof claudeModelSchema>;
+export const DEFAULT_CLAUDE_MODEL: ClaudeModel = 'sonnet';
+export const CODEX_CHAT_NOTICE = 'Codex chat uses local answers only: on Windows its sandbox does not stop it from reading files or running commands.';
+
 export const settingsSchema = z.object({
   orchestrator: agentIdSchema,
   voice: voiceChoiceSchema,
+  chatModel: claudeModelSchema.default(DEFAULT_CLAUDE_MODEL),
 }).strict();
-export type Settings = z.infer<typeof settingsSchema>;
+// Saves may omit chatModel; parsed settings always contain the default.
+export type Settings = z.input<typeof settingsSchema>;
 
 export const settingsResponseSchema = settingsSchema.extend({ worker: agentIdSchema }).strict();
 export type SettingsResponse = z.infer<typeof settingsResponseSchema>;
@@ -118,10 +126,12 @@ export type Agents = z.infer<typeof agentsSchema>;
 export const healthSchema = z.object({ status: z.literal('ok') }).strict();
 export type Health = z.infer<typeof healthSchema>;
 
+export const CHAT_HISTORY_MESSAGE_LIMIT = 10000;
+
 export const chatHistoryMessageSchema = z.object({
   role: z.enum(['user', 'assistant']),
-  text: z.string().max(10000),
-  source: z.literal('local').optional(),
+  text: z.string().max(CHAT_HISTORY_MESSAGE_LIMIT),
+  source: z.enum(['local', 'orchestrator']).optional(),
 }).strict();
 export type ChatHistoryMessage = z.infer<typeof chatHistoryMessageSchema>;
 
@@ -135,7 +145,8 @@ export type ChatRequest = z.infer<typeof chatRequestSchema>;
 
 export const chatResponseSchema = z.object({
   reply: z.string(),
-  source: z.literal('local'),
+  notice: z.string().optional(),
+  source: z.enum(['local', 'orchestrator']),
 }).strict();
 export type ChatResponse = z.infer<typeof chatResponseSchema>;
 
