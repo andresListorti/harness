@@ -533,3 +533,16 @@ Dependencies were installed by the orchestrator once, during task 1, because the
 - **Orchestrator review of attempt 1:** a probe showed that when the `.env` file was missing, process environment values were ignored, although the spec says they override the file.
 - **Attempt 2:** the orchestrator sent the probe back. Codex made a missing or unreadable file mean "no values from the file" and added regression tests. Duration of attempt 2: 58s.
 - **Orchestrator check:** the same probe now returns the provider as available with env values and none without them; no byte order marks; `npm test` passed (29 files, 605 tests), `npm run typecheck` was clean, and `npm run build` passed.
+
+## D36. tts-fish-audio
+
+| | |
+|---|---|
+| Branch | `task/tts-fish-audio` |
+| Codex attempts | 1 |
+| Codex model | not reported |
+| Duration | 1m 24s |
+| Result | Done |
+
+- **Attempt 1:** Codex added `synthesizeFishAudio` (POST with bearer header, JSON body with text, voice reference, and mp3 format, a 30-second timeout, injectable `fetch`), the shared `TtsProviderError` in `server/voice/errors.ts` with a generic message and the upstream status only, and mocked-fetch tests. It also exported the `VoiceConfig` type.
+- **Orchestrator check:** read the adapter and error class; the error message carries no key, voice ID, response body, or request text, and thrown fetch errors are replaced rather than rethrown; no byte order marks; `npm test` passed (30 files, 612 tests), `npm run typecheck` was clean, and `npm run build` passed.

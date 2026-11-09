@@ -2,7 +2,7 @@ import { readFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import type { VoiceProviders } from '../../shared/api';
 
-type VoiceConfig = {
+export type VoiceConfig = {
   fishAudio: { apiKey: string; voiceId: string } | null;
   elevenLabs: { apiKey: string; voiceId: string } | null;
   openai: { apiKey: string; voice: string } | null;

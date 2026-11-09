@@ -165,10 +165,7 @@ Work in the order listed. A milestone closes only after these steps, in order:
 
 ## In progress
 
-### tts-fish-audio
-- **Goal:** Add the Fish Audio adapter.
-- **Files:** `server/voice/fish-audio.ts`, `tests/server/tts-fish-audio.test.ts`
-- **Definition of done:** `tests/server/tts-fish-audio.test.ts` passes with a mocked `fetch`: URL, headers, and body are correct; audio bytes are returned; provider errors become a typed error that contains no key.
+_None._
 
 ## Done
 
@@ -381,6 +378,12 @@ Work in the order listed. A milestone closes only after these steps, in order:
 - **Files:** `server/voice/config.ts`, `shared/api.ts`, `../.env.example`, `tests/server/tts-config.test.ts`
 - **Definition of done:** `tests/server/tts-config.test.ts` passes: a provider is available only with both key and voice ID; the public view contains no key or voice ID. `.env.example` no longer says it is intentionally empty, and has empty, commented `FISH_AUDIO_API_KEY`, `FISH_AUDIO_VOICE_ID`, `ELEVENLABS_API_KEY`, `ELEVENLABS_VOICE_ID`, `OPENAI_TTS_API_KEY`, and `OPENAI_TTS_VOICE`.
 - **Result:** done in 2 attempts. 605 tests pass, typecheck and build clean. Adds the shared `voiceProvidersSchema`, an `.env` parser with no new dependency, and a public view with only `id` and `available`. Process env values override the file and still work when the file is missing.
+
+### tts-fish-audio
+- **Goal:** Add the Fish Audio adapter.
+- **Files:** `server/voice/fish-audio.ts`, `server/voice/errors.ts`, `server/voice/config.ts`, `tests/server/tts-fish-audio.test.ts`
+- **Definition of done:** `tests/server/tts-fish-audio.test.ts` passes with a mocked `fetch`: URL, headers, and body are correct; audio bytes are returned; provider errors become a typed error that contains no key.
+- **Result:** done in 1 attempt. 612 tests pass, typecheck and build clean. Adds the shared `TtsProviderError` (no key, voice ID, or response body in its message) that the other adapters reuse.
 
 ## Phase 2: real agent execution
 
