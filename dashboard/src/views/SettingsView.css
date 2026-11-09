@@ -1,0 +1,11 @@
+.settings-view { display: flex; flex-direction: column; gap: var(--space-6); }
+.settings-choices { border: 0; padding: 0; margin: var(--space-4) 0 0; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--space-4); min-width: 0; }
+.settings-choice { display: flex; align-items: center; gap: var(--space-3); padding: var(--space-5); border: 1px solid var(--color-border); border-radius: var(--radius-lg); background: var(--color-bg-raised); cursor: pointer; overflow-wrap: anywhere; }
+.settings-choice:has(input:checked) { border-color: var(--color-teal); }
+.settings-choice:has(input:disabled) { color: var(--color-text-muted); cursor: default; }
+.settings-choice:focus-within { outline: 2px solid var(--color-teal); outline-offset: 3px; }
+.settings-choice input { accent-color: var(--color-teal); flex-shrink: 0; }
+.settings-choice small { display: block; color: var(--color-text-muted); margin-top: var(--space-2); font-size: var(--text-sm); }
+.settings-choice small span { display: block; }
+.settings-error { color: var(--color-danger); }
+@media (max-width: 40rem) { .settings-choices { grid-template-columns: minmax(0, 1fr); } }

@@ -2,15 +2,17 @@ import { useEffect, useState } from 'react';
 import type { AgentStatus } from '../hooks/useAgentStatus';
 import './Sidebar.css';
 
-export type ViewId = 'harness' | 'agents' | 'galaxy' | 'plan';
+export type ViewId = 'harness' | 'agents' | 'galaxy' | 'plan' | 'settings';
 export const VIEWS: { id: ViewId; label: string }[] = [
   { id: 'harness', label: 'Harness' },
   { id: 'agents', label: 'Agents' },
   { id: 'galaxy', label: 'Galaxy' },
   { id: 'plan', label: 'Plan' },
+  { id: 'settings', label: 'Settings' },
 ];
 
 const paths = {
+  settings: 'M4 6h16M4 12h16M4 18h16M8 3v6m8 0v6m-6 0v6',
   harness: 'M4 10 12 3l8 7v10h-6v-6h-4v6H4Z',
   agents: 'M8 4h8v7H8ZM4 20v-3a5 5 0 0 1 5-3h6a5 5 0 0 1 5 3v3M3 6h2m14 0h2',
   galaxy: 'M12 3v3m0 12v3M3 12h3m12 0h3M5 5l2 2m10 10 2 2M5 19l2-2M17 7l2-2M12 8a4 4 0 1 0 0 8 4 4 0 0 0 0-8',

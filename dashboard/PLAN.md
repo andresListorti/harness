@@ -140,10 +140,7 @@ Work in the order listed. A milestone closes only after these steps, in order:
 
 ## In progress
 
-### settings-view
-- **Goal:** Add the Settings view with orchestrator and voice choices.
-- **Files:** `src/views/SettingsView.tsx`, `src/components/Sidebar.tsx`, `src/App.tsx`, `tests/client/settings-view.test.tsx`
-- **Definition of done:** `tests/client/settings-view.test.tsx` passes: Settings appears in the sidebar; choosing an orchestrator saves it and shows the other as worker; unconfigured voice providers are disabled; no key field exists.
+_None._
 
 ## Done
 
@@ -386,6 +383,12 @@ Work in the order listed. A milestone closes only after these steps, in order:
 - **Files:** `server/settings.ts`, `server/routes/settings.ts`, `server/routes/data.ts`, `server/app.ts`, `shared/api.ts`, `tests/server/settings.test.ts`
 - **Definition of done:** `tests/server/settings.test.ts` passes: defaults apply when the file is missing or corrupt; a save survives a reload; invalid values return 400; choosing one orchestrator makes the other agent the worker; the galaxy route reflects the saved roles; historical agent cards do not change.
 - **Result:** done in 1 attempt. 659 tests pass, typecheck and build clean. Settings are validated on read and write, saved atomically, and fall back to defaults when the file is missing or corrupt. The agent cards ignore the setting.
+
+### settings-view
+- **Goal:** Add the Settings view with orchestrator and voice choices.
+- **Files:** `src/views/SettingsView.tsx`, `src/views/SettingsView.css`, `src/components/Sidebar.tsx`, `src/App.tsx`, `src/lib/api.ts`, `tests/client/settings-view.test.tsx`, `tests/client/sidebar.test.tsx`, `tests/client/api.test.ts`
+- **Definition of done:** `tests/client/settings-view.test.tsx` passes: Settings appears in the sidebar; choosing an orchestrator saves it and shows the other as worker; unconfigured voice providers are disabled; no key field exists.
+- **Result:** done in 1 attempt. 671 tests pass, typecheck and build clean. Adds `getSettings`, `saveSettings`, and `getVoiceProviders` to the API client. If the providers request fails, only the browser voice stays selectable.
 
 ## Phase 2: real agent execution
 
