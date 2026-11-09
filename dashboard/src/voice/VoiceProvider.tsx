@@ -15,15 +15,21 @@ const choices: { id: VoiceChoice; label: string }[] = [
 ];
 
 function useVoiceState(client: VoiceClient, speaker: typeof defaultSpeaker) {
+  const widgetOpen = useRef(false);
   const listeners = useRef(new Set<TranscriptListener>());
   const chatSink = useRef<ChatSink | null>(null);
   const settledListeners = useRef(new Set<() => void>());
   const directBusy = useRef(false);
   const submitRef = useRef<(text: string) => void>(() => {});
-  const input = useSpeechInput({ enableSpace: true, onBeforeStart: () => speaker.cancel(), onTranscript: (text, final) => {
+  const input = useSpeechInput({ enableSpace: true, allowBackground: () => widgetOpen.current, onBeforeStart: () => speaker.cancel(), onTranscript: (text, final) => {
     for (const listener of listeners.current) listener(text, final);
     if (final) submitRef.current(text);
   } });
+  const stopInput = input.stop;
+  const setWidgetOpen = useCallback((open: boolean) => {
+    widgetOpen.current = open;
+    if (!open) stopInput();
+  }, [stopInput]);
   const [speaking, setSpeaking] = useState(false);
   const [muted, setMuted] = useState(() => speaker.isMuted());
   const [voice, updateVoice] = useState<VoiceChoice>('browser');
@@ -109,6 +115,7 @@ function useVoiceState(client: VoiceClient, speaker: typeof defaultSpeaker) {
   }
 
   return {
+    setWidgetOpen,
     supported: input.supported, listening: input.listening, speaking,
     orbState: (input.listening ? 'listening' : speaking ? 'speaking' : 'idle') as OrbState,
     error: error ?? input.error, notice: SPEECH_PRIVACY_NOTICE,

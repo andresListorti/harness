@@ -18,6 +18,7 @@ export default function App() {
 
 function AppContent() {
   const voice = useVoice();
+  const setWidgetOpen = voice?.setWidgetOpen;
   const [view, setView] = useState<ViewId>('harness');
   const [collapsed, setCollapsed] = useState(false);
   const agentStatus = useAgentStatus();
@@ -51,12 +52,14 @@ function AppContent() {
       released = true;
       handle.window.removeEventListener('pagehide', onHide);
       release.current = null;
+      setWidgetOpen?.(false);
       if (mounted.current) setWidget(null);
       if (close) { try { handle.window.close(); } catch { /* Already closed. */ } }
     };
     const onHide = () => cleanup(false);
     release.current = () => cleanup(true);
     handle.window.addEventListener('pagehide', onHide);
+    setWidgetOpen?.(true);
     setWidget(handle);
   }
 
