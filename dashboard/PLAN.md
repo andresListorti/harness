@@ -70,7 +70,10 @@ Work in the order listed. A milestone closes only after these steps, in order:
 
 ## In progress
 
-_None._
+### chat-error-messages
+- **Goal:** Show the server's clear message in the chat for a busy chat (429) and a timeout (504).
+- **Files:** `src/lib/api.ts`, `tests/client/api.test.ts`, `tests/client/chat-panel.test.tsx`
+- **Definition of done:** a test reproduces the bug first: a 429 `CHAT_BUSY` or 504 `TIMEOUT` response produces the generic message. After the fix the chat shows the server message for those two and for 503 `CLI_NOT_FOUND`; every other error keeps the generic message.
 
 ## Done
 
