@@ -61,11 +61,6 @@ Work in the order listed. A milestone closes only after these steps, in order:
 
 ### Milestone 2: voice and widget
 
-### m2-acceptance
-- **Goal:** Check voice and widget in a real browser. Performed by the orchestrator, with the user for microphone steps.
-- **Files:** none
-- **Definition of done:** from a clean `npm ci`, all checks pass; hold Space to talk and browser voice output work; Settings persists after a restart; widget mode opens; no key or voice ID appears in browser responses; providers without keys are verified only through their mocked tests, and this is reported. Then follow "Closing a milestone".
-
 ### Milestone 3: chat with the orchestrator
 
 ### chat-isolation-check
@@ -105,7 +100,10 @@ Work in the order listed. A milestone closes only after these steps, in order:
 
 ## In progress
 
-_None._
+### m2-acceptance
+- **Goal:** Check voice and widget in a real browser. Performed by the orchestrator, with the user for microphone steps.
+- **Files:** none
+- **Definition of done:** from a clean `npm ci`, all checks pass; hold Space to talk and browser voice output work; Settings persists after a restart; widget mode opens; no key or voice ID appears in browser responses; providers without keys are verified only through their mocked tests, and this is reported. Then follow "Closing a milestone".
 
 ## Done
 
