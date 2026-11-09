@@ -70,11 +70,6 @@ Work in the order listed. A milestone closes only after these steps, in order:
 - **Files:** none
 - **Definition of done:** from a clean `npm ci`, all checks pass; with Claude Code a free-text question is answered with repo data; no file changes in the repo after a chat; a prompt asking the agent to write a file does not change anything and shows no tool-call markup; with Codex selected no CLI starts, the answer is local, and the notice and its link work. Then follow "Closing a milestone".
 
-### chat-local-intent
-- **Goal:** Stop treating `to do` inside phrases such as `how to do it` as a question about pending tasks, and make the local help reply say that free-text questions go to the orchestrator (found in `m3-acceptance`).
-- **Files:** `server/chat/local.ts`, `tests/server/chat-local.test.ts`, `tests/server/chat-route.test.ts`
-- **Definition of done:** a test reproduces the bug first: `how to do it` gets the pending tasks. After the fix such phrases are not recognized, real `to do` questions still are, and the help reply mentions the orchestrator.
-
 ## Done
 
 ### scaffold
@@ -460,6 +455,12 @@ Work in the order listed. A milestone closes only after these steps, in order:
 - **Files:** `server/routes/chat.ts`, `tests/server/chat-route.test.ts`
 - **Definition of done:** a test reproduces the bug first: an orchestrator reply keeps its markdown characters. After the fix the reply and the saved history are clean, and the tools notice survives.
 - **Result:** done in 1 attempt. 930 tests pass, typecheck and build clean. The reproducing test failed before the fix. Orchestrator replies and their saved history are clean of markdown; the tools notice survives.
+
+### chat-local-intent
+- **Goal:** Stop treating `to do` inside phrases such as `how to do it` as a question about pending tasks, and make the local help reply say that free-text questions go to the orchestrator (found in `m3-acceptance`).
+- **Files:** `server/chat/local.ts`, `tests/server/chat-local.test.ts`, `tests/server/chat-route.test.ts`
+- **Definition of done:** a test reproduces the bug first: `how to do it` gets the pending tasks. After the fix such phrases are not recognized, real `to do` questions still are, and the help reply mentions the orchestrator.
+- **Result:** done in 1 attempt. 954 tests pass, typecheck and build clean. The reproducing tests failed before the fix. Phrases such as how to do it are no longer pending-tasks questions, and the help reply mentions the orchestrator.
 
 ## Phase 2: real agent execution
 
