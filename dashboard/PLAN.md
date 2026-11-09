@@ -61,11 +61,6 @@ Work in the order listed. A milestone closes only after these steps, in order:
 
 ### Milestone 2: voice and widget
 
-### voice-controls
-- **Goal:** Add Talk, Mute, and voice selector to the sidebar, plus Reply with voice, Hands-free, and microphone to the chat, and connect voice to the orb.
-- **Files:** `src/components/VoiceControls.tsx`, `src/components/Sidebar.tsx`, `src/components/ChatPanel.tsx`, `src/views/HomeView.tsx`, `tests/client/voice-controls.test.tsx`
-- **Definition of done:** `tests/client/voice-controls.test.tsx` passes: Talk and Mute call the voice modules; the selector lists available voices; orb state follows voice state; Reply with voice speaks replies only when on; Hands-free sends the final transcript.
-
 ### widget-mode
 - **Goal:** Add Widget mode to the sidebar: a compact window with only the orb, status, and Talk button, using Document Picture-in-Picture with a popup fallback.
 - **Files:** `src/widget/openWidget.ts`, `src/widget/WidgetView.tsx`, `src/components/Sidebar.tsx`, `tests/client/widget.test.tsx`
@@ -120,7 +115,10 @@ Work in the order listed. A milestone closes only after these steps, in order:
 
 ## In progress
 
-_None._
+### voice-controls
+- **Goal:** Add Talk, Mute, and voice selector to the sidebar, plus Reply with voice, Hands-free, and microphone to the chat, and connect voice to the orb.
+- **Files:** `src/components/VoiceControls.tsx`, `src/components/Sidebar.tsx`, `src/components/ChatPanel.tsx`, `src/views/HomeView.tsx`, `tests/client/voice-controls.test.tsx`
+- **Definition of done:** `tests/client/voice-controls.test.tsx` passes: Talk and Mute call the voice modules; the selector lists available voices; orb state follows voice state; Reply with voice speaks replies only when on; Hands-free sends the final transcript.
 
 ## Done
 
