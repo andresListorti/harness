@@ -61,11 +61,6 @@ Work in the order listed. A milestone closes only after these steps, in order:
 
 ### Milestone 2: voice and widget
 
-### speech-output
-- **Goal:** Speak replies with the browser voice by default, or through `/api/tts`.
-- **Files:** `src/voice/speak.ts`, `server/app.ts`, `tests/client/speech-output.test.ts`, `tests/server/static.test.ts`
-- **Definition of done:** `tests/client/speech-output.test.ts` passes with mocks: the browser provider never calls the backend; other providers do; a new reply cancels the previous one; Mute stops playback; a backend failure falls back to the browser voice. `tests/server/static.test.ts` passes: the CSP allows generated audio and still blocks remote sources.
-
 ### voice-controls
 - **Goal:** Add Talk, Mute, and voice selector to the sidebar, plus Reply with voice, Hands-free, and microphone to the chat, and connect voice to the orb.
 - **Files:** `src/components/VoiceControls.tsx`, `src/components/Sidebar.tsx`, `src/components/ChatPanel.tsx`, `src/views/HomeView.tsx`, `tests/client/voice-controls.test.tsx`
@@ -125,7 +120,10 @@ Work in the order listed. A milestone closes only after these steps, in order:
 
 ## In progress
 
-_None._
+### speech-output
+- **Goal:** Speak replies with the browser voice by default, or through `/api/tts`.
+- **Files:** `src/voice/speak.ts`, `server/app.ts`, `tests/client/speech-output.test.ts`, `tests/server/static.test.ts`
+- **Definition of done:** `tests/client/speech-output.test.ts` passes with mocks: the browser provider never calls the backend; other providers do; a new reply cancels the previous one; Mute stops playback; a backend failure falls back to the browser voice. `tests/server/static.test.ts` passes: the CSP allows generated audio and still blocks remote sources.
 
 ## Done
 
