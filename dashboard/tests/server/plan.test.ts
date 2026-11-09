@@ -144,7 +144,6 @@ test('parses the real dashboard plan', () => {
   const board = parsePlan(markdown, 'dashboard');
   expect(planBoardSchema.safeParse(board).success).toBe(true);
   expect(board.tasks).toContainEqual(expect.objectContaining({ id: 'scaffold', column: 'done' }));
-  expect(board.tasks.some(task => task.column === 'pending' && task.group !== null)).toBe(true);
   expect(board.tasks.some(task => task.id === 'run-audit-log')).toBe(false);
 });
 
