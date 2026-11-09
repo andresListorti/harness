@@ -125,10 +125,7 @@ Work in the order listed. A milestone closes only after these steps, in order:
 
 ## In progress
 
-### speech-input
-- **Goal:** Add Web Speech API input with hold Space to talk.
-- **Files:** `src/voice/useSpeechInput.ts`, `tests/client/speech-input.test.tsx`
-- **Definition of done:** `tests/client/speech-input.test.tsx` passes with a mocked API: holding Space starts once and release stops; Space is ignored inside inputs; the transcript is delivered; an unsupported browser reports it without throwing; the UI discloses that the browser may process audio through its vendor's service.
+_None._
 
 ## Done
 
@@ -389,6 +386,12 @@ Work in the order listed. A milestone closes only after these steps, in order:
 - **Files:** `src/hooks/usePolling.ts`, `src/views/AgentsView.tsx`, `src/views/PlanView.tsx`, `tests/client/use-polling.test.tsx`, `tests/client/agents-view.test.tsx`, `tests/client/plan-view.test.tsx`
 - **Definition of done:** `tests/client/use-polling.test.tsx` passes with fake timers: the callback runs every 5 seconds; polling pauses while `document.visibilityState` is hidden and refreshes once when the tab becomes visible; no request overlaps a pending one; the timer is cleared on unmount. Agents and Plan reload on their own without losing the page, layout, or source selection, and a failed refresh keeps the last data and shows no flicker. Manual Refresh still works.
 - **Result:** done in 1 attempt. 690 tests pass, typecheck and build clean. Silent refreshes never show the loading state, keep the last data on failure, and are discarded when a newer load or an unmount makes them stale. Polling is off while the first load runs or shows an error.
+
+### speech-input
+- **Goal:** Add Web Speech API input with hold Space to talk.
+- **Files:** `src/voice/useSpeechInput.ts`, `tests/client/speech-input.test.tsx`
+- **Definition of done:** `tests/client/speech-input.test.tsx` passes with a mocked API: holding Space starts once and release stops; Space is ignored inside inputs; the transcript is delivered; an unsupported browser reports it without throwing; the UI discloses that the browser may process audio through its vendor's service.
+- **Result:** done in 1 attempt. 716 tests pass, typecheck and build clean. It is the hook only; the interface that uses it and shows the privacy notice comes with `voice-controls`. Space is also ignored on buttons, links, and selects, because Space activates them.
 
 ## Phase 2: real agent execution
 

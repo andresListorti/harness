@@ -639,3 +639,16 @@ Dependencies were installed by the orchestrator once, during task 1, because the
 
 - **Attempt 1:** Codex added `usePolling` (5-second cadence, no overlapping calls, paused while the tab is hidden, one immediate call when it becomes visible, latest callback kept in a ref, timer and listener cleaned up) and gave the Agents and Plan views a silent refresh that keeps the loading state, the page, the layout, and the source selection untouched and keeps the last data when a refresh fails.
 - **Orchestrator check:** read the hook and both views; stale responses are dropped through the existing request counter, so a manual or source-change load wins over a late refresh; no byte order marks; `.data` absent after the suite; 37 files and 690 tests passed, `npm run typecheck` was clean, and `npm run build` passed.
+
+## D44. speech-input
+
+| | |
+|---|---|
+| Branch | `task/speech-input` |
+| Codex attempts | 1 |
+| Codex model | not reported |
+| Duration | 2m 46s |
+| Result | Done |
+
+- **Attempt 1:** Codex added the `useSpeechInput` hook (Web Speech API with the prefixed fallback, interim and final transcripts, hold Space to talk that starts once and stops on release, blur, or a hidden tab, generic error messages, cleanup on unmount) and the exported `SPEECH_PRIVACY_NOTICE`. Its first test and typecheck runs failed and it fixed that within the attempt.
+- **Orchestrator check:** read the hook; Space is ignored inside inputs, text areas, editable elements, buttons, links, and selects, and unsupported browsers get a clear message instead of an exception; no byte order marks; 38 files and 716 tests passed, `npm run typecheck` was clean, and `npm run build` passed.
