@@ -914,3 +914,17 @@ Dependencies were installed by the orchestrator once, during task 1, because the
 - **Why:** a busy chat and a timeout showed the generic "API request failed" text instead of the server's clear message.
 - **Attempt 1:** Codex first wrote tests that reproduce it and confirmed they failed (4 failures). It then passed the server message through for exactly 429 `CHAT_BUSY`, 504 `TIMEOUT`, and 503 `CLI_NOT_FOUND`; every other error keeps the generic text.
 - **Orchestrator check:** read the diff; no byte order marks; 45 files and 927 tests passed, `npm run typecheck` was clean, `npm run build` passed, and the real `dashboard/.data/chat-history.json` has the same hash before and after the suite.
+
+## D64. plan-test-real-state
+
+| | |
+|---|---|
+| Branch | `task/plan-test-real-state` |
+| Codex attempts | 1 |
+| Codex model | not reported |
+| Duration | 1m 2s |
+| Result | Done |
+
+- **Why:** the clean `npm ci` run of `m3-acceptance` failed because the test on the real plan required at least one pending task, which stops being true when the last task of a milestone starts.
+- **Attempt 1:** Codex confirmed the failure and removed that one assertion. An inline fixture already covers grouping of pending tasks.
+- **Orchestrator check:** read the diff; no byte order marks; 45 files and 927 tests passed, `npm run typecheck` was clean, and `npm run build` passed.
