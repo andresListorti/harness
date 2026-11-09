@@ -900,3 +900,17 @@ Dependencies were installed by the orchestrator once, during task 1, because the
 
 - **Attempt 1:** Codex documented the routing of chat questions, the isolation flags, what is sent to the model and through which account, setup, the Codex restriction, and the limits of the isolation check, and removed the statements that the chat never starts an agent or was not built yet. Each of the three documents links to `docs/chat-isolation.md`.
 - **Orchestrator check:** read the diff; no byte order marks; a search of the changed files finds no personal data or local paths; 45 files and 914 tests passed, `npm run typecheck` was clean, `npm run build` passed, and the real `dashboard/.data/chat-history.json` has the same hash before and after the suite.
+
+## D63. chat-error-messages
+
+| | |
+|---|---|
+| Branch | `task/chat-error-messages` |
+| Codex attempts | 1 |
+| Codex model | not reported |
+| Duration | 1m 39s |
+| Result | Done |
+
+- **Why:** a busy chat and a timeout showed the generic "API request failed" text instead of the server's clear message.
+- **Attempt 1:** Codex first wrote tests that reproduce it and confirmed they failed (4 failures). It then passed the server message through for exactly 429 `CHAT_BUSY`, 504 `TIMEOUT`, and 503 `CLI_NOT_FOUND`; every other error keeps the generic text.
+- **Orchestrator check:** read the diff; no byte order marks; 45 files and 927 tests passed, `npm run typecheck` was clean, `npm run build` passed, and the real `dashboard/.data/chat-history.json` has the same hash before and after the suite.

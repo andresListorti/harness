@@ -34,7 +34,11 @@ export function createApiClient(fetchImpl: typeof fetch = (...args) => fetch(...
     if (!response.ok) {
       const error = apiErrorSchema.safeParse(body);
       throw new ApiError(
-        error.success && response.status === 503 && error.data.error.code === 'CLI_NOT_FOUND'
+        error.success && (
+          (response.status === 429 && error.data.error.code === 'CHAT_BUSY')
+          || (response.status === 504 && error.data.error.code === 'TIMEOUT')
+          || (response.status === 503 && error.data.error.code === 'CLI_NOT_FOUND')
+        )
           ? error.data.error.message : 'API request failed.',
         error.success ? error.data.error.code : 'HTTP_ERROR', response.status,
       );
