@@ -11,6 +11,7 @@ export const CONTENT_SECURITY_POLICY: string = [
   "style-src 'self'",
   "img-src 'self'",
   "font-src 'self'",
+  "media-src 'self' blob:",
   "connect-src 'self'",
   "object-src 'none'",
   "base-uri 'self'",

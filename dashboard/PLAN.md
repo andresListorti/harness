@@ -120,10 +120,7 @@ Work in the order listed. A milestone closes only after these steps, in order:
 
 ## In progress
 
-### speech-output
-- **Goal:** Speak replies with the browser voice by default, or through `/api/tts`.
-- **Files:** `src/voice/speak.ts`, `server/app.ts`, `tests/client/speech-output.test.ts`, `tests/server/static.test.ts`
-- **Definition of done:** `tests/client/speech-output.test.ts` passes with mocks: the browser provider never calls the backend; other providers do; a new reply cancels the previous one; Mute stops playback; a backend failure falls back to the browser voice. `tests/server/static.test.ts` passes: the CSP allows generated audio and still blocks remote sources.
+_None._
 
 ## Done
 
@@ -390,6 +387,12 @@ Work in the order listed. A milestone closes only after these steps, in order:
 - **Files:** `src/voice/useSpeechInput.ts`, `tests/client/speech-input.test.tsx`
 - **Definition of done:** `tests/client/speech-input.test.tsx` passes with a mocked API: holding Space starts once and release stops; Space is ignored inside inputs; the transcript is delivered; an unsupported browser reports it without throwing; the UI discloses that the browser may process audio through its vendor's service.
 - **Result:** done in 1 attempt. 716 tests pass, typecheck and build clean. It is the hook only; the interface that uses it and shows the privacy notice comes with `voice-controls`. Space is also ignored on buttons, links, and selects, because Space activates them.
+
+### speech-output
+- **Goal:** Speak replies with the browser voice by default, or through `/api/tts`.
+- **Files:** `src/voice/speak.ts`, `server/static.ts`, `tests/client/speech-output.test.ts`, `tests/server/static.test.ts`
+- **Definition of done:** `tests/client/speech-output.test.ts` passes with mocks: the browser provider never calls the backend; other providers do; a new reply cancels the previous one; Mute stops playback; a backend failure falls back to the browser voice. `tests/server/static.test.ts` passes: the CSP allows generated audio and still blocks remote sources.
+- **Result:** done in 1 attempt. 739 tests pass, typecheck and build clean. A stale or superseded request never plays, and any provider failure falls back to the browser voice with no error text exposed. The policy lives in `server/static.ts` and now allows `media-src 'self' blob:` only; every remote source is still blocked.
 
 ## Phase 2: real agent execution
 
