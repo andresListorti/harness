@@ -130,10 +130,7 @@ Work in the order listed. A milestone closes only after these steps, in order:
 
 ## In progress
 
-### live-refresh
-- **Goal:** Refresh the Agents and Plan views on their own every 5 seconds by polling the API, and pause while the browser tab is hidden.
-- **Files:** `src/hooks/usePolling.ts`, `src/views/AgentsView.tsx`, `src/views/PlanView.tsx`, `tests/client/use-polling.test.tsx`, `tests/client/agents-view.test.tsx`, `tests/client/plan-view.test.tsx`
-- **Definition of done:** `tests/client/use-polling.test.tsx` passes with fake timers: the callback runs every 5 seconds; polling pauses while `document.visibilityState` is hidden and refreshes once when the tab becomes visible; no request overlaps a pending one; the timer is cleared on unmount. Agents and Plan reload on their own without losing the page, layout, or source selection, and a failed refresh keeps the last data and shows no flicker. Manual Refresh still works.
+_None._
 
 ## Done
 
@@ -388,6 +385,12 @@ Work in the order listed. A milestone closes only after these steps, in order:
 - **Files:** `server/chat/history.ts`, `server/routes/chat.ts`, `server/routes/data.ts`, `shared/api.ts`, `src/components/ChatPanel.tsx`, `src/lib/api.ts`, `tests/server/chat-history.test.ts`, `tests/client/chat-panel.test.tsx`, `tests/test-app.ts`, `tests/storage-safeguard.ts`, `vitest.config.ts`, and the tests that build the app or mock the client
 - **Definition of done:** the history is stored in `.data/chat-history.json` (ignored by git, written atomically, capped in size, validated on read, with a corrupt file treated as empty); `GET /api/chat/history` returns it and `DELETE /api/chat/history` clears it, both behind the existing Host and Origin guards; the chat panel loads the history on mount and renders it as plain text; every sent message and reply is saved; `New chat` deletes the stored history; a reload shows the previous conversation.
 - **Result:** done in 2 attempts. 683 tests pass, typecheck and build clean. The server saves each question and reply in `POST /api/chat` (capped at 200 messages and 100000 characters, written atomically, writes serialized). A history write failure never blocks an answer. A failed clear keeps the conversation and shows an error. A suite-wide safeguard fails the tests if they ever touch the real `.data` files.
+
+### live-refresh
+- **Goal:** Refresh the Agents and Plan views on their own every 5 seconds by polling the API, and pause while the browser tab is hidden.
+- **Files:** `src/hooks/usePolling.ts`, `src/views/AgentsView.tsx`, `src/views/PlanView.tsx`, `tests/client/use-polling.test.tsx`, `tests/client/agents-view.test.tsx`, `tests/client/plan-view.test.tsx`
+- **Definition of done:** `tests/client/use-polling.test.tsx` passes with fake timers: the callback runs every 5 seconds; polling pauses while `document.visibilityState` is hidden and refreshes once when the tab becomes visible; no request overlaps a pending one; the timer is cleared on unmount. Agents and Plan reload on their own without losing the page, layout, or source selection, and a failed refresh keeps the last data and shows no flicker. Manual Refresh still works.
+- **Result:** done in 1 attempt. 690 tests pass, typecheck and build clean. Silent refreshes never show the loading state, keep the last data on failure, and are discarded when a newer load or an unmount makes them stale. Polling is off while the first load runs or shows an error.
 
 ## Phase 2: real agent execution
 

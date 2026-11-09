@@ -2,6 +2,7 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import type { PlanSource, PlanTask, RunLogEntry } from '../../shared/api';
 import { api, ApiError } from '../lib/api';
 import { EMPTY_VALUE } from '../lib/format';
+import { usePolling } from '../hooks/usePolling';
 import './PlanView.css';
 
 const columns = [
@@ -34,22 +35,29 @@ export function PlanView({ client = api }: { client?: Pick<typeof api, 'getPlan'
   const [error, setError] = useState<string | null>(null);
   const request = useRef(0);
 
-  const load = useCallback(async () => {
+  const fetchData = useCallback(async (silent = false) => {
     const current = ++request.current;
-    setLoading(true);
-    setError(null);
+    if (!silent) {
+      setLoading(true);
+      setError(null);
+    }
     try {
       const [plan, log] = await Promise.all([client.getPlan(source), client.getRunLog(source)]);
       if (current !== request.current) return;
       setTasks(plan.tasks);
       setEntries(log.entries);
+      setError(null);
     } catch (cause) {
       if (current !== request.current) return;
-      setError(cause instanceof ApiError ? `Could not load plan: ${cause.message}` : 'Could not load plan.');
+      if (!silent) setError(cause instanceof ApiError ? `Could not load plan: ${cause.message}` : 'Could not load plan.');
     } finally {
-      if (current === request.current) setLoading(false);
+      if (!silent && current === request.current) setLoading(false);
     }
   }, [client, source]);
+
+  const load = useCallback(() => fetchData(), [fetchData]);
+  const refresh = useCallback(() => fetchData(true), [fetchData]);
+  usePolling(refresh, 5000, !loading && error === null);
 
   useEffect(() => {
     void load();

@@ -1,5 +1,5 @@
 // @vitest-environment jsdom
-import { act, cleanup, render, screen, within } from '@testing-library/react';
+import { act, cleanup, fireEvent, render, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import type { PlanBoard, PlanSource, PlanTask, RunLog, RunLogEntry } from '../../shared/api';
 import { ApiError } from '../../src/lib/api';
@@ -177,4 +177,41 @@ test('renders API HTML literally', async () => {
   await userEvent.click(screen.getByText('D1. Run D1'));
   expect(screen.getByText(note)).toBeVisible();
   expect(container.querySelector('img, b')).toBeNull();
+});
+
+
+test('polls silently, preserves selection, survives failure, and supports manual refresh', async () => {
+  vi.useFakeTimers({ toFake: ['setInterval', 'clearInterval'] });
+  const visibility = vi.spyOn(document, 'visibilityState', 'get').mockReturnValue('visible');
+  try {
+    const client = clientFor([task('Initial')]);
+    render(<PlanView client={client} />);
+    await act(async () => {});
+    await waitFor(() => expect(screen.getByText('Initial')).toBeInTheDocument());
+    await act(async () => fireEvent.click(screen.getByRole('button', { name: 'Example app' })));
+    await waitFor(() => expect(client.getPlan).toHaveBeenLastCalledWith('example-app'));
+    const pending = deferred<PlanBoard>();
+    client.getPlan.mockReturnValueOnce(pending.promise);
+    client.getRunLog.mockResolvedValue({ source: 'example-app', entries: [entry('Updated')] });
+    await act(async () => { await vi.advanceTimersByTimeAsync(5000); });
+    expect(screen.queryByText(/Loading/)).not.toBeInTheDocument();
+    expect(screen.getByText('Initial')).toBeInTheDocument();
+    await act(async () => pending.resolve({ source: 'example-app', tasks: [task('Updated task')] }));
+    await waitFor(() => expect(screen.getByText('Updated task')).toBeInTheDocument());
+    expect(screen.getByText('Updated. Run Updated')).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'Example app' })).toHaveAttribute('aria-pressed', 'true');
+    expect(client.getPlan).toHaveBeenLastCalledWith('example-app');
+    expect(client.getRunLog).toHaveBeenLastCalledWith('example-app');
+    client.getPlan.mockRejectedValueOnce(new Error('Unavailable'));
+    await act(async () => { await vi.advanceTimersByTimeAsync(5000); });
+    expect(screen.getByText('Updated task')).toBeInTheDocument();
+    expect(screen.queryByRole('alert')).not.toBeInTheDocument();
+    await act(async () => fireEvent.click(screen.getByRole('button', { name: 'Refresh' })));
+    await waitFor(() => expect(screen.getByText('Initial')).toBeInTheDocument());
+    expect(client.getPlan).toHaveBeenCalledTimes(5);
+  } finally {
+    cleanup();
+    visibility.mockRestore();
+    vi.useRealTimers();
+  }
 });
