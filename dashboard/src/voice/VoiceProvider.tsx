@@ -1,5 +1,5 @@
 import { createContext, useCallback, useContext, useEffect, useRef, useState, type ReactNode } from 'react';
-import type { VoiceChoice } from '../../shared/api';
+import type { ChatResponse, VoiceChoice } from '../../shared/api';
 import type { OrbState } from '../components/Orb';
 import { api } from '../lib/api';
 import { notifySettingsChanged, SETTINGS_CHANGED_EVENT } from '../lib/settings-events';
@@ -41,6 +41,15 @@ function useVoiceState(client: VoiceClient, speaker: typeof defaultSpeaker) {
   latest.current = { handsFree, replyWithVoice, voice };
   function speakReply(text: string) {
     if (latest.current.replyWithVoice) void speaker.speak(text, latest.current.voice);
+  }
+  // Observe the request independently of the chat panel's mounted lifetime.
+  async function trackChatReply(response: Promise<ChatResponse>, abandoned: () => boolean) {
+    try {
+      const result = await response;
+      if (!abandoned()) speakReply(result.reply);
+    } catch {
+      // The chat panel owns request error reporting.
+    }
   }
   submitRef.current = text => {
     if (!latest.current.handsFree) return;
@@ -125,7 +134,7 @@ function useVoiceState(client: VoiceClient, speaker: typeof defaultSpeaker) {
       setMuted(speaker.isMuted());
     },
     voice, voices, setVoice, replyWithVoice, setReplyWithVoice, handsFree, setHandsFree,
-    speakReply, onTranscript, registerChatSink, onChatSettled,
+    speakReply, trackChatReply, onTranscript, registerChatSink, onChatSettled,
   };
 }
 

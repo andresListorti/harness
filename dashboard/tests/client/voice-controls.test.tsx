@@ -320,6 +320,32 @@ function enableHandsFree() {
   fireEvent.click(screen.getByRole('switch', { name: 'Hands-free' }));
 }
 
+test('Hands-free reply survives navigation away from Home before resolution', async () => {
+  let resolve!: (value: { reply: string; source: 'local' }) => void;
+  vi.mocked(api.sendChat).mockClear().mockReturnValueOnce(new Promise(res => { resolve = res; }));
+  const speak = vi.spyOn(defaultSpeaker, 'speak').mockResolvedValue(undefined);
+  vi.spyOn(defaultSpeaker, 'cancel').mockImplementation(() => {});
+  render(<App />);
+  await waitFor(() => expect(screen.getByRole('switch', { name: 'Hands-free' })).toBeInTheDocument());
+  enableHandsFree();
+  fireEvent.click(screen.getByRole('switch', { name: 'Reply with voice' }));
+  fireEvent.click(screen.getByRole('button', { name: 'Microphone' }));
+  act(() => Recognition.latest.result('Question from Home', true));
+  expect(api.sendChat).toHaveBeenCalledExactlyOnceWith('Question from Home');
+  fireEvent.click(screen.getByRole('button', { name: 'Agents' }));
+  expect(screen.queryByRole('region', { name: 'Chat' })).not.toBeInTheDocument();
+  await act(async () => resolve({ reply: 'Answer after navigation', source: 'local' }));
+  await waitFor(() => expect(speak).toHaveBeenCalledExactlyOnceWith('Answer after navigation', 'browser'));
+  vi.mocked(api.getChatHistory).mockResolvedValueOnce({ messages: [
+    { role: 'user', text: 'Question from Home' },
+    { role: 'assistant', text: 'Answer after navigation', source: 'local' },
+  ] });
+  fireEvent.click(screen.getByRole('button', { name: 'Harness' }));
+  await screen.findByText('Answer after navigation');
+  await waitFor(() => expect(screen.getByRole('log').querySelectorAll('.chat-message')).toHaveLength(2));
+  expect(speak).toHaveBeenCalledOnce();
+});
+
 test.each([false, true])('direct Talk submits once without a chat (widget: %s)', async widget => {
   const s = setup();
   await ready();
@@ -472,3 +498,48 @@ test.each(['blur', 'hidden'])('widget Talk keeps listening when the main window 
   else act(() => { events.dispatchEvent(new Event('pagehide')); });
   expect(next.stop).toHaveBeenCalledOnce();
 });
+
+
+test.each(['mounted', 'away', 'new chat', 'voice off', 'failure'])(
+  'pending Hands-free playback respects %s', async scenario => {
+    const s = setup();
+    await ready();
+    let resolve!: (value: { reply: string; source: string }) => void;
+    let reject!: (reason: Error) => void;
+    s.client.sendChat.mockReturnValueOnce(new Promise((res, rej) => { resolve = res; reject = rej; }));
+    enableHandsFree();
+    fireEvent.click(screen.getByRole('switch', { name: 'Reply with voice' }));
+    fireEvent.click(screen.getByRole('button', { name: 'Microphone' }));
+    act(() => Recognition.latest.result('Pending question', true));
+    expect(s.client.sendChat).toHaveBeenCalledExactlyOnceWith('Pending question');
+    if (scenario === 'new chat') {
+      fireEvent.click(screen.getByRole('button', { name: 'New chat' }));
+      await waitFor(() => expect(screen.getByRole('log').querySelector('.chat-message')).toBeNull());
+      detached(s);
+    }
+    if (scenario === 'away' || scenario === 'voice off') detached(s);
+    if (scenario === 'voice off') {
+      function DisableReply() {
+        const voice = useVoice()!;
+        return <button onClick={() => voice.setReplyWithVoice(false)}>Disable reply</button>;
+      }
+      s.rerender(<VoiceProvider client={s.client} speaker={s.speaker}><DisableReply /></VoiceProvider>);
+      fireEvent.click(screen.getByRole('button', { name: 'Disable reply' }));
+    }
+    await act(async () => {
+      if (scenario === 'failure') reject(new Error('Unavailable'));
+      else resolve({ reply: 'Pending answer', source: 'local' });
+    });
+    if (scenario === 'mounted' || scenario === 'away') {
+      await waitFor(() => expect(s.speaker.speak).toHaveBeenCalledExactlyOnceWith('Pending answer', 'browser'));
+      if (scenario === 'mounted') expect(screen.getByText('Pending answer')).toBeInTheDocument();
+    } else {
+      expect(s.speaker.speak).not.toHaveBeenCalled();
+      if (scenario === 'failure') {
+        await screen.findByRole('alert');
+        await waitFor(() => expect(screen.getByRole('alert')).toHaveTextContent('Could not get an answer.'));
+      }
+    }
+    expect(s.client.sendChat).toHaveBeenCalledOnce();
+  },
+);
