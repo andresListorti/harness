@@ -61,11 +61,6 @@ Work in the order listed. A milestone closes only after these steps, in order:
 
 ### Milestone 2: voice and widget
 
-### live-refresh
-- **Goal:** Refresh the Agents and Plan views on their own every 5 seconds by polling the API, and pause while the browser tab is hidden.
-- **Files:** `src/hooks/usePolling.ts`, `src/views/AgentsView.tsx`, `src/views/PlanView.tsx`, `tests/client/use-polling.test.tsx`, `tests/client/agents-view.test.tsx`, `tests/client/plan-view.test.tsx`
-- **Definition of done:** `tests/client/use-polling.test.tsx` passes with fake timers: the callback runs every 5 seconds; polling pauses while `document.visibilityState` is hidden and refreshes once when the tab becomes visible; no request overlaps a pending one; the timer is cleared on unmount. Agents and Plan reload on their own without losing the page, layout, or source selection, and a failed refresh keeps the last data and shows no flicker. Manual Refresh still works.
-
 ### speech-input
 - **Goal:** Add Web Speech API input with hold Space to talk.
 - **Files:** `src/voice/useSpeechInput.ts`, `tests/client/speech-input.test.tsx`
@@ -135,7 +130,10 @@ Work in the order listed. A milestone closes only after these steps, in order:
 
 ## In progress
 
-_None._
+### live-refresh
+- **Goal:** Refresh the Agents and Plan views on their own every 5 seconds by polling the API, and pause while the browser tab is hidden.
+- **Files:** `src/hooks/usePolling.ts`, `src/views/AgentsView.tsx`, `src/views/PlanView.tsx`, `tests/client/use-polling.test.tsx`, `tests/client/agents-view.test.tsx`, `tests/client/plan-view.test.tsx`
+- **Definition of done:** `tests/client/use-polling.test.tsx` passes with fake timers: the callback runs every 5 seconds; polling pauses while `document.visibilityState` is hidden and refreshes once when the tab becomes visible; no request overlaps a pending one; the timer is cleared on unmount. Agents and Plan reload on their own without losing the page, layout, or source selection, and a failed refresh keeps the last data and shows no flicker. Manual Refresh still works.
 
 ## Done
 
