@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import type { AgentStatus } from '../hooks/useAgentStatus';
 import './Sidebar.css';
+import { VoiceControls } from './VoiceControls';
 
 export type ViewId = 'harness' | 'agents' | 'galaxy' | 'plan' | 'settings';
 export const VIEWS: { id: ViewId; label: string }[] = [
@@ -66,6 +67,7 @@ export function Sidebar({ view, onNavigate, collapsed, onToggleCollapsed, agentS
         <Icon name={id} />{!collapsed && <span>{label}</span>}
       </button>)}
     </nav>
+    <VoiceControls collapsed={collapsed} />
     <div className="sidebar-footer">
       <div role="status" aria-label={statusText} className="sidebar-status"><span aria-hidden="true" className={`status-dot status-dot--${agentStatus}`} />{!collapsed && <span>{statusText}</span>}</div>
       <button type="button" className="sidebar-item" aria-label={fullscreenText} onClick={() => void toggleFullscreen()}><Icon name="fullscreen" />{!collapsed && <span>{fullscreenText}</span>}</button>

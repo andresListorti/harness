@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import type { Settings, SettingsResponse, VoiceChoice, VoiceProviders } from '../../shared/api';
 import { api, ApiError } from '../lib/api';
+import { notifySettingsChanged } from '../lib/settings-events';
 import './SettingsView.css';
 
 const agents = [{ id: 'claude-code', name: 'Claude Code' }, { id: 'codex', name: 'Codex' }] as const;
@@ -52,6 +53,7 @@ export function SettingsView({ client = api }: { client?: Client }) {
     setSaveError(null);
     try {
       const result = await client.saveSettings(next);
+      notifySettingsChanged();
       if (current === request.current) setSettings(result);
     } catch {
       if (current === request.current) setSaveError('Could not save settings. Please try again.');

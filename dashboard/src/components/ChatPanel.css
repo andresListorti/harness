@@ -44,3 +44,7 @@
   .chat-panel { padding: var(--space-3); }
   .chat-message { max-width: 95%; }
 }
+
+.chat-header { flex-wrap: wrap; align-items: center; gap: var(--space-3); }
+.chat-header label { display: flex; align-items: center; gap: var(--space-2); font-size: var(--text-sm); }
+.chat-header svg { width: 22px; height: 22px; display: block; }
