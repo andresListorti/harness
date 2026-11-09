@@ -61,6 +61,11 @@ Work in the order listed. A milestone closes only after these steps, in order:
 
 ### Milestone 2: voice and widget
 
+### chat-clear-generation
+- **Goal:** Make "New chat" safe against requests still in flight, with a conversation generation identifier on the server (finding from the Codex review of Milestone 2).
+- **Files:** `server/chat/history.ts`, `server/routes/chat.ts`, `tests/server/chat-history.test.ts`
+- **Definition of done:** a test reproduces the bug first: a chat request is held while it reads repo data, the history is cleared, the request is released, and the cleared conversation reappears. After the fix the history stays empty: each history path has a generation that clearing increments, a chat request captures the generation before it reads anything, and its save is skipped when the generation changed; the reply is still returned to the caller; requests that start after a clear are saved normally; concurrent requests without a clear lose nothing; two app instances over the same file share the generation.
+
 ### Milestone 3: chat with the orchestrator
 
 ### chat-isolation-check
@@ -100,7 +105,10 @@ Work in the order listed. A milestone closes only after these steps, in order:
 
 ## In progress
 
-_None._
+### voice-transcript-provider
+- **Goal:** Send Hands-free transcripts from the persistent voice provider, so they work from any view and from the widget (finding from the Codex review of Milestone 2).
+- **Files:** `src/voice/VoiceProvider.tsx`, `src/components/ChatPanel.tsx`, `tests/client/voice-controls.test.tsx`, `tests/client/chat-panel.test.tsx`
+- **Definition of done:** a test reproduces the bug first: with Hands-free on, navigating to Agents (chat unmounted) and finishing a transcript sends no chat request. After the fix the final transcript is sent exactly once with Hands-free on, from any view and from the widget; when the chat panel is mounted it still shows the exchange live through its own send path (no duplicate request); when it is not mounted the provider sends the message directly, speaks the reply if Reply with voice is on, and a chat panel that mounts later shows the saved exchange from the history, including one that finishes after mounting; with Hands-free off nothing is sent; interim transcripts still only fill the field of a mounted chat.
 
 ## Done
 
