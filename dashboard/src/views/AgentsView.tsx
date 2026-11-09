@@ -2,6 +2,7 @@ import { useCallback, useEffect, useRef, useState, type CSSProperties } from 're
 import type { AgentCard } from '../../shared/api';
 import { api, ApiError } from '../lib/api';
 import { EMPTY_VALUE, formatElapsed } from '../lib/format';
+import { usePolling } from '../hooks/usePolling';
 import './AgentsView.css';
 
 const statuses = { working: 'Working', done: 'Done', error: 'Error' };
@@ -23,21 +24,28 @@ export function AgentsView({ client = api }: { client?: Pick<typeof api, 'getAge
   const pages = Math.max(1, Math.ceil(agents.length / pageSize));
   const currentPage = Math.min(page, pages);
 
-  const load = useCallback(async () => {
+  const fetchData = useCallback(async (silent = false) => {
     const current = ++request.current;
-    setLoading(true);
-    setError(null);
+    if (!silent) {
+      setLoading(true);
+      setError(null);
+    }
     try {
       const result = await client.getAgents();
       if (current !== request.current) return;
       setAgents(result.agents);
+      setError(null);
     } catch (cause) {
       if (current !== request.current) return;
-      setError(cause instanceof ApiError ? `Could not load agents: ${cause.message}` : 'Could not load agents.');
+      if (!silent) setError(cause instanceof ApiError ? `Could not load agents: ${cause.message}` : 'Could not load agents.');
     } finally {
-      if (current === request.current) setLoading(false);
+      if (!silent && current === request.current) setLoading(false);
     }
   }, [client]);
+
+  const load = useCallback(() => fetchData(), [fetchData]);
+  const refresh = useCallback(() => fetchData(true), [fetchData]);
+  usePolling(refresh, 5000, !loading && error === null);
 
   useEffect(() => { setPage(previous => Math.min(previous, pages)); }, [pages]);
 

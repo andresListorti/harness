@@ -626,3 +626,16 @@ Dependencies were installed by the orchestrator once, during task 1, because the
 - **Orchestrator review of attempt 1:** after the suite ran, the real `dashboard/.data/chat-history.json` existed. Existing tests that post to `/api/chat` used the default history path, so running the tests would overwrite a user's saved conversation. The orchestrator deleted that file and sent the finding back.
 - **Attempt 2:** Codex gave every test that builds the app its own temporary storage under the system temp folder (a shared `tests/test-app.ts` helper), and added a global safeguard (`tests/storage-safeguard.ts`) that fails the suite if the default storage files appear. Duration of attempt 2: 1m 53s.
 - **Orchestrator check:** after `npm test` the `.data` folder does not exist; no byte order marks; 36 files and 683 tests passed, `npm run typecheck` was clean, and `npm run build` passed.
+
+## D43. live-refresh
+
+| | |
+|---|---|
+| Branch | `task/live-refresh` |
+| Codex attempts | 1 |
+| Codex model | not reported |
+| Duration | 2m 27s |
+| Result | Done |
+
+- **Attempt 1:** Codex added `usePolling` (5-second cadence, no overlapping calls, paused while the tab is hidden, one immediate call when it becomes visible, latest callback kept in a ref, timer and listener cleaned up) and gave the Agents and Plan views a silent refresh that keeps the loading state, the page, the layout, and the source selection untouched and keeps the last data when a refresh fails.
+- **Orchestrator check:** read the hook and both views; stale responses are dropped through the existing request counter, so a manual or source-change load wins over a late refresh; no byte order marks; `.data` absent after the suite; 37 files and 690 tests passed, `npm run typecheck` was clean, and `npm run build` passed.

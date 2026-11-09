@@ -2,7 +2,7 @@
 import { readFileSync } from 'node:fs';
 import { dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { act, cleanup, render, screen, within } from '@testing-library/react';
+import { act, cleanup, fireEvent, render, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import type { AgentCard, Agents } from '../../shared/api';
 import { ApiError } from '../../src/lib/api';
@@ -199,4 +199,38 @@ test('renders HTML in task and output literally', async () => {
   expect(screen.getByText(output).tagName).toBe('PRE');
   expect(screen.getByText(output)).toHaveAttribute('title', output);
   expect(container.querySelector('img, b')).toBeNull();
+});
+
+
+test('polls silently, preserves selection, survives failure, and supports manual refresh', async () => {
+  vi.useFakeTimers({ toFake: ['setInterval', 'clearInterval'] });
+  const visibility = vi.spyOn(document, 'visibilityState', 'get').mockReturnValue('visible');
+  try {
+    const client = clientFor([card(1), card(2)]);
+    const { container } = render(<AgentsView client={client} />);
+    await act(async () => {});
+    await waitFor(() => expect(screen.getByRole('article', { name: 'Task 1' })).toBeInTheDocument());
+    fireEvent.click(screen.getByRole('button', { name: '1 per page' }));
+    fireEvent.click(screen.getByRole('button', { name: 'Next' }));
+    const pending = deferred();
+    client.getAgents.mockReturnValueOnce(pending.promise);
+    await act(async () => { await vi.advanceTimersByTimeAsync(5000); });
+    expect(screen.queryByText(/Loading/)).not.toBeInTheDocument();
+    expect(screen.getByRole('article', { name: 'Task 2' })).toBeInTheDocument();
+    await act(async () => pending.resolve({ agents: [card(1), card(2, { task: 'Updated task' })] }));
+    await waitFor(() => expect(screen.getByRole('article', { name: 'Updated task' })).toBeInTheDocument());
+    expect(container.querySelector('.agents-grid')).toHaveAttribute('data-columns', '1');
+    expect(screen.getByText('Page 2 of 2')).toBeInTheDocument();
+    client.getAgents.mockRejectedValueOnce(new Error('Unavailable'));
+    await act(async () => { await vi.advanceTimersByTimeAsync(5000); });
+    expect(screen.getByRole('article', { name: 'Updated task' })).toBeInTheDocument();
+    expect(screen.queryByRole('alert')).not.toBeInTheDocument();
+    await act(async () => fireEvent.click(screen.getByRole('button', { name: 'Refresh' })));
+    await waitFor(() => expect(screen.getByRole('article', { name: 'Task 2' })).toBeInTheDocument());
+    expect(client.getAgents).toHaveBeenCalledTimes(4);
+  } finally {
+    cleanup();
+    visibility.mockRestore();
+    vi.useRealTimers();
+  }
 });
