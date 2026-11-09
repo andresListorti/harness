@@ -61,11 +61,6 @@ Work in the order listed. A milestone closes only after these steps, in order:
 
 ### Milestone 2: voice and widget
 
-### chat-clear-generation
-- **Goal:** Make "New chat" safe against requests still in flight, with a conversation generation identifier on the server (finding from the Codex review of Milestone 2).
-- **Files:** `server/chat/history.ts`, `server/routes/chat.ts`, `tests/server/chat-history.test.ts`
-- **Definition of done:** a test reproduces the bug first: a chat request is held while it reads repo data, the history is cleared, the request is released, and the cleared conversation reappears. After the fix the history stays empty: each history path has a generation that clearing increments, a chat request captures the generation before it reads anything, and its save is skipped when the generation changed; the reply is still returned to the caller; requests that start after a clear are saved normally; concurrent requests without a clear lose nothing; two app instances over the same file share the generation.
-
 ### Milestone 3: chat with the orchestrator
 
 ### chat-isolation-check
@@ -105,7 +100,10 @@ Work in the order listed. A milestone closes only after these steps, in order:
 
 ## In progress
 
-_None._
+### chat-clear-generation
+- **Goal:** Make "New chat" safe against requests still in flight, with a conversation generation identifier on the server (finding from the Codex review of Milestone 2).
+- **Files:** `server/chat/history.ts`, `server/routes/chat.ts`, `tests/server/chat-history.test.ts`
+- **Definition of done:** a test reproduces the bug first: a chat request is held while it reads repo data, the history is cleared, the request is released, and the cleared conversation reappears. After the fix the history stays empty: each history path has a generation that clearing increments, a chat request captures the generation before it reads anything, and its save is skipped when the generation changed; the reply is still returned to the caller; requests that start after a clear are saved normally; concurrent requests without a clear lose nothing; two app instances over the same file share the generation.
 
 ## Done
 
