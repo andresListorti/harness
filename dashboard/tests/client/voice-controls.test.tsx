@@ -79,6 +79,23 @@ async function ready() {
   await waitFor(() => expect(screen.getByRole('option', { name: 'OpenAI' })).toBeInTheDocument());
 }
 
+test('Space cancels a spoken reply once before recognition starts and release stops listening', async () => {
+  const s = setup();
+  await ready();
+  fireEvent.click(screen.getByRole('switch', { name: 'Reply with voice' }));
+  await userEvent.type(screen.getByRole('textbox'), 'Question{Enter}');
+  await waitFor(() => expect(s.speaker.speak).toHaveBeenCalledExactlyOnceWith('New reply', 'browser'));
+  act(() => s.emit('speaking'));
+  fireEvent.keyDown(document.body, { key: ' ' });
+  expect(s.speaker.cancel).toHaveBeenCalledOnce();
+  expect(Recognition.latest.start).toHaveBeenCalledOnce();
+  expect(s.speaker.cancel.mock.invocationCallOrder[0]).toBeLessThan(Recognition.latest.start.mock.invocationCallOrder[0]);
+  fireEvent.keyUp(document.body, { key: ' ' });
+  expect(Recognition.latest.stop).toHaveBeenCalledOnce();
+  expect(screen.getByRole('button', { name: 'Talk' })).toHaveAttribute('aria-pressed', 'false');
+  expect(s.speaker.cancel).toHaveBeenCalledOnce();
+});
+
 test('Talk cancels speech before starting, toggles listening, and Mute toggles speaker and name', async () => {
   const s = setup();
   await ready();
@@ -88,6 +105,7 @@ test('Talk cancels speech before starting, toggles listening, and Mute toggles s
   expect(screen.getByRole('button', { name: 'Talk' })).toHaveAttribute('aria-pressed', 'true');
   fireEvent.click(screen.getByRole('button', { name: 'Talk' }));
   expect(Recognition.latest.stop).toHaveBeenCalledOnce();
+  expect(s.speaker.cancel).toHaveBeenCalledOnce();
   expect(screen.getByRole('button', { name: 'Talk' })).toHaveAttribute('aria-pressed', 'false');
   fireEvent.click(screen.getByRole('button', { name: 'Mute' }));
   expect(s.speaker.mute).toHaveBeenCalledOnce();
@@ -96,6 +114,40 @@ test('Talk cancels speech before starting, toggles listening, and Mute toggles s
   expect(s.speaker.unmute).toHaveBeenCalledOnce();
   s.unmount();
   expect(s.unsubscribe).toHaveBeenCalledOnce();
+});
+
+test.each(['sidebar', 'chat', 'widget'])('%s control cancels exactly once per start and does not cancel on stop', async control => {
+  const s = setup();
+  await ready();
+  if (control === 'widget') detached(s, true);
+  const button = screen.getByRole('button', { name: control === 'chat' ? 'Microphone' : 'Talk' });
+  for (let count = 1; count <= 2; count++) {
+    fireEvent.click(button);
+    expect(s.speaker.cancel).toHaveBeenCalledTimes(count);
+    expect(Recognition.latest.start).toHaveBeenCalledOnce();
+    expect(s.speaker.cancel.mock.invocationCallOrder[count - 1]).toBeLessThan(Recognition.latest.start.mock.invocationCallOrder[0]);
+    fireEvent.click(button);
+    expect(Recognition.latest.stop).toHaveBeenCalledOnce();
+    expect(s.speaker.cancel).toHaveBeenCalledTimes(count);
+  }
+});
+
+test.each(['input', 'textarea', 'editable', 'button', 'repeat', 'ctrlKey', 'altKey', 'metaKey', 'shiftKey', 'unsupported'])('ignored Space (%s) never cancels speech or starts recognition', async kind => {
+  const s = setup();
+  await ready();
+  const previous = Recognition.latest;
+  let target: HTMLElement = document.body;
+  if (['input', 'textarea', 'editable', 'button'].includes(kind)) {
+    target = document.createElement(kind === 'editable' ? 'div' : kind);
+    if (kind === 'editable') target.setAttribute('contenteditable', 'true');
+    document.body.append(target);
+  }
+  if (kind === 'unsupported') Reflect.deleteProperty(window, 'SpeechRecognition');
+  fireEvent.keyDown(target, { key: ' ', ...(['repeat', 'ctrlKey', 'altKey', 'metaKey', 'shiftKey'].includes(kind) ? { [kind]: true } : {}) });
+  expect(s.speaker.cancel).not.toHaveBeenCalled();
+  expect(Recognition.latest).toBe(previous);
+  expect(screen.getByRole('button', { name: 'Talk' })).toHaveAttribute('aria-pressed', 'false');
+  if (target !== document.body) target.remove();
 });
 
 test('lists only configured providers, preserves orchestrator on save, and keeps voice on failure', async () => {

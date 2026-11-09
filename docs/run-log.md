@@ -762,3 +762,17 @@ Dependencies were installed by the orchestrator once, during task 1, because the
 - **Why:** the second `/codex:review` of Milestone 2 reported that, with Settings open, a voice change made from the sidebar left the Settings view holding the old voice, so choosing an orchestrator afterwards saved the old voice and undid the change.
 - **Attempt 1:** Codex first wrote a test that reproduces it (the saved payload carried the old voice) and confirmed it failed. It then made the Settings view listen for the settings-changed event and silently re-read the settings, ignoring failed reads, reads that were superseded by a newer read or a save, and reads after unmount, and skipping the re-read while its own save is running, so its own save does not cause an extra read or a loop.
 - **Orchestrator check:** read the diff; no byte order marks; 41 files and 784 tests passed, `npm run typecheck` was clean, `npm run build` passed, and the real `dashboard/.data/chat-history.json` has the same hash before and after the suite.
+
+## D53. space-cancels-speech
+
+| | |
+|---|---|
+| Branch | `task/space-cancels-speech` |
+| Codex attempts | 1 |
+| Codex model | not reported |
+| Duration | 2m 8s |
+| Result | Done |
+
+- **Why:** the second `/codex:review` of Milestone 2 reported that holding Space while a reply was being spoken started recognition without cancelling the speech, unlike the Talk button, so the microphone could transcribe the assistant's own reply and, with Hands-free on, send it as a new question.
+- **Attempt 1:** Codex first wrote a test that reproduces it (Space did not cancel the speaker) and confirmed it failed. It then added an `onBeforeStart` option to the speech input hook, called once at every real start and never on ignored starts (inputs, buttons, key repeat, modified keys, unsupported browsers), and made the voice provider pass the speaker cancel to it, so every way of starting cancels once.
+- **Orchestrator check:** read the diff; no byte order marks; 41 files and 801 tests passed, `npm run typecheck` was clean, `npm run build` passed, and the real `dashboard/.data/chat-history.json` has the same hash before and after the suite.

@@ -29,7 +29,7 @@ function down(target: Document | Element = document, extra: KeyboardEventInit = 
   fireEvent(target, event);
   return event;
 }
-function setup(options: { enableSpace?: boolean; lang?: string } = {}) {
+function setup(options: { enableSpace?: boolean; lang?: string; onBeforeStart?: () => void } = {}) {
   const callback = vi.fn();
   return { callback, ...renderHook(() => useSpeechInput({ onTranscript: callback, ...options })) };
 }
@@ -63,7 +63,8 @@ test('holding Space starts once and prevents default only for the starting keydo
 });
 
 test.each(['input', 'textarea', 'select', 'button', 'editable', 'link', 'role-button', 'role-textbox'])('ignores Space inside %s including descendants', kind => {
-  setup();
+  const onBeforeStart = vi.fn();
+  setup({ onBeforeStart });
   const element = document.createElement(kind === 'editable' || kind.startsWith('role-') ? 'div' : kind === 'link' ? 'a' : kind);
   if (kind === 'editable') element.setAttribute('contenteditable', 'true');
   if (kind === 'link') element.setAttribute('href', '#');
@@ -74,12 +75,15 @@ test.each(['input', 'textarea', 'select', 'button', 'editable', 'link', 'role-bu
   expect(down(element).defaultPrevented).toBe(false);
   expect(down(child).defaultPrevented).toBe(false);
   expect(MockRecognition.instances).toHaveLength(0);
+  expect(onBeforeStart).not.toHaveBeenCalled();
 });
 
 test.each(['ctrlKey', 'altKey', 'metaKey', 'shiftKey'])('ignores modified Space with %s', modifier => {
-  setup();
+  const onBeforeStart = vi.fn();
+  setup({ onBeforeStart });
   expect(down(document, { [modifier]: true }).defaultPrevented).toBe(false);
   expect(MockRecognition.instances).toHaveLength(0);
+  expect(onBeforeStart).not.toHaveBeenCalled();
 });
 
 test('delivers interim and final transcripts using the latest callback and latest result finality', () => {
@@ -105,13 +109,15 @@ test('delivers interim and final transcripts using the latest callback and lates
 
 test('unsupported browsers report an error without throwing and ignore Space', () => {
   install('SpeechRecognition', undefined);
-  const { result } = setup();
+  const onBeforeStart = vi.fn();
+  const { result } = setup({ onBeforeStart });
   expect(result.current.supported).toBe(false);
   expect(down().defaultPrevented).toBe(false);
   expect(result.current.error).toBeNull();
   act(() => expect(() => result.current.start()).not.toThrow());
   expect(result.current.error).toBe('Speech recognition is not supported in this browser.');
   expect(result.current.listening).toBe(false);
+  expect(onBeforeStart).not.toHaveBeenCalled();
 });
 
 test('supports the prefixed constructor and default language', () => {
@@ -207,10 +213,13 @@ test('unmount aborts and removes listeners and ignores late callbacks', () => {
 });
 
 test('enableSpace=false disables shortcuts while explicit start and stop still work', () => {
-  const { result } = setup({ enableSpace: false });
+  const onBeforeStart = vi.fn();
+  const { result } = setup({ enableSpace: false, onBeforeStart });
   expect(down().defaultPrevented).toBe(false);
   expect(MockRecognition.instances).toHaveLength(0);
+  expect(onBeforeStart).not.toHaveBeenCalled();
   act(() => result.current.start());
+  expect(onBeforeStart).toHaveBeenCalledOnce();
   fireEvent.keyUp(document, { key: ' ' });
   expect(result.current.listening).toBe(true);
   act(() => result.current.stop());
@@ -222,4 +231,54 @@ test('privacy notice explains browser audio transcription by a service', () => {
   expect(SPEECH_PRIVACY_NOTICE).toMatch(/browser/);
   expect(SPEECH_PRIVACY_NOTICE).toMatch(/audio/);
   expect(SPEECH_PRIVACY_NOTICE).toMatch(/service/);
+});
+
+test('prepares once per actual start and ignores repeated or already-listening starts', () => {
+  const onBeforeStart = vi.fn();
+  const { result } = setup({ onBeforeStart });
+  down(document, { repeat: true });
+  expect(onBeforeStart).not.toHaveBeenCalled();
+  down();
+  act(() => result.current.start());
+  down();
+  down(document, { repeat: true });
+  expect(onBeforeStart).toHaveBeenCalledOnce();
+  expect(onBeforeStart.mock.invocationCallOrder[0]).toBeLessThan(instance().start.mock.invocationCallOrder[0]);
+  act(() => result.current.stop());
+  expect(onBeforeStart).toHaveBeenCalledOnce();
+  act(() => result.current.start());
+  expect(onBeforeStart).toHaveBeenCalledTimes(2);
+});
+
+test('a throwing onBeforeStart does not block recognition', () => {
+  const onBeforeStart = vi.fn(() => { throw new Error('Preparation failed'); });
+  const { result } = setup({ onBeforeStart });
+  down();
+  expect(onBeforeStart).toHaveBeenCalledOnce();
+  expect(instance().start).toHaveBeenCalledOnce();
+  expect(result.current.listening).toBe(true);
+  expect(result.current.error).toBeNull();
+});
+
+test('uses the latest onBeforeStart without restarting active recognition', () => {
+  const first = vi.fn();
+  const latest = vi.fn();
+  const { result, rerender } = renderHook(({ onBeforeStart }) => useSpeechInput({ onTranscript: vi.fn(), onBeforeStart }), {
+    initialProps: { onBeforeStart: first },
+  });
+  down();
+  const speech = instance();
+  const start = result.current.start;
+  rerender({ onBeforeStart: latest });
+  expect(result.current.start).toBe(start);
+  expect(result.current.listening).toBe(true);
+  expect(speech.stop).not.toHaveBeenCalled();
+  expect(speech.abort).not.toHaveBeenCalled();
+  expect(MockRecognition.instances).toHaveLength(1);
+  expect(latest).not.toHaveBeenCalled();
+  fireEvent.keyUp(document, { key: ' ' });
+  down();
+  expect(first).toHaveBeenCalledOnce();
+  expect(latest).toHaveBeenCalledOnce();
+  expect(instance().start).toHaveBeenCalledOnce();
 });

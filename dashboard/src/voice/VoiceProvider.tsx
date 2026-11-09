@@ -20,7 +20,7 @@ function useVoiceState(client: VoiceClient, speaker: typeof defaultSpeaker) {
   const settledListeners = useRef(new Set<() => void>());
   const directBusy = useRef(false);
   const submitRef = useRef<(text: string) => void>(() => {});
-  const input = useSpeechInput({ enableSpace: true, onTranscript: (text, final) => {
+  const input = useSpeechInput({ enableSpace: true, onBeforeStart: () => speaker.cancel(), onTranscript: (text, final) => {
     for (const listener of listeners.current) listener(text, final);
     if (final) submitRef.current(text);
   } });
@@ -112,7 +112,7 @@ function useVoiceState(client: VoiceClient, speaker: typeof defaultSpeaker) {
     supported: input.supported, listening: input.listening, speaking,
     orbState: (input.listening ? 'listening' : speaking ? 'speaking' : 'idle') as OrbState,
     error: error ?? input.error, notice: SPEECH_PRIVACY_NOTICE,
-    talk() { if (input.listening) input.stop(); else { speaker.cancel(); input.start(); } },
+    talk() { if (input.listening) input.stop(); else input.start(); },
     muted, toggleMute() {
       if (speaker.isMuted()) speaker.unmute(); else speaker.mute();
       setMuted(speaker.isMuted());
