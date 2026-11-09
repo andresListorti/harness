@@ -748,3 +748,17 @@ Dependencies were installed by the orchestrator once, during task 1, because the
 - **Why:** the `/codex:review` of Milestone 2 reported that a chat request still reading repo data could save its exchange after New chat had cleared the history, so the deleted conversation came back on reload.
 - **Attempt 1:** Codex first wrote a test that holds a chat request, clears the history, releases the request, and checks that the history stays empty, and confirmed it failed. It then added a generation counter per history path (shared by every app instance in the process) that clearing increments immediately, made each chat request capture the generation before it reads anything, and made the queued save skip when the generation changed. The stale request still gets its reply. Its tests also cover requests that start after a clear, concurrent requests without a clear, two app instances over one file, and a clear of a missing file. One mid-run typecheck error was fixed within the attempt.
 - **Orchestrator check:** read the diff; no byte order marks; 41 files and 778 tests passed, `npm run typecheck` was clean, and `npm run build` passed. The real `dashboard/.data/chat-history.json` has the same hash before and after the suite.
+
+## D52. settings-view-sync
+
+| | |
+|---|---|
+| Branch | `task/settings-view-sync` |
+| Codex attempts | 1 |
+| Codex model | not reported |
+| Duration | 1m 49s |
+| Result | Done |
+
+- **Why:** the second `/codex:review` of Milestone 2 reported that, with Settings open, a voice change made from the sidebar left the Settings view holding the old voice, so choosing an orchestrator afterwards saved the old voice and undid the change.
+- **Attempt 1:** Codex first wrote a test that reproduces it (the saved payload carried the old voice) and confirmed it failed. It then made the Settings view listen for the settings-changed event and silently re-read the settings, ignoring failed reads, reads that were superseded by a newer read or a save, and reads after unmount, and skipping the re-read while its own save is running, so its own save does not cause an extra read or a loop.
+- **Orchestrator check:** read the diff; no byte order marks; 41 files and 784 tests passed, `npm run typecheck` was clean, `npm run build` passed, and the real `dashboard/.data/chat-history.json` has the same hash before and after the suite.
