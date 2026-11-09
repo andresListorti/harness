@@ -65,10 +65,7 @@ Work in the order listed. A milestone closes only after these steps, in order:
 
 ## In progress
 
-### chat-codex-reply
-- **Goal:** Make the reply to a free-text question in Codex mode say that it was not sent to a model, instead of "I didn't understand that" (requested after `m3-acceptance`).
-- **Files:** `server/chat/local.ts`, `server/routes/chat.ts`, `tests/server/chat-local.test.ts`, `tests/server/chat-route.test.ts`
-- **Definition of done:** a test reproduces the bug first: with Codex as orchestrator a free-text question gets "I didn't understand that". After the fix the reply says free-text questions are not sent to a model, points to Why?, and lists what the chat can answer; known questions and Claude Code mode do not change.
+_None._
 
 ## Done
 
@@ -467,6 +464,12 @@ Work in the order listed. A milestone closes only after these steps, in order:
 - **Files:** none
 - **Definition of done:** from a clean `npm ci`, all checks pass; with Claude Code a free-text question is answered with repo data; no file changes in the repo after a chat; a prompt asking the agent to write a file does not change anything and shows no tool-call markup; with Codex selected no CLI starts, the answer is local, and the notice and its link work. Then follow "Closing a milestone".
 - **Result:** done. Clean `npm ci` with all checks passing; real Claude Code answered with repo data and could not write files or run commands; Codex mode stayed local with its notice. The user confirmed the seven browser steps. Next: `/codex:review` and the push confirmation.
+
+### chat-codex-reply
+- **Goal:** Make the reply to a free-text question in Codex mode say that it was not sent to a model, instead of "I didn't understand that" (requested after `m3-acceptance`).
+- **Files:** `server/chat/local.ts`, `server/routes/chat.ts`, `tests/server/chat-local.test.ts`, `tests/server/chat-route.test.ts`
+- **Definition of done:** a test reproduces the bug first: with Codex as orchestrator a free-text question gets "I didn't understand that". After the fix the reply says free-text questions are not sent to a model, points to Why?, and lists what the chat can answer; known questions and Claude Code mode do not change.
+- **Result:** done in 1 attempt. 958 tests pass, typecheck and build clean from a clean `npm ci`. The reproducing test failed before the fix. In Codex mode a free-text question now gets a reply saying it was not sent to a model, with what the chat can answer.
 
 ## Phase 2: real agent execution
 
