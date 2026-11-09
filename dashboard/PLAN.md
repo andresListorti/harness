@@ -61,11 +61,6 @@ Work in the order listed. A milestone closes only after these steps, in order:
 
 ### Milestone 2: voice and widget
 
-### settings-view
-- **Goal:** Add the Settings view with orchestrator and voice choices.
-- **Files:** `src/views/SettingsView.tsx`, `src/components/Sidebar.tsx`, `src/App.tsx`, `tests/client/settings-view.test.tsx`
-- **Definition of done:** `tests/client/settings-view.test.tsx` passes: Settings appears in the sidebar; choosing an orchestrator saves it and shows the other as worker; unconfigured voice providers are disabled; no key field exists.
-
 ### chat-history
 - **Goal:** Keep the chat history in the ignored `.data/` folder and restore it when the page reloads; "New chat" deletes it.
 - **Files:** `server/chat/history.ts`, `server/routes/chat.ts`, `shared/api.ts`, `src/components/ChatPanel.tsx`, `src/lib/api.ts`, `tests/server/chat-history.test.ts`, `tests/client/chat-panel.test.tsx`
@@ -145,7 +140,10 @@ Work in the order listed. A milestone closes only after these steps, in order:
 
 ## In progress
 
-_None._
+### settings-view
+- **Goal:** Add the Settings view with orchestrator and voice choices.
+- **Files:** `src/views/SettingsView.tsx`, `src/components/Sidebar.tsx`, `src/App.tsx`, `tests/client/settings-view.test.tsx`
+- **Definition of done:** `tests/client/settings-view.test.tsx` passes: Settings appears in the sidebar; choosing an orchestrator saves it and shows the other as worker; unconfigured voice providers are disabled; no key field exists.
 
 ## Done
 
