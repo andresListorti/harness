@@ -32,6 +32,7 @@ function constructor() {
 
 export function useSpeechInput(options: {
   onTranscript: (text: string, isFinal: boolean) => void;
+  onBeforeStart?: () => void;
   lang?: string;
   enableSpace?: boolean;
 }) {
@@ -90,6 +91,7 @@ export function useSpeechInput(options: {
       };
       setError(null);
       setListening(true);
+      try { latest.current.onBeforeStart?.(); } catch { /* Preparation is best effort. */ }
       instance.start();
     } catch {
       active.current = false;
