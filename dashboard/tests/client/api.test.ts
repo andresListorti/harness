@@ -2,6 +2,8 @@ import { vi } from 'vitest';
 import { api, ApiError, createApiClient } from '../../src/lib/api';
 import type { PlanSource } from '../../shared/api';
 
+const settings = { orchestrator: 'claude-code', voice: 'browser', worker: 'codex' } as const;
+const providers = { providers: [{ id: 'openai', available: true }] };
 const health = { status: 'ok' };
 const plan = { source: 'dashboard', tasks: [{
   id: 'client', title: 'API client', group: null, goal: 'Validate responses',
@@ -23,6 +25,8 @@ function setup(body: unknown, status = 200) {
 }
 
 test.each([
+  ['getSettings', '/api/settings', settings],
+  ['getVoiceProviders', '/api/voice/providers', providers],
   ['getHealth', '/api/health', health],
   ['getPlan', '/api/plan?source=dashboard', plan],
   ['getRunLog', '/api/runlog?source=dashboard', runLog],
@@ -107,5 +111,27 @@ test('the default client resolves global fetch when called', async () => {
     expect(fetchMock).toHaveBeenCalledOnce();
   } finally {
     vi.unstubAllGlobals();
+  }
+});
+
+
+test('saveSettings puts only the choices as JSON and parses the server response', async () => {
+  const { client, fetchMock } = setup(settings);
+  const choices = { orchestrator: settings.orchestrator, voice: settings.voice };
+  expect(await client.saveSettings(choices)).toEqual(settings);
+  expect(fetchMock).toHaveBeenCalledExactlyOnceWith('/api/settings', {
+    method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(choices),
+  });
+});
+
+test.each(['getSettings', 'saveSettings', 'getVoiceProviders'] as const)('%s rejects HTTP errors and invalid shapes', async method => {
+  for (const [body, status, code] of [
+    [{ error: { code: 'UNAVAILABLE', message: 'Unavailable' } }, 503, 'UNAVAILABLE'],
+    [{}, 200, 'INVALID_RESPONSE'],
+    [method === 'getVoiceProviders' ? { providers: [{ id: 'unknown', available: true }] } : { ...settings, voice: 'unknown' }, 200, 'INVALID_RESPONSE'],
+  ] as const) {
+    const { client } = setup(body, status);
+    const result = method === 'saveSettings' ? client.saveSettings({ orchestrator: 'codex', voice: 'browser' }) : client[method]();
+    await expect(result).rejects.toMatchObject({ name: 'ApiError', status, code });
   }
 });

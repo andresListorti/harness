@@ -598,3 +598,16 @@ Dependencies were installed by the orchestrator once, during task 1, because the
 
 - **Attempt 1:** Codex added the settings schemas (orchestrator and voice choice, with the worker derived as the other agent), `server/settings.ts` (defaults, validated read that falls back to defaults on a missing or corrupt file, atomic write through a temporary file and rename), `GET` and `PUT /api/settings`, and the galaxy route now builds its roles from the saved orchestrator. The tests cover the 400 and 500 paths, persistence across app instances, no leftover temporary files, unchanged agent cards, and the global guards.
 - **Orchestrator check:** read the store and the router; error responses carry no paths; no byte order marks; the tests use temporary folders outside `dashboard/`; `npm test` passed (34 files, 659 tests), `npm run typecheck` was clean, and `npm run build` passed.
+
+## D41. settings-view
+
+| | |
+|---|---|
+| Branch | `task/settings-view` |
+| Codex attempts | 1 |
+| Codex model | not reported |
+| Duration | 3m 28s |
+| Result | Done |
+
+- **Attempt 1:** Codex added the Settings view (orchestrator and voice radio groups, the worker shown from the server response, unconfigured providers disabled and labelled, no key field), the API client methods, the sidebar entry, and tests. Its first two test runs failed on missing spacing in the radio labels' accessible names and it fixed that within the attempt. The delegating agent's final report did not arrive, so the orchestrator verified the working tree directly.
+- **Orchestrator check:** read the view; a failed save keeps the previous selection and shows an alert; no byte order marks; `npm test` passed (35 files, 671 tests), `npm run typecheck` was clean, and `npm run build` passed.

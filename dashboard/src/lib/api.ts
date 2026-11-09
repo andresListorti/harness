@@ -2,7 +2,7 @@ import type { z } from 'zod';
 import {
   agentsSchema, apiErrorSchema, chatResponseSchema, chatSuggestionsSchema,
   commitsSchema, galaxySchema, healthSchema, planBoardSchema, runLogSchema,
-  type PlanSource,
+  settingsResponseSchema, voiceProvidersSchema, type Settings, type PlanSource,
 } from '../../shared/api';
 
 export class ApiError extends Error {
@@ -47,6 +47,13 @@ export function createApiClient(fetchImpl: typeof fetch = (...args) => fetch(...
     request(url, schema, { method: 'GET', headers: { Accept: 'application/json' } });
 
   return {
+    getSettings: () => get('/api/settings', settingsResponseSchema),
+    saveSettings: (settings: Settings) => request('/api/settings', settingsResponseSchema, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(settings),
+    }),
+    getVoiceProviders: () => get('/api/voice/providers', voiceProvidersSchema),
     getHealth: () => get('/api/health', healthSchema),
     getPlan: (source: PlanSource = 'dashboard') =>
       get(`/api/plan?source=${encodeURIComponent(source)}`, planBoardSchema),

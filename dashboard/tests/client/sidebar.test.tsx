@@ -1,4 +1,4 @@
-import { act, cleanup, fireEvent, render, renderHook, screen, within } from '@testing-library/react';
+import { act, cleanup, fireEvent, render, renderHook, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { Sidebar, VIEWS } from '../../src/components/Sidebar';
 import { useAgentStatus } from '../../src/hooks/useAgentStatus';
@@ -13,6 +13,9 @@ vi.mock('../../src/lib/api', () => ({ api: {
   getRunLog: vi.fn().mockResolvedValue({ source: 'dashboard', entries: [] }),
   getChatSuggestions: vi.fn().mockResolvedValue({ suggestions: [] }),
   sendChat: vi.fn(),
+  getSettings: vi.fn().mockResolvedValue({ orchestrator: 'claude-code', worker: 'codex', voice: 'browser' }),
+  getVoiceProviders: vi.fn().mockResolvedValue({ providers: [] }),
+  saveSettings: vi.fn(),
 } }));
 
 afterEach(() => {
@@ -31,6 +34,8 @@ test('lists views in order, marks the active page, and navigates', async () => {
   const { props } = sidebar();
   const buttons = within(screen.getByRole('navigation')).getAllByRole('button');
   expect(buttons.map(button => button.getAttribute('aria-label'))).toEqual(VIEWS.map(view => view.label));
+  expect(buttons.at(-1)).toHaveAccessibleName('Settings');
+  expect(buttons).toHaveLength(5);
   expect(buttons[0]).toHaveAttribute('aria-current', 'page');
   for (const [index, view] of VIEWS.entries()) {
     if (index > 0) expect(buttons[index]).not.toHaveAttribute('aria-current');
@@ -135,10 +140,12 @@ test.each([true, false])('App shows health status and switches views (healthy: %
   const user = userEvent.setup();
   render(<App />);
   expect(await screen.findByText(healthy ? 'Agents ready' : 'Agents offline')).toBeInTheDocument();
-  for (const name of ['Agents', 'Galaxy', 'Plan']) {
+  await waitFor(() => expect(api.getHealth).toHaveBeenCalled());
+  for (const name of ['Agents', 'Galaxy', 'Plan', 'Settings']) {
     await user.click(screen.getByRole('button', { name }));
     expect(within(screen.getByRole('main')).getByRole('heading', { name })).toBeInTheDocument();
   }
+  await waitFor(() => expect(screen.getByRole('radiogroup', { name: 'Orchestrator' })).toBeInTheDocument());
   await user.click(screen.getByRole('button', { name: 'Close menu' }));
   expect(screen.queryByText('Galaxy')).not.toBeInTheDocument();
   await user.click(screen.getByRole('button', { name: 'Open menu' }));
