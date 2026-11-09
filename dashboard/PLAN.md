@@ -63,11 +63,6 @@ Work in the order listed. A milestone closes only after these steps, in order:
 
 ### Milestone 3: chat with the orchestrator
 
-### voice-widget-focus
-- **Goal:** Keep microphone input running when it was started from the widget and the main window loses focus or is hidden (finding from the third Codex review of Milestone 2).
-- **Files:** `src/voice/useSpeechInput.ts`, `src/voice/VoiceProvider.tsx`, `src/App.tsx`, `tests/client/speech-input.test.tsx`, `tests/client/voice-controls.test.tsx`, `tests/client/widget.test.tsx`
-- **Definition of done:** a test reproduces the bug first: with the widget open, starting recognition from the widget Talk button and then blurring or hiding the main window stops recognition. After the fix, while the widget is open, a session started from a Talk button is not stopped by the blur or hidden-tab events of the main window; it still stops when Talk is pressed again, when recognition ends or fails, and when the widget closes. A session started by holding Space still stops on key release, blur, and hidden tab, and without the widget open the current stop behavior on blur and hidden tab is unchanged (the microphone is never left on in a hidden dashboard with no widget). The listeners are removed on unmount and nothing updates state after it.
-
 ### voice-reply-on-navigation
 - **Goal:** Speak the reply of a Hands-free chat request even when the user navigates away from Home before it arrives (finding from the third Codex review of Milestone 2).
 - **Files:** `src/voice/VoiceProvider.tsx`, `src/components/ChatPanel.tsx`, `tests/client/voice-controls.test.tsx`, `tests/client/chat-panel.test.tsx`
@@ -110,7 +105,10 @@ Work in the order listed. A milestone closes only after these steps, in order:
 
 ## In progress
 
-_None._
+### voice-widget-focus
+- **Goal:** Keep microphone input running when it was started from the widget and the main window loses focus or is hidden (finding from the third Codex review of Milestone 2).
+- **Files:** `src/voice/useSpeechInput.ts`, `src/voice/VoiceProvider.tsx`, `src/App.tsx`, `tests/client/speech-input.test.tsx`, `tests/client/voice-controls.test.tsx`, `tests/client/widget.test.tsx`
+- **Definition of done:** a test reproduces the bug first: with the widget open, starting recognition from the widget Talk button and then blurring or hiding the main window stops recognition. After the fix, while the widget is open, a session started from a Talk button is not stopped by the blur or hidden-tab events of the main window; it still stops when Talk is pressed again, when recognition ends or fails, and when the widget closes. A session started by holding Space still stops on key release, blur, and hidden tab, and without the widget open the current stop behavior on blur and hidden tab is unchanged (the microphone is never left on in a hidden dashboard with no widget). The listeners are removed on unmount and nothing updates state after it.
 
 ## Done
 
