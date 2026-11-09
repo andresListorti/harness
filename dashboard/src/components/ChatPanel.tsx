@@ -8,14 +8,13 @@ type Message = { id: number; role: 'user' | 'assistant'; text: string; source?: 
 
 export function ChatPanel({ client = api }: { client?: Pick<typeof api, 'getChatSuggestions' | 'sendChat' | 'getChatHistory' | 'clearChatHistory'> }) {
   const voice = useVoice();
-  const latestVoice = useRef(voice);
-  latestVoice.current = voice;
   const [messages, setMessages] = useState<Message[]>([]);
   const [suggestions, setSuggestions] = useState<string[]>([]);
   const [text, setText] = useState('');
   const [pending, setPending] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const request = useRef(0);
+  const conversation = useRef(0);
   const busy = useRef(false);
   const nextId = useRef(0);
   const historyLoad = useRef(0);
@@ -55,11 +54,13 @@ export function ChatPanel({ client = api }: { client?: Pick<typeof api, 'getChat
     setError(null);
     setPending(true);
     try {
-      const result = await client.sendChat(message);
+      const currentConversation = conversation.current;
+      const response = client.sendChat(message);
+      void voice?.trackChatReply?.(response, () => conversation.current !== currentConversation);
+      const result = await response;
       if (current !== request.current) return;
       const reply: Message = { id: nextId.current++, role: 'assistant', text: result.reply, source: result.source };
       setMessages(previous => [...previous, reply]);
-      latestVoice.current?.speakReply(result.reply);
     } catch (cause) {
       if (current !== request.current) return;
       setError(cause instanceof ApiError ? `Could not get an answer: ${cause.message}` : 'Could not get an answer.');
@@ -103,6 +104,7 @@ export function ChatPanel({ client = api }: { client?: Pick<typeof api, 'getChat
       return;
     }
     request.current += 1;
+    conversation.current += 1;
     busy.current = false;
     setPending(false);
     setMessages([]);
