@@ -956,3 +956,17 @@ Dependencies were installed by the orchestrator once, during task 1, because the
 - **Why:** in `m3-acceptance`, a sentence ending in `to do it` got the pending-tasks reply, and the local help reply still said that answers come without an agent.
 - **Attempt 1:** Codex first wrote tests that reproduce both and confirmed they failed. `to do` now counts as a pending-tasks question only at the end of the message or before `list` or `item`, and never after `how`. The help reply now says that other questions go to the orchestrator (Claude Code) when it is selected.
 - **Orchestrator check:** read the diff; no byte order marks; 45 files and 954 tests passed, `npm run typecheck` was clean, `npm run build` passed, and the real `dashboard/.data/chat-history.json` has the same hash before and after the suite.
+
+## D67. m3-acceptance
+
+| | |
+|---|---|
+| Branch | none (performed on `main`) |
+| Codex attempts | 0 |
+| Codex model | not applicable (done by the orchestrator and the user) |
+| Duration | not measured |
+| Result | Done |
+
+- **Orchestrator check:** from a clean `npm ci`, tests, typecheck, and build passed. Against the real app, runner, and built front end, with temporary settings and history files, and Claude Code for real: known questions and action requests stayed local; a free-text question was answered with repo data; requests to write a file or run a command changed nothing and the repo stayed clean; two questions at once gave one answer and one 429; with Codex selected the answer was local with the notice and no CLI started; the isolation document was served as plain text; no run folder was left behind.
+- **User check:** all seven browser steps passed: free-text answer with its label and no markdown, model selector surviving a reload, local answer label, busy message, Codex mode with notice and link, return to Claude Code, and a reply spoken once.
+- **Found and fixed during the acceptance:** `plan-test-real-state` (D64), `chat-orchestrator-plain-text` (D65), and `chat-local-intent` (D66). The replacement of tool-call markup is covered by tests only, because Claude Code did not print markup in these runs.
