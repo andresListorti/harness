@@ -9,6 +9,7 @@ import { ChatRunError, type runClaudeChat } from '../../server/chat/runner';
 import { CHAT_HISTORY_MESSAGE_LIMIT, CODEX_CHAT_NOTICE } from '../../shared/api';
 import { appendToHistory, readHistory } from '../../server/chat/history';
 import { readSettings } from '../../server/settings';
+import { cleanChatReply } from '../../server/chat/reply';
 
 const createApp = useTestApp();
 let root: string;
@@ -79,22 +80,60 @@ test('Claude uses saved model, supplied snapshot and history, and saves the exch
     { role: 'assistant', text: 'Orchestrator reply', source: 'orchestrator' },
   ]);
 });
-test('long orchestrator replies stay complete in the response and are shortened in history', async () => {
+test('orchestrator markdown is cleaned in the response and saved history', async () => {
   await settings();
-  const reply = 'a'.repeat(15000);
+  const reply = '# Summary\n**Bold words** with `inline code` and [a link](https://example.com).';
+  const cleaned = 'Summary\nBold words with inline code and a link.';
   const s = setup(vi.fn<typeof runClaudeChat>().mockResolvedValue(reply));
   const response = await s.post();
   expect(response.status).toBe(200);
-  expect(response.body).toEqual({ reply, source: 'orchestrator' });
+  expect(response.body).toEqual({ reply: cleaned, source: 'orchestrator' });
+  expect((await readHistory(historyPath)).messages[1]).toEqual({
+    role: 'assistant', text: cleaned, source: 'orchestrator',
+  });
+});
+
+test('long orchestrator replies stay complete in the response and are shortened in history', async () => {
+  await settings();
+  const reply = 'Clean words '.repeat(1500);
+  const s = setup(vi.fn<typeof runClaudeChat>().mockResolvedValue(`# Summary\n**${reply}**`));
+  const response = await s.post();
+  expect(response.status).toBe(200);
+  const cleaned = `Summary\n${reply}`;
+  expect(response.body).toEqual({ reply: cleaned, source: 'orchestrator' });
   const messages = (await readHistory(historyPath)).messages;
   expect(messages).toHaveLength(2);
   expect(messages[0]).toEqual({ role: 'user', text: 'Explain the architecture' });
   expect(messages[1]).toEqual({
     role: 'assistant',
-    text: reply.slice(0, CHAT_HISTORY_MESSAGE_LIMIT - '[reply shortened in history]'.length) + '[reply shortened in history]',
+    text: cleaned.slice(0, CHAT_HISTORY_MESSAGE_LIMIT - '[reply shortened in history]'.length) + '[reply shortened in history]',
     source: 'orchestrator',
   });
   expect(messages[1].text).toHaveLength(CHAT_HISTORY_MESSAGE_LIMIT);
+});
+
+test('plain-text cleaning follows runner tool cleanup and preserves its notice and literal HTML', async () => {
+  await settings();
+  const raw = '**Before**\n<function_calls><invoke name="fixture">`hidden`</invoke></function_calls>\n'
+    + '# After\n<b>literal HTML</b> <script>example()</script> &amp;';
+  const s = setup(vi.fn<typeof runClaudeChat>().mockImplementation(async () => cleanChatReply(raw)));
+  const cleaned = 'Before\nTools are not available in this chat.\nAfter\n'
+    + '<b>literal HTML</b> <script>example()</script> &amp;';
+  const response = await s.post();
+  expect(response.status).toBe(200);
+  expect(response.body).toEqual({ reply: cleaned, source: 'orchestrator' });
+  expect((await readHistory(historyPath)).messages[1].text).toBe(cleaned);
+});
+
+test('local markdown is cleaned once and literal HTML is preserved', async () => {
+  await writeFile(join(root, 'dashboard/PLAN.md'), '# PLAN\n## Pending\n### **Bold** `code` [link](https://example.com) <b>literal</b>\n- **Goal:** Fixture goal\n');
+  const s = setup();
+  const response = await s.post('What is pending?');
+  const cleaned = 'Pending tasks: 1\n- Bold code link <b>literal</b>';
+  expect(response.status).toBe(200);
+  expect(response.body).toEqual({ reply: cleaned, source: 'local' });
+  expect(s.runner).not.toHaveBeenCalled();
+  expect((await readHistory(historyPath)).messages[1].text).toBe(cleaned);
 });
 
 test('Codex free text stays local with the exact notice and never calls the runner', async () => {
