@@ -396,7 +396,7 @@ _None._
 - **Goal:** Check voice and widget in a real browser. Performed by the orchestrator, with the user for microphone steps.
 - **Files:** none
 - **Definition of done:** from a clean `npm ci`, all checks pass; hold Space to talk and browser voice output work; Settings persists after a restart; widget mode opens; no key or voice ID appears in browser responses; providers without keys are verified only through their mocked tests, and this is reported. Then follow "Closing a milestone".
-- **Result:** done. From a clean `npm ci`, 761 tests, typecheck, and build pass. The server listens only on `127.0.0.1`; no key or voice ID appeared in any response or bundled asset; Settings survived a server restart; the user confirmed microphone input, browser voice output, Mute, and widget mode in a real browser. Fish Audio, ElevenLabs, and OpenAI were verified only through their mocked tests, not with real keys. Waiting for `/codex:review` and the push confirmation.
+- **Result:** done. From a clean `npm ci`, 761 tests, typecheck, and build pass. The server listens only on `127.0.0.1`; no key or voice ID appeared in any response or bundled asset; Settings survived a server restart; the user confirmed microphone input, browser voice output, Mute, and widget mode in a real browser. Fish Audio, ElevenLabs, and OpenAI were verified only through their mocked tests, not with real keys. Two `/codex:review` passes found four issues, fixed as D50 to D53; the milestone was then pushed (`7109af8`) and CI was green on both jobs.
 
 ### voice-transcript-provider
 - **Goal:** Send Hands-free transcripts from the persistent voice provider, so they work from any view and from the widget (finding from the Codex review of Milestone 2).
