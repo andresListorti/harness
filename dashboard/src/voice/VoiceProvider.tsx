@@ -20,6 +20,8 @@ function useVoiceState(client: VoiceClient, speaker: typeof defaultSpeaker) {
   const chatSink = useRef<ChatSink | null>(null);
   const settledListeners = useRef(new Set<() => void>());
   const directBusy = useRef(false);
+  const conversation = useRef(0);
+  const startNewConversation = useCallback(() => { conversation.current += 1; }, []);
   const submitRef = useRef<(text: string) => void>(() => {});
   const input = useSpeechInput({ enableSpace: true, allowBackground: () => widgetOpen.current, onBeforeStart: () => speaker.cancel(), onTranscript: (text, final) => {
     for (const listener of listeners.current) listener(text, final);
@@ -43,10 +45,11 @@ function useVoiceState(client: VoiceClient, speaker: typeof defaultSpeaker) {
     if (latest.current.replyWithVoice) void speaker.speak(text, latest.current.voice);
   }
   // Observe the request independently of the chat panel's mounted lifetime.
-  async function trackChatReply(response: Promise<ChatResponse>, abandoned: () => boolean) {
+  async function trackChatReply(response: Promise<ChatResponse>) {
+    const generation = conversation.current;
     try {
       const result = await response;
-      if (!abandoned()) speakReply(result.reply);
+      if (generation === conversation.current) speakReply(result.reply);
     } catch {
       // The chat panel owns request error reporting.
     }
@@ -134,7 +137,7 @@ function useVoiceState(client: VoiceClient, speaker: typeof defaultSpeaker) {
       setMuted(speaker.isMuted());
     },
     voice, voices, setVoice, replyWithVoice, setReplyWithVoice, handsFree, setHandsFree,
-    speakReply, trackChatReply, onTranscript, registerChatSink, onChatSettled,
+    speakReply, trackChatReply, startNewConversation, onTranscript, registerChatSink, onChatSettled,
   };
 }
 

@@ -19,7 +19,6 @@ export function ChatPanel({ client = api }: { client?: Pick<typeof api, 'getChat
   const [savingModel, setSavingModel] = useState(false);
   const settingsVersion = useRef(0);
   const request = useRef(0);
-  const conversation = useRef(0);
   const busy = useRef(false);
   const nextId = useRef(0);
   const historyLoad = useRef(0);
@@ -101,9 +100,8 @@ export function ChatPanel({ client = api }: { client?: Pick<typeof api, 'getChat
     setError(null);
     setPending(true);
     try {
-      const currentConversation = conversation.current;
       const response = client.sendChat(message);
-      void voice?.trackChatReply?.(response, () => conversation.current !== currentConversation);
+      void voice?.trackChatReply?.(response);
       const result = await response;
       if (current !== request.current) return;
       const reply: Message = { id: nextId.current++, role: 'assistant', text: result.reply, source: result.source };
@@ -151,7 +149,7 @@ export function ChatPanel({ client = api }: { client?: Pick<typeof api, 'getChat
       return;
     }
     request.current += 1;
-    conversation.current += 1;
+    voice?.startNewConversation?.();
     busy.current = false;
     setPending(false);
     setMessages([]);
