@@ -10,6 +10,7 @@ import { CHAT_HISTORY_MESSAGE_LIMIT, CODEX_CHAT_NOTICE } from '../../shared/api'
 import { appendToHistory, readHistory } from '../../server/chat/history';
 import { readSettings } from '../../server/settings';
 import { cleanChatReply } from '../../server/chat/reply';
+import { CAPABILITY_NOTICE, LOCAL_SUGGESTIONS } from '../../server/chat/local';
 
 const createApp = useTestApp();
 let root: string;
@@ -154,10 +155,30 @@ test('Codex free text stays local with the exact notice and never calls the runn
   const s = setup();
   const response = await s.post();
   expect(response.status).toBe(200);
-  expect(response.body).toEqual({ reply: expect.stringContaining("I didn't understand that."), source: 'local', notice: CODEX_CHAT_NOTICE });
+  expect(response.body.reply).not.toContain("I didn't understand that");
+  const reply = 'With Codex as the orchestrator, free-text questions are not sent to a model (see Why?).'
+    + '\nI can answer:\n' + LOCAL_SUGGESTIONS.map(question => `- ${question}`).join('\n');
+  expect(response.body).toEqual({ reply, source: 'local', notice: CODEX_CHAT_NOTICE });
+  expect(response.body.reply).not.toContain(CAPABILITY_NOTICE);
   expect(s.runner).not.toHaveBeenCalled();
-  expect((await readHistory(historyPath)).messages[1].source).toBe('local');
+  expect((await readHistory(historyPath)).messages).toEqual([
+    { role: 'user', text: 'Explain the architecture' },
+    { role: 'assistant', text: reply, source: 'local' },
+  ]);
 });
+test.each(['What is pending?', 'please run the tests', 'write a file', 'launch codex'])(
+  'Codex preserves the existing local reply for recognized messages: %s', async message => {
+    await settings('claude-code');
+    const s = setup();
+    const previous = await s.post(message);
+    await settings('codex');
+    const response = await s.post(message);
+    expect(response.status).toBe(200);
+    expect(response.body).toEqual(previous.body);
+    expect(response.body.source).toBe('local');
+    expect(s.runner).not.toHaveBeenCalled();
+  },
+);
 test.each([false, true])('concurrent free text is rejected; local questions work; slot releases (failure=%s)', async failure => {
   const held = deferred();
   const entered = deferred();
