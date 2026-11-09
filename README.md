@@ -70,6 +70,27 @@ npm run build && npm start
 
 Open `http://127.0.0.1:3001`.
 
+![Harness home view with the orb and a chat answer](docs/images/home.png)
+
+*Harness: the orb and a chat with suggested questions, answered by Claude Code or locally from repo data.*
+
+<table>
+  <tr>
+    <td width="33%" valign="top">
+      <img src="docs/images/galaxy.png" alt="Galaxy view of the repo as a system">
+      <br><sub><b>Galaxy:</b> the repo as an animated system of agents, tasks, commits, and tests.</sub>
+    </td>
+    <td width="33%" valign="top">
+      <img src="docs/images/agents.png" alt="Agents view with historical cards">
+      <br><sub><b>Agents:</b> historical cards built from the plans and run log.</sub>
+    </td>
+    <td width="33%" valign="top">
+      <img src="docs/images/plan.png" alt="Plan board with run log">
+      <br><sub><b>Plan:</b> a Pending, In progress, and Done board with the run log.</sub>
+    </td>
+  </tr>
+</table>
+
 ## Design notes
 
 - **The Codex sandbox has no network**, so the orchestrator installs dependencies as an environment step.
