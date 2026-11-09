@@ -572,3 +572,16 @@ Dependencies were installed by the orchestrator once, during task 1, because the
 
 - **Attempt 1:** Codex added `synthesizeOpenAi` (POST to the speech endpoint with a bearer header, JSON body with model, text, voice, and mp3 format, a 30-second timeout, injectable `fetch`) and mocked-fetch tests, reusing `TtsProviderError` unchanged.
 - **Orchestrator check:** read the adapter; no secret can reach an error; no byte order marks; `npm test` passed (32 files, 626 tests), `npm run typecheck` was clean, and `npm run build` passed.
+
+## D39. tts-route
+
+| | |
+|---|---|
+| Branch | `task/tts-route` |
+| Codex attempts | 1 |
+| Codex model | not reported |
+| Duration | 2m 6s |
+| Result | Done |
+
+- **Attempt 1:** Codex added `ttsRequestSchema`, the router with `GET /api/voice/providers` (availability only) and `POST /api/tts` (400 invalid request, 409 provider not configured, audio on success, 502 with a fixed generic message on any adapter failure), injectable configuration and adapters, and the mount in `server/app.ts`. The tests cover secrets absent from every response and the global Host, Origin, and content-type guards on the new route.
+- **Orchestrator check:** read the router; the failure path discards the error entirely, so nothing from it, the key, the voice ID, or the text can reach the response; no byte order marks; `npm test` passed (33 files, 641 tests), `npm run typecheck` was clean, and `npm run build` passed.

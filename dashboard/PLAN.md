@@ -150,10 +150,7 @@ Work in the order listed. A milestone closes only after these steps, in order:
 
 ## In progress
 
-### tts-route
-- **Goal:** Add `GET /api/voice/providers` and `POST /api/tts`, which dispatches to the selected adapter.
-- **Files:** `server/routes/tts.ts`, `server/app.ts`, `shared/api.ts`, `tests/server/tts-route.test.ts`
-- **Definition of done:** `tests/server/tts-route.test.ts` passes: providers returns availability only; audio is returned with the right content type; an unconfigured provider returns 409; over-limit text returns 400; a provider failure returns 502 with no secret in the body.
+_None._
 
 ## Done
 
@@ -384,6 +381,12 @@ Work in the order listed. A milestone closes only after these steps, in order:
 - **Files:** `server/voice/openai-tts.ts`, `tests/server/tts-openai.test.ts`
 - **Definition of done:** `tests/server/tts-openai.test.ts` passes with a mocked `fetch`: URL, headers, and body are correct; audio bytes are returned; provider errors become a typed error that contains no key.
 - **Result:** done in 1 attempt. 626 tests pass, typecheck and build clean.
+
+### tts-route
+- **Goal:** Add `GET /api/voice/providers` and `POST /api/tts`, which dispatches to the selected adapter.
+- **Files:** `server/routes/tts.ts`, `server/app.ts`, `shared/api.ts`, `tests/server/tts-route.test.ts`
+- **Definition of done:** `tests/server/tts-route.test.ts` passes: providers returns availability only; audio is returned with the right content type; an unconfigured provider returns 409; over-limit text returns 400; a provider failure returns 502 with no secret in the body.
+- **Result:** done in 1 attempt. 641 tests pass, typecheck and build clean. Adapters are injectable for tests; the voice configuration is read on every request, so `.env` edits apply without a restart.
 
 ## Phase 2: real agent execution
 
