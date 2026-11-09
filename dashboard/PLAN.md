@@ -44,16 +44,16 @@ Work in the order listed. A milestone closes only after these steps, in order:
 - The API reports only whether a provider is configured, and never returns a key or voice ID.
 
 **Orchestrator with no capabilities (Milestone 3)**
-- Free text goes to the selected CLI with a repo snapshot built by the backend, so the agent has nothing to fetch:
-  - Claude Code: `claude -p --tools "" --strict-mcp-config`.
-  - Codex: `codex exec --sandbox read-only --ephemeral --skip-git-repo-check`.
+- Free text goes to Claude Code, the only CLI used for the chat, with a repo snapshot built by the backend, so the agent has nothing to fetch:
+  - Arguments: `-p --tools "" --strict-mcp-config --safe-mode --no-session-persistence`, plus the allowlisted model. `--safe-mode` keeps locally installed plugins and hooks from running.
+  - On Windows the native `claude.exe` is started, because the npm `.cmd` shim cannot start without a shell.
   - The working directory is an empty temporary folder.
   - The prompt goes through stdin. It is never an argument.
   - Arguments are fixed, there is no shell, and the model comes from a server-side allowlist.
   - Voice keys are removed from the child environment.
   - Each run has a timeout and an output cap, and only one can run at a time.
-- Repo content in the snapshot is marked as untrusted data. Replies render as plain text, never as HTML.
-- The Codex read-only sandbox still allows reading files and running commands, so `chat-isolation-check` must prove what it can reach before that path ships.
+- Repo content in the snapshot is marked as untrusted data. The prompt tells the agent not to try to use tools. Replies render as plain text, never as HTML, and tool-call markup in a reply is replaced by a short notice.
+- Codex is never started by the chat. `docs/chat-isolation.md` showed that on Windows its read-only sandbox does not stop it from reading files outside its working directory or running commands. When Codex is the selected orchestrator the chat gives local answers only and the interface explains why.
 
 ## Pending
 
@@ -66,22 +66,22 @@ Work in the order listed. A milestone closes only after these steps, in order:
 ### chat-prompt
 - **Goal:** Build the capped prompt from the repo snapshot and chat history.
 - **Files:** `server/chat/prompt.ts`, `tests/server/chat-prompt.test.ts`
-- **Definition of done:** `tests/server/chat-prompt.test.ts` passes: repo content sits inside a marked untrusted block; closing markers inside repo content are neutralized; size and history limits are enforced; the read-only instruction is present.
+- **Definition of done:** `tests/server/chat-prompt.test.ts` passes: repo content sits inside a marked untrusted block; closing markers inside repo content are neutralized; size and history limits are enforced; the read-only instruction is present; the prompt tells the agent that it has no tools and must not try to use them or print tool-call markup.
 
 ### chat-runner
-- **Goal:** Run the selected CLI with the isolation rules in the security model.
-- **Files:** `server/chat/runner.ts`, `server/chat/models.ts`, `tests/server/chat-runner.test.ts`
-- **Definition of done:** `tests/server/chat-runner.test.ts` passes with a mocked spawn: exact arguments for each CLI; `shell` is never true; the prompt is sent only through stdin; the working directory is empty and is removed afterwards; voice keys are absent from the child environment; a model outside the allowlist is rejected; timeout kills the process; output is capped; a missing CLI returns a typed error.
+- **Goal:** Run Claude Code with the isolation rules in the security model and return a clean reply. The runner cannot start Codex.
+- **Files:** `server/chat/runner.ts`, `server/chat/models.ts`, `server/chat/reply.ts`, `tests/server/chat-runner.test.ts`, `tests/server/chat-reply.test.ts`
+- **Definition of done:** `tests/server/chat-runner.test.ts` passes with a mocked spawn: exact Claude Code arguments, including `--safe-mode` and `--no-session-persistence`; `shell` is never true; on Windows the native executable is resolved from the global npm package folder or an explicit server-side setting, and a `.cmd` file is never started; no code path starts Codex; the prompt is sent only through stdin; the working directory is empty and is removed afterwards; voice keys are absent from the child environment; a model outside the allowlist is rejected; timeout kills the process; output is capped; stderr is never part of the reply; a missing CLI returns a typed error. `tests/server/chat-reply.test.ts` passes: replies with no markup are unchanged; `invoke`, `parameter`, and `function_calls` blocks, including unclosed ones, are replaced by one short notice that tools are not available in this chat; surrounding text is kept; a reply that is only markup becomes only the notice.
 
 ### chat-route
-- **Goal:** Extend `POST /api/chat`: local answer first, then the saved orchestrator and model, which are added to the settings.
+- **Goal:** Extend `POST /api/chat`: local answer first, then Claude Code with the saved model, which is added to the settings. With Codex as orchestrator the chat stays on local answers.
 - **Files:** `server/routes/chat.ts`, `server/settings.ts`, `shared/api.ts`, `tests/server/chat-route.test.ts`, `tests/server/chat-local.test.ts`
-- **Definition of done:** `tests/server/chat-route.test.ts` passes: a known question never spawns a CLI; a free-text question uses the saved orchestrator and model; a concurrent run returns 429; a missing CLI returns a clear message and local answers keep working; invalid bodies return 400. `tests/server/chat-local.test.ts` is updated so only the agent-free path is covered there.
+- **Definition of done:** `tests/server/chat-route.test.ts` passes: a known question never spawns a CLI; a free-text question with Claude Code as orchestrator uses the saved model; with Codex as orchestrator no CLI is ever spawned, the reply is local, and the response carries a notice saying why; a concurrent run returns 429; a missing CLI returns a clear message and local answers keep working; invalid bodies return 400; a settings file saved before this task still loads; `GET /api/docs/chat-isolation` serves that one fixed document as plain text with `nosniff`. `tests/server/chat-local.test.ts` is updated so only the agent-free path is covered there.
 
 ### chat-panel-orchestrator
-- **Goal:** Add the orchestrator model selector and a running state to the chat.
-- **Files:** `src/components/ChatPanel.tsx`, `tests/client/chat-panel.test.tsx`
-- **Definition of done:** `tests/client/chat-panel.test.tsx` passes: the selector lists only the models for the current orchestrator; a change is saved; a reply shows whether it was local or from the orchestrator; a missing CLI message is shown.
+- **Goal:** Add the Claude Code model selector, a running state, and the Codex notice to the chat.
+- **Files:** `src/components/ChatPanel.tsx`, `src/components/ChatPanel.css`, `src/lib/api.ts`, `tests/client/chat-panel.test.tsx`
+- **Definition of done:** `tests/client/chat-panel.test.tsx` passes: with Claude Code as orchestrator the selector lists only its allowlisted models and a change is saved; a running state is shown; a reply shows whether it was local or from the orchestrator; a missing CLI message is shown; with Codex as orchestrator there is no selector and a clear notice says the chat uses local answers because on Windows its sandbox does not stop it from reading files or running commands, with a link to the isolation document.
 
 ### docs-chat
 - **Goal:** Document the orchestrator chat, its isolation, and its limits.
@@ -89,9 +89,9 @@ Work in the order listed. A milestone closes only after these steps, in order:
 - **Definition of done:** the documents match the implemented behavior and link to `docs/chat-isolation.md`; a search of the changed files finds no personal data or local paths.
 
 ### m3-acceptance
-- **Goal:** Check the orchestrator chat in a real browser with each CLI. Performed by the orchestrator.
+- **Goal:** Check the orchestrator chat in a real browser. Performed by the orchestrator.
 - **Files:** none
-- **Definition of done:** from a clean `npm ci`, all checks pass; a free-text question is answered with repo data; no file changes in the repo after a chat; a prompt asking the agent to write a file does not change anything. Then follow "Closing a milestone".
+- **Definition of done:** from a clean `npm ci`, all checks pass; with Claude Code a free-text question is answered with repo data; no file changes in the repo after a chat; a prompt asking the agent to write a file does not change anything and shows no tool-call markup; with Codex selected no CLI starts, the answer is local, and the notice and its link work. Then follow "Closing a milestone".
 
 ## In progress
 
@@ -438,6 +438,11 @@ _None._
 ## Phase 2: real agent execution
 
 Not started. Requires explicit user approval and a new security review. The plan parser excludes this section from the board.
+
+### codex-chat-sandbox
+- **Goal:** Enable Codex for the orchestrator chat, only if its reading can be limited to an empty folder.
+- **Files:** `server/chat/runner.ts`, `../docs/chat-isolation.md`, `tests/server/chat-runner.test.ts`
+- **Definition of done:** `docs/chat-isolation.md` records a repeated check in which Codex cannot read a canary file outside an empty folder and cannot run a command. Without that result Codex stays on local answers.
 
 ### run-audit-log
 - **Goal:** Record every launched run in an append-only ignored log.

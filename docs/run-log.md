@@ -819,3 +819,17 @@ Dependencies were installed by the orchestrator once, during task 1, because the
 - **What was done:** the orchestrator ran Claude Code and Codex for real, with no shell, the prompt on stdin, and an empty working directory, and asked each to read a canary file outside that directory, create files, and run a command. Duration is the time of the CLI probes only (20s and 38s).
 - **Result:** Claude Code failed all three requests. Codex could read the canary and run a command, and only its writes were blocked, so Codex chat stays limited to local answers until the user decides. Also found: the `claude` and `codex` shims are `.cmd` files that cannot be started without a shell on Windows, so the runner must start the native executables. Details in `docs/chat-isolation.md`.
 - **Orchestrator check:** a search of the new files finds no local paths, host names, or personal data.
+
+## D57. chat-isolation-decision
+
+| | |
+|---|---|
+| Branch | `task/chat-isolation-decision` |
+| Codex attempts | 0 |
+| Codex model | not applicable (done by the orchestrator) |
+| Duration | 14s |
+| Result | Done |
+
+- **Why:** the user decided that the orchestrator chat uses only Claude Code, and asked for three corrections to `docs/chat-isolation.md`.
+- **What was done:** the first run showed that locally installed plugin hooks still start under `--tools "" --strict-mcp-config`, so the orchestrator repeated the three requests with `--safe-mode --no-session-persistence` added. Duration is the time of that repeated probe only. No hook ran, stderr was empty, and no request succeeded. The document now records both runs, states the limits of the check, and no longer claims which files Codex can read beyond the one tested. The plan was updated: Claude Code only, a notice for Codex, clean replies, and a Phase 2 task for a possible Codex chat.
+- **Orchestrator check:** a search of the changed files finds no local paths, host names, or personal data; the test suite passes.
