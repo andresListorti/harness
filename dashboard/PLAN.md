@@ -61,11 +61,6 @@ Work in the order listed. A milestone closes only after these steps, in order:
 
 ### Milestone 2: voice and widget
 
-### speech-input
-- **Goal:** Add Web Speech API input with hold Space to talk.
-- **Files:** `src/voice/useSpeechInput.ts`, `tests/client/speech-input.test.tsx`
-- **Definition of done:** `tests/client/speech-input.test.tsx` passes with a mocked API: holding Space starts once and release stops; Space is ignored inside inputs; the transcript is delivered; an unsupported browser reports it without throwing; the UI discloses that the browser may process audio through its vendor's service.
-
 ### speech-output
 - **Goal:** Speak replies with the browser voice by default, or through `/api/tts`.
 - **Files:** `src/voice/speak.ts`, `server/app.ts`, `tests/client/speech-output.test.ts`, `tests/server/static.test.ts`
@@ -130,7 +125,10 @@ Work in the order listed. A milestone closes only after these steps, in order:
 
 ## In progress
 
-_None._
+### speech-input
+- **Goal:** Add Web Speech API input with hold Space to talk.
+- **Files:** `src/voice/useSpeechInput.ts`, `tests/client/speech-input.test.tsx`
+- **Definition of done:** `tests/client/speech-input.test.tsx` passes with a mocked API: holding Space starts once and release stops; Space is ignored inside inputs; the transcript is delivered; an unsupported browser reports it without throwing; the UI discloses that the browser may process audio through its vendor's service.
 
 ## Done
 
