@@ -804,3 +804,18 @@ Dependencies were installed by the orchestrator once, during task 1, because the
 - **Why:** the third `/codex:review` of Milestone 2 reported that a Hands-free request sent from the chat panel was spoken by the panel itself, so if the user left Home before the reply arrived, the panel was gone and the reply was never spoken.
 - **Attempt 1:** Codex first wrote a test that reproduces it (request sent on Home, navigation before it resolves, zero playback calls) and confirmed it failed. It then moved playback to the persistent voice provider: the chat panel hands each request to a new `trackChatReply` function that waits for the response and speaks it once if Reply with voice is on, whether or not the panel is still mounted. The panel no longer speaks on its own, so there is no double playback. New chat bumps a conversation counter so an abandoned request is not spoken; failed requests speak nothing and the panel still shows the error.
 - **Orchestrator check:** read the diff; no byte order marks; 41 files and 817 tests passed, `npm run typecheck` was clean, `npm run build` passed, and the real `dashboard/.data/chat-history.json` has the same hash before and after the suite. Known limit: the conversation counter lives in the panel instance, so New chat pressed in a freshly mounted panel does not cancel a request started by an earlier, unmounted panel.
+
+## D56. chat-isolation-check
+
+| | |
+|---|---|
+| Branch | `task/chat-isolation-check` |
+| Codex attempts | 0 |
+| Codex model | not applicable (done by the orchestrator) |
+| Duration | 58s |
+| Result | Done |
+
+- **Why:** the plan requires proving what each CLI can reach with the exact chat flags before any chat code is written.
+- **What was done:** the orchestrator ran Claude Code and Codex for real, with no shell, the prompt on stdin, and an empty working directory, and asked each to read a canary file outside that directory, create files, and run a command. Duration is the time of the CLI probes only (20s and 38s).
+- **Result:** Claude Code failed all three requests. Codex could read the canary and run a command, and only its writes were blocked, so Codex chat stays limited to local answers until the user decides. Also found: the `claude` and `codex` shims are `.cmd` files that cannot be started without a shell on Windows, so the runner must start the native executables. Details in `docs/chat-isolation.md`.
+- **Orchestrator check:** a search of the new files finds no local paths, host names, or personal data.
