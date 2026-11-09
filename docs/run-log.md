@@ -680,3 +680,16 @@ Dependencies were installed by the orchestrator once, during task 1, because the
 - **Orchestrator review of attempt 1:** the provider read the saved voice once on mount, so changing the voice in Settings left the sidebar selector and spoken replies on the old voice until a reload. The finding was sent back.
 - **Attempt 2:** Codex added `src/lib/settings-events.ts`; Settings announces each successful save, and the provider listens, re-reads the settings, ignores stale or failed reads, and removes the listener on unmount. Duration of attempt 2: 1m 34s.
 - **Orchestrator check:** no byte order marks; `.data` absent after the suite; 40 files and 750 tests passed, `npm run typecheck` was clean, and `npm run build` passed.
+
+## D47. widget-mode
+
+| | |
+|---|---|
+| Branch | `task/widget-mode` |
+| Codex attempts | 1 |
+| Codex model | not reported |
+| Duration | 3m 23s |
+| Result | Done |
+
+- **Attempt 1:** Codex added `openWidget` (Document Picture-in-Picture first, then a popup, a message instead of an exception when the popup is blocked, same-origin stylesheets cloned into the new window), `WidgetView` (only the orb, a status line, and a Talk button), a Widget mode button in the sidebar footer, and the App wiring: the widget is rendered into the new window through a portal, so it shares the voice state of the main app, and closing it through the toggle, the window itself, or unmounting the app cleans up once.
+- **Orchestrator check:** read the opener, the view, and the App changes; no remote source is used and nothing is fetched; no byte order marks; `.data` absent after the suite; 41 files and 761 tests passed, `npm run typecheck` was clean, and `npm run build` passed. Real Picture-in-Picture behavior is checked in `m2-acceptance`.

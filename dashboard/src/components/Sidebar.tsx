@@ -20,6 +20,7 @@ const paths = {
   plan: 'M8 5h12M8 12h12M8 19h12M3 5h1m-1 7h1m-1 7h1',
   menu: 'm14 6-6 6 6 6',
   fullscreen: 'M9 3H3v6m12-6h6v6M3 15v6h6m6 0h6v-6',
+  widget: 'M3 4h18v16H3ZM12 11h7v7h-7Z',
 };
 
 function Icon({ name }: { name: keyof typeof paths }) {
@@ -32,9 +33,12 @@ type Props = {
   collapsed: boolean;
   onToggleCollapsed: () => void;
   agentStatus: AgentStatus;
+  widgetOpen?: boolean;
+  onToggleWidget?: () => void;
+  widgetError?: string | null;
 };
 
-export function Sidebar({ view, onNavigate, collapsed, onToggleCollapsed, agentStatus }: Props) {
+export function Sidebar({ view, onNavigate, collapsed, onToggleCollapsed, agentStatus, widgetOpen = false, onToggleWidget, widgetError }: Props) {
   const [fullscreen, setFullscreen] = useState(() => Boolean(document.fullscreenElement));
   useEffect(() => {
     const sync = () => setFullscreen(Boolean(document.fullscreenElement));
@@ -71,6 +75,10 @@ export function Sidebar({ view, onNavigate, collapsed, onToggleCollapsed, agentS
     <div className="sidebar-footer">
       <div role="status" aria-label={statusText} className="sidebar-status"><span aria-hidden="true" className={`status-dot status-dot--${agentStatus}`} />{!collapsed && <span>{statusText}</span>}</div>
       <button type="button" className="sidebar-item" aria-label={fullscreenText} onClick={() => void toggleFullscreen()}><Icon name="fullscreen" />{!collapsed && <span>{fullscreenText}</span>}</button>
+      {onToggleWidget && <>
+        <button type="button" className="sidebar-item" aria-label="Widget mode" aria-pressed={widgetOpen} title={collapsed ? widgetError || 'Widget mode' : undefined} onClick={onToggleWidget}><Icon name="widget" />{!collapsed && <span>Widget mode</span>}</button>
+        {!collapsed && widgetError && <p role="alert">{widgetError}</p>}
+      </>}
     </div>
   </aside>;
 }
