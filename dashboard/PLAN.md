@@ -61,11 +61,6 @@ Work in the order listed. A milestone closes only after these steps, in order:
 
 ### Milestone 2: voice and widget
 
-### chat-history
-- **Goal:** Keep the chat history in the ignored `.data/` folder and restore it when the page reloads; "New chat" deletes it.
-- **Files:** `server/chat/history.ts`, `server/routes/chat.ts`, `shared/api.ts`, `src/components/ChatPanel.tsx`, `src/lib/api.ts`, `tests/server/chat-history.test.ts`, `tests/client/chat-panel.test.tsx`
-- **Definition of done:** the history is stored in `.data/chat-history.json` (ignored by git, written atomically, capped in size, validated on read, with a corrupt file treated as empty); `GET /api/chat/history` returns it and `DELETE /api/chat/history` clears it, both behind the existing Host and Origin guards; the chat panel loads the history on mount and renders it as plain text; every sent message and reply is saved; `New chat` deletes the stored history; a reload shows the previous conversation.
-
 ### live-refresh
 - **Goal:** Refresh the Agents and Plan views on their own every 5 seconds by polling the API, and pause while the browser tab is hidden.
 - **Files:** `src/hooks/usePolling.ts`, `src/views/AgentsView.tsx`, `src/views/PlanView.tsx`, `tests/client/use-polling.test.tsx`, `tests/client/agents-view.test.tsx`, `tests/client/plan-view.test.tsx`
@@ -140,7 +135,10 @@ Work in the order listed. A milestone closes only after these steps, in order:
 
 ## In progress
 
-_None._
+### chat-history
+- **Goal:** Keep the chat history in the ignored `.data/` folder and restore it when the page reloads; "New chat" deletes it.
+- **Files:** `server/chat/history.ts`, `server/routes/chat.ts`, `shared/api.ts`, `src/components/ChatPanel.tsx`, `src/lib/api.ts`, `tests/server/chat-history.test.ts`, `tests/client/chat-panel.test.tsx`
+- **Definition of done:** the history is stored in `.data/chat-history.json` (ignored by git, written atomically, capped in size, validated on read, with a corrupt file treated as empty); `GET /api/chat/history` returns it and `DELETE /api/chat/history` clears it, both behind the existing Host and Origin guards; the chat panel loads the history on mount and renders it as plain text; every sent message and reply is saved; `New chat` deletes the stored history; a reload shows the previous conversation.
 
 ## Done
 
