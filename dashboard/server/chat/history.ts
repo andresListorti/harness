@@ -17,6 +17,11 @@ export async function readHistory(filePath: string): Promise<ChatHistory> {
 }
 
 const writes = new Map<string, Promise<void>>();
+const generations = new Map<string, number>();
+
+export function currentGeneration(filePath: string): number {
+  return generations.get(resolve(filePath)) ?? 0;
+}
 
 function serialize(filePath: string, operation: () => Promise<void>): Promise<void> {
   const key = resolve(filePath);
@@ -27,8 +32,9 @@ function serialize(filePath: string, operation: () => Promise<void>): Promise<vo
   return next;
 }
 
-export function appendToHistory(filePath: string, messages: ChatHistoryMessage[]): Promise<void> {
+export function appendToHistory(filePath: string, messages: ChatHistoryMessage[], generation?: number): Promise<void> {
   return serialize(filePath, async () => {
+    if (generation !== undefined && generation !== currentGeneration(filePath)) return;
     const history = chatHistorySchema.parse({ messages: [...(await readHistory(filePath)).messages, ...messages] });
     let characters = history.messages.reduce((total, message) => total + message.text.length, 0);
     while (history.messages.length > 200 || characters > 100000) {
@@ -47,5 +53,6 @@ export function appendToHistory(filePath: string, messages: ChatHistoryMessage[]
 }
 
 export function clearHistory(filePath: string): Promise<void> {
+  generations.set(resolve(filePath), currentGeneration(filePath) + 1);
   return serialize(filePath, () => rm(filePath, { force: true }));
 }

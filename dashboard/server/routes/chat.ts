@@ -1,6 +1,6 @@
 import { Router } from 'express';
 import { chatHistorySchema, chatRequestSchema, chatResponseSchema, chatSuggestionsSchema } from '../../shared/api';
-import { appendToHistory, clearHistory, defaultHistoryPath, readHistory } from '../chat/history';
+import { appendToHistory, clearHistory, currentGeneration, defaultHistoryPath, readHistory } from '../chat/history';
 import { answerLocally, LOCAL_SUGGESTIONS } from '../chat/local';
 import { createRepoReader, type DataDeps } from './data';
 
@@ -32,6 +32,7 @@ export function createChatRouter(deps: DataDeps = {}): Router {
       res.status(400).json({ error: { code: 'INVALID_REQUEST', message: 'Message must be a non-empty string of at most 2000 characters, with no extra fields.' } });
       return;
     }
+    const generation = currentGeneration(filePath);
     const [[example, dashboard], history, testFiles] = await Promise.all([
       reader.sources(), reader.commits(reader.repoRoot, 5), reader.tests(reader.repoRoot),
     ]);
@@ -44,7 +45,7 @@ export function createChatRouter(deps: DataDeps = {}): Router {
       await appendToHistory(filePath, [
         { role: 'user', text: parsed.data.message },
         { role: 'assistant', text: reply, source: 'local' },
-      ]);
+      ], generation);
     } catch { /* A history failure must not prevent an answer. */ }
     res.json(chatResponseSchema.parse({ reply, source: 'local' }));
   });
