@@ -95,10 +95,7 @@ Work in the order listed. A milestone closes only after these steps, in order:
 
 ## In progress
 
-### chat-isolation-check
-- **Goal:** Verify on this machine what each CLI can reach with the exact chat flags, including how to launch each one without a shell on Windows. Performed by the orchestrator, not Codex.
-- **Files:** `docs/chat-isolation.md`
-- **Definition of done:** the document records the result of asking each CLI to read a canary file outside its working directory, write a file, and run a command. Claude Code must fail all three. If Codex can read the canary, Codex chat stays limited to local answers until the user decides.
+_None._
 
 ## Done
 
@@ -431,6 +428,12 @@ Work in the order listed. A milestone closes only after these steps, in order:
 - **Files:** `src/voice/VoiceProvider.tsx`, `src/components/ChatPanel.tsx`, `tests/client/voice-controls.test.tsx`, `tests/client/chat-panel.test.tsx`
 - **Definition of done:** a test reproduces the bug first: with Hands-free and Reply with voice on, a transcript is submitted on Home through the chat panel, the user navigates to another view before the request resolves, and the reply is never spoken. After the fix the reply is spoken exactly once whether the chat panel is still mounted or not (no double playback when it is mounted), and it is still saved in the history as before. Playback is owned by the persistent provider or the pending request is handed over when the chat unmounts. A request abandoned on purpose with New chat is not spoken, Reply with voice off speaks nothing, and a failed request speaks nothing and shows its error as before.
 - **Result:** done in 1 attempt. 817 tests pass, typecheck and build clean. The reproducing test failed before the fix (zero playback calls). The persistent voice provider now speaks the reply exactly once, whether or not the chat panel is still mounted; New chat, Reply with voice off, and failed requests speak nothing. Known limit: New chat in a freshly mounted panel does not cancel a request started by an earlier, unmounted panel.
+
+### chat-isolation-check
+- **Goal:** Verify on this machine what each CLI can reach with the exact chat flags, including how to launch each one without a shell on Windows. Performed by the orchestrator, not Codex.
+- **Files:** `docs/chat-isolation.md`
+- **Definition of done:** the document records the result of asking each CLI to read a canary file outside its working directory, write a file, and run a command. Claude Code must fail all three. If Codex can read the canary, Codex chat stays limited to local answers until the user decides.
+- **Result:** done by the orchestrator. Claude Code failed all three requests (read the canary, write a file, run a command). Codex read the canary and ran a command; only its writes were blocked, so Codex chat stays limited to local answers until the user decides. The `claude` and `codex` npm shims cannot be started without a shell on Windows, so the runner must start the native executables. Details in `docs/chat-isolation.md`.
 
 ## Phase 2: real agent execution
 
