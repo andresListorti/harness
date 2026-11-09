@@ -2,7 +2,9 @@
 import { Server } from 'node:http';
 import request from 'supertest';
 import { afterEach, expect, test, vi } from 'vitest';
-import { createApp } from '../../server/app';
+import { useTestApp } from '../test-app';
+
+const createApp = useTestApp();
 
 afterEach(() => {
   vi.restoreAllMocks();
@@ -25,7 +27,8 @@ test('imports the app and entry point without opening a port', async () => {
 
   const { createApp: factory } = await import('../../server/app');
   const { HOST, PORT } = await import('../../server/index');
-  factory();
+  expect(factory).toBeTypeOf('function');
+  createApp();
 
   expect(listen).not.toHaveBeenCalled();
   expect(HOST).toBe('127.0.0.1');

@@ -1,10 +1,12 @@
 // @vitest-environment node
 import request from 'supertest';
 import { afterEach, expect, test, vi } from 'vitest';
-import { createApp } from '../../server/app';
+import { useTestApp } from '../test-app';
 import { apiErrorSchema, voiceProvidersSchema, type VoiceProviderId } from '../../shared/api';
 import type { VoiceConfig } from '../../server/voice/config';
 import { TtsProviderError } from '../../server/voice/errors';
+
+const createApp = useTestApp();
 
 const config: VoiceConfig = {
   fishAudio: { apiKey: 'test-fish-key', voiceId: 'test-fish-voice' },

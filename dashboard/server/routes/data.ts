@@ -15,6 +15,7 @@ import { defaultSettingsPath, readSettings } from '../settings';
 
 export interface DataDeps {
   settingsPath?: string;
+  historyPath?: string;
   repoRoot?: string;
   readCommits?: typeof readCommits;
   listTestFiles?: typeof listTestFiles;

@@ -11,6 +11,8 @@ vi.mock('../../src/lib/api', () => ({ api: {
   getAgents: vi.fn().mockResolvedValue({ agents: [] }),
   getPlan: vi.fn().mockResolvedValue({ source: 'dashboard', tasks: [] }),
   getRunLog: vi.fn().mockResolvedValue({ source: 'dashboard', entries: [] }),
+  getChatHistory: vi.fn().mockResolvedValue({ messages: [] }),
+  clearChatHistory: vi.fn().mockResolvedValue({ messages: [] }),
   getChatSuggestions: vi.fn().mockResolvedValue({ suggestions: [] }),
   sendChat: vi.fn(),
   getSettings: vi.fn().mockResolvedValue({ orchestrator: 'claude-code', worker: 'codex', voice: 'browser' }),
