@@ -70,6 +70,16 @@ Work in the order listed. A milestone closes only after these steps, in order:
 - **Files:** none
 - **Definition of done:** from a clean `npm ci`, all checks pass; with Claude Code a free-text question is answered with repo data; no file changes in the repo after a chat; a prompt asking the agent to write a file does not change anything and shows no tool-call markup; with Codex selected no CLI starts, the answer is local, and the notice and its link work. Then follow "Closing a milestone".
 
+### chat-orchestrator-plain-text
+- **Goal:** Pass orchestrator replies through the same markdown cleaner as local replies (found in `m3-acceptance`).
+- **Files:** `server/routes/chat.ts`, `tests/server/chat-route.test.ts`
+- **Definition of done:** a test reproduces the bug first: an orchestrator reply keeps its markdown characters. After the fix the reply and the saved history are clean, and the tools notice survives.
+
+### chat-local-intent
+- **Goal:** Stop treating `to do` inside phrases such as `how to do it` as a question about pending tasks, and make the local help reply say that free-text questions go to the orchestrator (found in `m3-acceptance`).
+- **Files:** `server/chat/local.ts`, `tests/server/chat-local.test.ts`, `tests/server/chat-route.test.ts`
+- **Definition of done:** a test reproduces the bug first: `how to do it` gets the pending tasks. After the fix such phrases are not recognized, real `to do` questions still are, and the help reply mentions the orchestrator.
+
 ## Done
 
 ### scaffold
