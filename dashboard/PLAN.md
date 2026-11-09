@@ -63,11 +63,6 @@ Work in the order listed. A milestone closes only after these steps, in order:
 
 ### Milestone 3: chat with the orchestrator
 
-### voice-reply-on-navigation
-- **Goal:** Speak the reply of a Hands-free chat request even when the user navigates away from Home before it arrives (finding from the third Codex review of Milestone 2).
-- **Files:** `src/voice/VoiceProvider.tsx`, `src/components/ChatPanel.tsx`, `tests/client/voice-controls.test.tsx`, `tests/client/chat-panel.test.tsx`
-- **Definition of done:** a test reproduces the bug first: with Hands-free and Reply with voice on, a transcript is submitted on Home through the chat panel, the user navigates to another view before the request resolves, and the reply is never spoken. After the fix the reply is spoken exactly once whether the chat panel is still mounted or not (no double playback when it is mounted), and it is still saved in the history as before. Playback is owned by the persistent provider or the pending request is handed over when the chat unmounts. A request abandoned on purpose with New chat is not spoken, Reply with voice off speaks nothing, and a failed request speaks nothing and shows its error as before.
-
 ### chat-isolation-check
 - **Goal:** Verify on this machine what each CLI can reach with the exact chat flags, including how to launch each one without a shell on Windows. Performed by the orchestrator, not Codex.
 - **Files:** `docs/chat-isolation.md`
@@ -105,7 +100,10 @@ Work in the order listed. A milestone closes only after these steps, in order:
 
 ## In progress
 
-_None._
+### voice-reply-on-navigation
+- **Goal:** Speak the reply of a Hands-free chat request even when the user navigates away from Home before it arrives (finding from the third Codex review of Milestone 2).
+- **Files:** `src/voice/VoiceProvider.tsx`, `src/components/ChatPanel.tsx`, `tests/client/voice-controls.test.tsx`, `tests/client/chat-panel.test.tsx`
+- **Definition of done:** a test reproduces the bug first: with Hands-free and Reply with voice on, a transcript is submitted on Home through the chat panel, the user navigates to another view before the request resolves, and the reply is never spoken. After the fix the reply is spoken exactly once whether the chat panel is still mounted or not (no double playback when it is mounted), and it is still saved in the history as before. Playback is owned by the persistent provider or the pending request is handed over when the chat unmounts. A request abandoned on purpose with New chat is not spoken, Reply with voice off speaks nothing, and a failed request speaks nothing and shows its error as before.
 
 ## Done
 
