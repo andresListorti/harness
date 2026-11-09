@@ -65,7 +65,10 @@ Work in the order listed. A milestone closes only after these steps, in order:
 
 ## In progress
 
-_None._
+### chat-conversation-generation
+- **Goal:** Move the conversation generation to the persistent voice provider, so New chat also cancels pending replies from earlier chat panel instances (finding from the Codex review of Milestone 3).
+- **Files:** `src/voice/VoiceProvider.tsx`, `src/components/ChatPanel.tsx`, `tests/client/voice-controls.test.tsx`, `tests/client/chat-panel.test.tsx`
+- **Definition of done:** a test reproduces the bug first: a question is sent, the panel remounts, New chat is pressed, and the old reply is still spoken. After the fix it is not spoken; replies not abandoned are spoken exactly once, and a request after New chat is spoken normally.
 
 ## Done
 
