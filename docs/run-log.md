@@ -652,3 +652,16 @@ Dependencies were installed by the orchestrator once, during task 1, because the
 
 - **Attempt 1:** Codex added the `useSpeechInput` hook (Web Speech API with the prefixed fallback, interim and final transcripts, hold Space to talk that starts once and stops on release, blur, or a hidden tab, generic error messages, cleanup on unmount) and the exported `SPEECH_PRIVACY_NOTICE`. Its first test and typecheck runs failed and it fixed that within the attempt.
 - **Orchestrator check:** read the hook; Space is ignored inside inputs, text areas, editable elements, buttons, links, and selects, and unsupported browsers get a clear message instead of an exception; no byte order marks; 38 files and 716 tests passed, `npm run typecheck` was clean, and `npm run build` passed.
+
+## D45. speech-output
+
+| | |
+|---|---|
+| Branch | `task/speech-output` |
+| Codex attempts | 1 |
+| Codex model | not reported |
+| Duration | 2m 48s |
+| Result | Done |
+
+- **Attempt 1:** Codex added `createSpeaker` and a shared `speaker` in `src/voice/speak.ts`: the browser voice never calls the backend, other providers go through `POST /api/tts` and play the audio from an object URL that is always revoked, any failure falls back to the browser voice, a new reply cancels the previous one, Mute stops playback and silences later replies, stale async results are dropped, and subscribers get `idle` and `speaking` changes. It added `media-src 'self' blob:` to the content security policy and updated the policy test. The plan listed `server/app.ts`, but the policy lives in `server/static.ts`.
+- **Orchestrator check:** read the speaker and the policy diff; no remote source was allowed; no byte order marks; 39 files and 739 tests passed, `npm run typecheck` was clean, and `npm run build` passed.

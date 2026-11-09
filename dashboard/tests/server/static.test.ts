@@ -41,16 +41,16 @@ it('serves the index with strict security headers and no caching', async () => {
   expectHeaders(response.headers);
 });
 
-it('defines exactly the ten local-only CSP directives', () => {
+it('defines exactly the eleven local-only CSP directives', () => {
   const directives = CONTENT_SECURITY_POLICY.split('; ').map((value) => value.split(' '));
   expect(directives).toEqual([
     ['default-src', "'self'"], ['script-src', "'self'"], ['style-src', "'self'"],
-    ['img-src', "'self'"], ['font-src', "'self'"], ['connect-src', "'self'"],
+    ['img-src', "'self'"], ['font-src', "'self'"], ['media-src', "'self'", 'blob:'], ['connect-src', "'self'"],
     ['object-src', "'none'"], ['base-uri', "'self'"], ['form-action', "'self'"],
     ['frame-ancestors', "'none'"],
   ]);
-  for (const [, ...sources] of directives) {
-    expect(sources.every((source) => source === "'self'" || source === "'none'")).toBe(true);
+  for (const [directive, ...sources] of directives) {
+    expect(sources.every((source) => source === "'self'" || source === "'none'" || (directive === 'media-src' && source === 'blob:'))).toBe(true);
   }
   expect(CONTENT_SECURITY_POLICY).not.toMatch(/unsafe-inline|unsafe-eval|data:|https?:|\*/);
 });
